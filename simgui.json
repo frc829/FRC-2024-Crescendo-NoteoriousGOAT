@@ -35,7 +35,9 @@
   },
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Pickup": "Subsystem",
+      "/SmartDashboard/Shooter": "Subsystem"
     }
   },
   "NetworkTables": {

@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Value;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -91,6 +94,25 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
+    builder.addDoubleProperty(
+        "Top Velocity",
+        () -> topVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Top Voltage",
+        () -> topVoltage.in(Volts),
+        null);
+
+    builder.addDoubleProperty(
+        "Bottom Velocity",
+        () -> topVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Bottom Voltage",
+        () -> bottomVoltage.in(Volts),
+        null);
   }
 
   public static final Supplier<ShooterSubsystem> create = () -> {
@@ -101,6 +123,7 @@ public class ShooterSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Top.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOVortexMaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Top.deviceId);
 
@@ -111,6 +134,7 @@ public class ShooterSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Bottom.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOVortexMaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Bottom.deviceId);
 

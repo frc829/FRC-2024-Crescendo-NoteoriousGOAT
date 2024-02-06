@@ -1,9 +1,12 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Value;
+
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,13 +26,17 @@ public class CommandBinder {
                 }
 
                 private static final class Shoot {
-                        private static final DoubleSupplier outerSpeed = () -> 0.0;
-                        private static final DoubleSupplier innerSpeed = () -> 0.0;
-                        private static final DoubleSupplier transportSpeed = () -> 0.5;
-                        private static final DoubleSupplier singulatorSpeed = () -> 0.5;
-                        private static final DoubleSupplier topShooterSpeed = () -> 0.5;
-                        private static final DoubleSupplier bottomShooterSpeed = () -> 0.5;
                         private static final double shutOffTime = 5;
+
+                        private static final class Fender {
+                                private static final DoubleSupplier outerSpeed = () -> 0.0;
+                                private static final DoubleSupplier innerSpeed = () -> 0.0;
+                                private static final DoubleSupplier transportSpeed = () -> 0.5;
+                                private static final DoubleSupplier singulatorSpeed = () -> 0.5;
+                                private static final DoubleSupplier topShooterSpeed = () -> 0.5;
+                                private static final DoubleSupplier bottomShooterSpeed = () -> 0.5;
+                                private static final double speedTolerance = 0.05;
+                        }
                 }
         }
 
@@ -61,18 +68,27 @@ public class CommandBinder {
                                 return pickupCommand;
                         };
 
-        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Command>> createShootCommand = (
+        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Command>> createFenderShootCommand = (
                         pickup) -> (shooter) -> {
-                                Command shootCommand = Commands.waitSeconds(Constants.Shoot.shutOffTime)
-                                                .deadlineWith(
-                                                                pickup.createPickupControlCommand
-                                                                                .apply(Constants.Shoot.outerSpeed)
-                                                                                .apply(Constants.Shoot.innerSpeed)
-                                                                                .apply(Constants.Shoot.transportSpeed)
-                                                                                .apply(Constants.Shoot.singulatorSpeed),
-                                                                shooter.createSpinShootersCommand
-                                                                                .apply(Constants.Shoot.topShooterSpeed)
-                                                                                .apply(Constants.Shoot.bottomShooterSpeed));
+
+                                Command shootCommand = shooter.createSpinShootersCommand
+                                                .apply(Constants.Shoot.Fender.topShooterSpeed)
+                                                .apply(Constants.Shoot.Fender.bottomShooterSpeed)
+                                                .until(() -> MathUtil.isNear(
+                                                                Constants.Shoot.Fender.topShooterSpeed.getAsDouble(),
+                                                                shooter.topVelocity.in(Value),
+                                                                Constants.Shoot.Fender.speedTolerance))
+                                                .andThen(Commands.waitSeconds(Constants.Shoot.shutOffTime)
+                                                                .deadlineWith(
+                                                                                pickup.createPickupControlCommand
+                                                                                                .apply(Constants.Shoot.Fender.outerSpeed)
+                                                                                                .apply(Constants.Shoot.Fender.innerSpeed)
+                                                                                                .apply(Constants.Shoot.Fender.transportSpeed)
+                                                                                                .apply(Constants.Shoot.Fender.singulatorSpeed),
+                                                                                shooter.createSpinShootersCommand
+                                                                                                .apply(Constants.Shoot.Fender.topShooterSpeed)
+                                                                                                .apply(Constants.Shoot.Fender.bottomShooterSpeed)));
+
                                 shootCommand.setName("Shoot");
                                 return shootCommand;
                         };
@@ -86,9 +102,9 @@ public class CommandBinder {
                                 trigger.whileTrue(manualPickupCommand);
                         };
 
-        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Consumer<Trigger>>> bindManualShooterCommand = (
+        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Consumer<Trigger>>> bindManualFenderShootCommand = (
                         pickup) -> (shooter) -> (trigger) -> {
-                                Command manualShooterCommand = createShootCommand
+                                Command manualShooterCommand = createFenderShootCommand
                                                 .apply(pickup)
                                                 .apply(shooter);
                                 manualShooterCommand.setName("Manual Shoot");

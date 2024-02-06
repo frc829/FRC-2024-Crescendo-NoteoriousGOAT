@@ -27,12 +27,10 @@ public class RobotContainer {
         .apply(Constants.Controller.operatorPort)
         .apply(Constants.Controller.deadband);
 
-    SmartDashboard.putData("Operator", operator);
-
     ShooterSubsystem shooterSubsystem = ShooterSubsystem.create.get();
     PickupSubsystem pickupSubsystem = PickupSubsystem.create.get();
 
-    CommandBinder.bindManualShooterCommand
+    CommandBinder.bindManualFenderShootCommand
         .apply(pickupSubsystem)
         .apply(shooterSubsystem)
         .accept(operator.b);
@@ -41,6 +39,10 @@ public class RobotContainer {
         .apply(pickupSubsystem)
         .apply(shooterSubsystem)
         .accept(operator.a);
+
+    SmartDashboard.putData("Operator", operator);
+    SmartDashboard.putData("Shooter", shooterSubsystem);
+    SmartDashboard.putData("Pickup", pickupSubsystem);
 
   }
 

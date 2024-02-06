@@ -159,6 +159,7 @@ public class PickupSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Outer.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Outer.deviceId);
 
@@ -169,6 +170,7 @@ public class PickupSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Inner.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Inner.deviceId);
 
@@ -179,6 +181,7 @@ public class PickupSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Transport.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Transport.deviceId);
 
@@ -189,6 +192,7 @@ public class PickupSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Singulator.slot0kF))
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
+        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Singulator.deviceId);
 

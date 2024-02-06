@@ -131,6 +131,14 @@ public class Motor {
                                         canSparkBase.getPIDController().setFF(gain, slotID);
                                         return canSparkBase;
                                 };
+
+                public static final Function<Double, Function<CANSparkBase, CANSparkBase>> setAngleWrapping = (
+                                gearing) -> (canSparkBase) -> {
+                                        canSparkBase.getPIDController().setPositionPIDWrappingEnabled(true);
+                                        canSparkBase.getPIDController().setPositionPIDWrappingMinInput(-0.5 * gearing);
+                                        canSparkBase.getPIDController().setPositionPIDWrappingMaxInput(0.5 * gearing);
+                                        return canSparkBase;
+                                };
                 // #endregion
 
                 // #region createMotorFromCANSparkMax
@@ -212,8 +220,8 @@ public class Motor {
                 };
                 // #endregion
 
-                // #region Handle REV Position Sim
-                public static final Function<Motor, Function<Double, Function<Double, Function<Double, Motor>>>> setREVPositionSim = (
+                // #region Handle REV Sim Control
+                public static final Function<Motor, Function<Double, Function<Double, Function<Double, Motor>>>> setTurnSim = (
                                 motor) -> (kP) -> (kI) -> (kD) -> {
 
                                         if (RobotBase.isSimulation()) {
@@ -227,19 +235,6 @@ public class Motor {
                                                         voltageSetpoint.mut_setMagnitude(volts);
                                                         motor.setVoltage.accept(voltageSetpoint);
                                                 };
-
-                                                MutableMeasure<Velocity<Angle>> spinSetpoint = MutableMeasure.zero(RPM);
-                                                Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
-                                                        double rpm = setpoint.in(RPM);
-                                                        rpm = MathUtil.clamp(
-                                                                        rpm,
-                                                                        -motor.maxAngularVelocity.in(RPM),
-                                                                        motor.maxAngularVelocity.in(RPM));
-                                                        spinSetpoint.mut_setMagnitude(rpm);
-                                                        motor.spin.accept(spinSetpoint);
-
-                                                };
-
                                                 return new Motor(
                                                                 motor.voltage,
                                                                 motor.angle,
@@ -248,26 +243,47 @@ public class Motor {
                                                                 motor.maxAngularVelocity,
                                                                 motor.setRelativeEncoderAngle,
                                                                 turn,
-                                                                spin,
-                                                                motor.setVoltage,
-                                                                motor.stop,
-                                                                motor.update);
-                                        } else {
-                                                return new Motor(
-                                                                motor.voltage,
-                                                                motor.angle,
-                                                                motor.absoluteAngle,
-                                                                motor.angularVelocity,
-                                                                motor.maxAngularVelocity,
-                                                                motor.setRelativeEncoderAngle,
-                                                                motor.turn,
                                                                 motor.spin,
                                                                 motor.setVoltage,
                                                                 motor.stop,
                                                                 motor.update);
                                         }
+                                        return motor;
                                 };
-                // #endregion
 
-        }
+                public static final Function<Motor, Motor> setSpinSim = (
+                                motor) -> {
+
+                        if (RobotBase.isSimulation()) {
+                                MutableMeasure<Velocity<Angle>> spinSetpoint = MutableMeasure.zero(RPM);
+                                Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
+                                        double rpm = setpoint.in(RPM);
+                                        rpm = MathUtil.clamp(
+                                                        rpm,
+                                                        -motor.maxAngularVelocity.in(RPM),
+                                                        motor.maxAngularVelocity.in(RPM));
+                                        spinSetpoint.mut_setMagnitude(rpm);
+                                        motor.spin.accept(spinSetpoint);
+
+                                };
+
+                                return new Motor(
+                                                motor.voltage,
+                                                motor.angle,
+                                                motor.absoluteAngle,
+                                                motor.angularVelocity,
+                                                motor.maxAngularVelocity,
+                                                motor.setRelativeEncoderAngle,
+                                                motor.turn,
+                                                spin,
+                                                motor.setVoltage,
+                                                motor.stop,
+                                                motor.update);
+                        }
+                        return motor;
+                };
+                // #endregion
+        };
+        // #endregion
+
 }
