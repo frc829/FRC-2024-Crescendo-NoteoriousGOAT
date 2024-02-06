@@ -45,6 +45,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> bottomVelocity;
   public final Runnable update;
 
+  public final Supplier<Command> createStopCommand;
   public final Function<DoubleSupplier, Function<DoubleSupplier, Command>> createSpinShootersCommand;
 
   private ShooterSubsystem(
@@ -62,8 +63,11 @@ public class ShooterSubsystem extends SubsystemBase {
     this.bottomVelocity = bottomVelocity;
     this.update = update;
 
-    Command defaultCommand = run(stop);
-    this.setDefaultCommand(defaultCommand);
+    createStopCommand = () -> {
+      Command stopCommand = run(stop);
+      stopCommand.setName("STOP");
+      return stopCommand;
+    };
 
     createSpinShootersCommand = (topSetpoint) -> (bottomSetpoint) -> {
       Runnable spin = () -> {
@@ -71,9 +75,11 @@ public class ShooterSubsystem extends SubsystemBase {
         spinBottom.accept(bottomSetpoint.getAsDouble());
       };
       Command spinCommand = run(spin);
-      spinCommand.setName("Spin At Speeds");
+      spinCommand.setName("Shooter Control");
       return spinCommand;
     };
+
+    this.setDefaultCommand(createStopCommand.get());
 
   }
 
