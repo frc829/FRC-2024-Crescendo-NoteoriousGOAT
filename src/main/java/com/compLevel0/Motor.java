@@ -11,6 +11,8 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -29,6 +31,7 @@ public class Motor {
         public final Consumer<Measure<Angle>> setRelativeEncoderAngle;
         public final Consumer<Measure<Angle>> turn;
         public final Consumer<Measure<Velocity<Angle>>> spin;
+        public final Consumer<Measure<Voltage>> setVoltage;
         public final Runnable stop;
         public final Runnable update;
 
@@ -41,6 +44,7 @@ public class Motor {
                         Consumer<Measure<Angle>> setRelativeEncoderAngle,
                         Consumer<Measure<Angle>> turn,
                         Consumer<Measure<Velocity<Angle>>> spin,
+                        Consumer<Measure<Voltage>> setVoltage,
                         Runnable stop,
                         Runnable update) {
                 this.voltage = voltage;
@@ -51,6 +55,7 @@ public class Motor {
                 this.setRelativeEncoderAngle = setRelativeEncoderAngle;
                 this.turn = turn;
                 this.spin = spin;
+                this.setVoltage = setVoltage;
                 this.stop = stop;
                 this.update = update;
         }
@@ -141,6 +146,9 @@ public class Motor {
                                         .setReference(setpoint.in(Rotations), ControlType.kPosition, 1);
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> canSparkBase.getPIDController()
                                         .setReference(setpoint.in(RPM), ControlType.kVelocity, 0);
+                        Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
+                                canSparkBase.getPIDController().setReference(setpoint.in(Volts), ControlType.kVoltage);
+                        };
                         Runnable stop = () -> canSparkBase.getPIDController()
                                         .setReference(0.0, ControlType.kVelocity);
                         Runnable update = () -> {
@@ -152,17 +160,8 @@ public class Motor {
                                 angularVelocity.mut_setMagnitude(canSparkBase.getEncoder().getVelocity());
                         };
 
-                        return new Motor(
-                                        voltage,
-                                        angle,
-                                        absoluteAngle,
-                                        angularVelocity,
-                                        maxAngularVelocity,
-                                        setRelativeEncoder,
-                                        turn,
-                                        spin,
-                                        stop,
-                                        update);
+                        return new Motor(voltage, angle, absoluteAngle, angularVelocity, maxAngularVelocity,
+                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
                 };
                 // #endregion
 
@@ -177,6 +176,7 @@ public class Motor {
                                         motor.setRelativeEncoderAngle,
                                         motor.turn,
                                         motor.spin,
+                                        motor.setVoltage,
                                         motor.stop,
                                         motor.update);
                 };
@@ -191,6 +191,7 @@ public class Motor {
                                         motor.setRelativeEncoderAngle,
                                         motor.turn,
                                         motor.spin,
+                                        motor.setVoltage,
                                         motor.stop,
                                         motor.update);
                 };
@@ -205,9 +206,67 @@ public class Motor {
                                         motor.setRelativeEncoderAngle,
                                         motor.turn,
                                         motor.spin,
+                                        motor.setVoltage,
                                         motor.stop,
                                         motor.update);
                 };
+                // #endregion
+
+                // #region Handle REV Position Sim
+                public static final Function<Motor, Function<Double, Function<Double, Function<Double, Motor>>>> setREVPositionSim = (
+                                motor) -> (kP) -> (kI) -> (kD) -> {
+
+                                        if (RobotBase.isSimulation()) {
+                                                PIDController pidController = new PIDController(kP, kI, kD);
+                                                MutableMeasure<Voltage> voltageSetpoint = MutableMeasure.zero(Volts);
+                                                Consumer<Measure<Angle>> turn = (setpoint) -> {
+                                                        double measurement = motor.angle.in(Rotations);
+                                                        double goal = setpoint.in(Rotations);
+                                                        double volts = pidController.calculate(measurement, goal);
+                                                        volts = MathUtil.clamp(volts, -12.0, 12.0);
+                                                        voltageSetpoint.mut_setMagnitude(volts);
+                                                        motor.setVoltage.accept(voltageSetpoint);
+                                                };
+
+                                                MutableMeasure<Velocity<Angle>> spinSetpoint = MutableMeasure.zero(RPM);
+                                                Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
+                                                        double rpm = setpoint.in(RPM);
+                                                        rpm = MathUtil.clamp(
+                                                                        rpm,
+                                                                        -motor.maxAngularVelocity.in(RPM),
+                                                                        motor.maxAngularVelocity.in(RPM));
+                                                        spinSetpoint.mut_setMagnitude(rpm);
+                                                        motor.spin.accept(spinSetpoint);
+
+                                                };
+
+                                                return new Motor(
+                                                                motor.voltage,
+                                                                motor.angle,
+                                                                motor.absoluteAngle,
+                                                                motor.angularVelocity,
+                                                                motor.maxAngularVelocity,
+                                                                motor.setRelativeEncoderAngle,
+                                                                turn,
+                                                                spin,
+                                                                motor.setVoltage,
+                                                                motor.stop,
+                                                                motor.update);
+                                        } else {
+                                                return new Motor(
+                                                                motor.voltage,
+                                                                motor.angle,
+                                                                motor.absoluteAngle,
+                                                                motor.angularVelocity,
+                                                                motor.maxAngularVelocity,
+                                                                motor.setRelativeEncoderAngle,
+                                                                motor.turn,
+                                                                motor.spin,
+                                                                motor.setVoltage,
+                                                                motor.stop,
+                                                                motor.update);
+                                        }
+                                };
                 // #endregion
 
         }
