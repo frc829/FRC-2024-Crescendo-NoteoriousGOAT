@@ -62,19 +62,9 @@ public class Motor {
 
         public static final class REV {
 
-                // #region create Motor Controllers
-                public static final Function<Integer, CANSparkMax> createBrushlessCANSparkMax = (
-                                deviceId) -> new CANSparkMax(
-                                                deviceId, MotorType.kBrushless);
-
-                public static final Function<Integer, CANSparkFlex> createBrushlessCANSparkFlex = (
-                                deviceId) -> new CANSparkFlex(
-                                                deviceId, MotorType.kBrushless);
-                // #endregion
-
                 // #region createSpark's for Specific Motors
                 public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO = (deviceId) -> {
-                        var canSparkMax = createBrushlessCANSparkMax.apply(deviceId);
+                        var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
                         if (RobotBase.isSimulation()) {
                                 REVPhysicsSim.getInstance().addSparkMax(
                                                 canSparkMax,
@@ -84,7 +74,7 @@ public class Motor {
                 };
 
                 public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO550 = (deviceId) -> {
-                        var canSparkMax = createBrushlessCANSparkMax.apply(deviceId);
+                        var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
                         if (RobotBase.isSimulation()) {
                                 REVPhysicsSim.getInstance().addSparkMax(
                                                 canSparkMax,
@@ -95,14 +85,14 @@ public class Motor {
 
                 public static final Function<Integer, CANSparkBase> createCANSparkBaseNEOVortex = (deviceId) -> {
                         if (RobotBase.isSimulation()) {
-                                var canSparkMax = createBrushlessCANSparkMax.apply(deviceId);
+                                var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
                                 REVPhysicsSim.getInstance().addSparkMax(
                                                 canSparkMax,
                                                 DCMotor.getNeoVortex(1));
                                 return canSparkMax;
 
                         } else {
-                                return createBrushlessCANSparkFlex.apply(deviceId);
+                                return new CANSparkFlex(deviceId, MotorType.kBrushless);
                         }
                 };
                 // #endregion
@@ -137,6 +127,27 @@ public class Motor {
                                         canSparkBase.getPIDController().setPositionPIDWrappingEnabled(true);
                                         canSparkBase.getPIDController().setPositionPIDWrappingMinInput(-0.5 * gearing);
                                         canSparkBase.getPIDController().setPositionPIDWrappingMaxInput(0.5 * gearing);
+                                        return canSparkBase;
+                                };
+                // #endregion
+
+                // #region absoluteEncoder Setters
+                public static final Function<Double, Function<CANSparkBase, CANSparkBase>> setAbsolutEencoderScaleFactor = (
+                                factor) -> (canSparkBase) -> {
+                                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
+                                                        .setPositionConversionFactor(factor);
+                                        return canSparkBase;
+                                };
+
+                public static final Function<CANSparkBase, CANSparkBase> setInvertAbsoluteEncoder = (canSparkBase) -> {
+                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle).setInverted(true);
+                        return canSparkBase;
+                };
+
+                public static final Function<Measure<Angle>, Function<CANSparkBase, CANSparkBase>> setAbsoluteEncoderOffset = (
+                                offset) -> (canSparkBase) -> {
+                                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
+                                                        .setZeroOffset(offset.in(Rotations));
                                         return canSparkBase;
                                 };
                 // #endregion
@@ -221,8 +232,9 @@ public class Motor {
                 // #endregion
 
                 // #region Handle REV Sim Control
-                public static final Function<Motor, Function<Double, Function<Double, Function<Double, Motor>>>> setTurnSim = (
-                                motor) -> (kP) -> (kI) -> (kD) -> {
+                @SuppressWarnings({ "resource" })
+                public static final Function<Double, Function<Double, Function<Double, Function<Motor, Motor>>>> setTurnSim = (
+                                kP) -> (kI) -> (kD) -> (motor) -> {
 
                                         if (RobotBase.isSimulation()) {
                                                 PIDController pidController = new PIDController(kP, kI, kD);

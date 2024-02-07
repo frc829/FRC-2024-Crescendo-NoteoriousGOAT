@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Value;
+import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -78,10 +80,6 @@ public class PickupSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> transportVelocity;
   public final Measure<Dimensionless> singulatorVelocity;
   public final BooleanSupplier hasNote;
-  public final Consumer<Double> spinOuter;
-  public final Consumer<Double> spinInner;
-  public final Consumer<Double> spinTransport;
-  public final Consumer<Double> spinSingulator;
   public final Runnable update;
 
   public final Supplier<Command> createStopCommand;
@@ -112,10 +110,6 @@ public class PickupSubsystem extends SubsystemBase {
     this.transportVelocity = transportVelocity;
     this.singulatorVelocity = singulatorVelocity;
     this.hasNote = hasNote;
-    this.spinOuter = spinOuter;
-    this.spinInner = spinInner;
-    this.spinTransport = spinTransport;
-    this.spinSingulator = spinSingulator;
     this.update = update;
 
     createStopCommand = () -> {
@@ -149,6 +143,50 @@ public class PickupSubsystem extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
+    builder.addDoubleProperty(
+        "Outer Velocity",
+        () -> outerVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Outer Voltage",
+        () -> outerVoltage.in(Volts),
+        null);
+
+    builder.addDoubleProperty(
+        "Inner Velocity",
+        () -> innerVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Inner Voltage",
+        () -> innerVoltage.in(Volts),
+        null);
+
+    builder.addDoubleProperty(
+        "Transport Velocity",
+        () -> transportVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Transport Voltage",
+        () -> transportVoltage.in(Volts),
+        null);
+
+    builder.addDoubleProperty(
+        "Singulator Velocity",
+        () -> singulatorVelocity.in(Value),
+        null);
+
+    builder.addDoubleProperty(
+        "Singulator Voltage",
+        () -> singulatorVoltage.in(Volts),
+        null);
+
+    builder.addBooleanProperty(
+        "Has Notes",
+        hasNote,
+        null);
   }
 
   public static final Supplier<PickupSubsystem> create = () -> {

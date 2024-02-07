@@ -10,8 +10,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandBinder;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PickupSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ShooterTiltSubsystem;
 
 public class RobotContainer {
 
@@ -27,22 +29,37 @@ public class RobotContainer {
         .apply(Constants.Controller.operatorPort)
         .apply(Constants.Controller.deadband);
 
-    ShooterSubsystem shooterSubsystem = ShooterSubsystem.create.get();
     PickupSubsystem pickupSubsystem = PickupSubsystem.create.get();
-
-    CommandBinder.bindManualFenderShootCommand
-        .apply(pickupSubsystem)
-        .apply(shooterSubsystem)
-        .accept(operator.b);
+    ShooterSubsystem shooterSubsystem = ShooterSubsystem.create.get();
+    ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
+    ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
 
     CommandBinder.bindManualPickupCommand
         .apply(pickupSubsystem)
         .apply(shooterSubsystem)
+        .apply(shooterTiltSubsystem)
         .accept(operator.a);
 
+    CommandBinder.bindManualFenderShootCommand
+        .apply(pickupSubsystem)
+        .apply(shooterSubsystem)
+        .apply(shooterTiltSubsystem)
+        .accept(operator.b);
+
+    CommandBinder.bindManualShooterTiltCommand
+        .apply(shooterTiltSubsystem)
+        .apply(operator.rightYValue)
+        .accept(operator.rightY);
+    CommandBinder.bindManualElevatorCommand
+        .apply(elevatorSubsystem)
+        .apply(operator.leftYValue)
+        .accept(operator.leftY);
+
     SmartDashboard.putData("Operator", operator);
-    SmartDashboard.putData("Shooter", shooterSubsystem);
     SmartDashboard.putData("Pickup", pickupSubsystem);
+    SmartDashboard.putData("Shooter", shooterSubsystem);
+    SmartDashboard.putData("Shooter Tilt", shooterTiltSubsystem);
+    SmartDashboard.putData("Elevator", elevatorSubsystem);
 
   }
 
