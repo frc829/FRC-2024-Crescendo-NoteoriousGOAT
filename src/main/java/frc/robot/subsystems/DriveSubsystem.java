@@ -89,6 +89,7 @@ public class DriveSubsystem extends SubsystemBase {
             ChassisSpeeds robotSpeeds,
             Measure<Velocity<Velocity<Distance>>> linearAcceleration,
             Measure<Velocity<Velocity<Angle>>> angularAcceleration,
+            Consumer<SwerveModuleState[]> controlModules,
             Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds,
             Runnable resetSteerEncodersFromAbsolutes,
             Runnable stop,
@@ -201,6 +202,11 @@ public class DriveSubsystem extends SubsystemBase {
         };
         ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
+        Consumer<SwerveModuleState[]> controlModules = (moduleStates) -> {
+            Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
+                    (i) -> modules.get(i).controlState.accept(moduleStates[i]));
+        };
+
         Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                 centerOfRotation) -> (chassisSpeeds) -> {
                     chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.20);
@@ -213,8 +219,8 @@ public class DriveSubsystem extends SubsystemBase {
                     Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
                             (i) -> wheelSpeeds.states[i].speedMetersPerSecond *= wheelSpeeds.states[i].angle
                                     .minus(currentModuleAngles[i]).getCos());
-                    Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
-                            (i) -> modules.get(i).controlState.accept(wheelSpeeds.states[i]));
+                    controlModules.accept(wheelSpeeds.states);
+
                 };
 
         Runnable resetSteerEncodersFromAbsolutes = () -> {
@@ -259,6 +265,7 @@ public class DriveSubsystem extends SubsystemBase {
                 robotSpeeds,
                 telemetry.accelerationMag,
                 angularAcceleration,
+                controlModules,
                 controlRobotChassisSpeeds,
                 resetSteerEncodersFromAbsolutes,
                 stop,
