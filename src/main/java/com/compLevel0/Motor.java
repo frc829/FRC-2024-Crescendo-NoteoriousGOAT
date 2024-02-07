@@ -153,35 +153,49 @@ public class Motor {
                 // #endregion
 
                 // #region createMotorFromCANSparkMax
-                public static final Function<CANSparkBase, Motor> createMotorFromCANSparkBase = (canSparkBase) -> {
-                        MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
-                        MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
-                        MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
-                        MutableMeasure<Velocity<Angle>> angularVelocity = MutableMeasure.zero(RPM);
-                        MutableMeasure<Velocity<Angle>> maxAngularVelocity = MutableMeasure.zero(RPM);
-                        Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> canSparkBase.getEncoder()
-                                        .setPosition(setpoint.in(Rotations));
-                        Consumer<Measure<Angle>> turn = (setpoint) -> canSparkBase.getPIDController()
-                                        .setReference(setpoint.in(Rotations), ControlType.kPosition, 1);
-                        Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> canSparkBase.getPIDController()
-                                        .setReference(setpoint.in(RPM), ControlType.kVelocity, 0);
-                        Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
-                                canSparkBase.getPIDController().setReference(setpoint.in(Volts), ControlType.kVoltage);
-                        };
-                        Runnable stop = () -> canSparkBase.getPIDController()
-                                        .setReference(0.0, ControlType.kVelocity);
-                        Runnable update = () -> {
-                                voltage.mut_setMagnitude(
-                                                canSparkBase.getAppliedOutput() * canSparkBase.getBusVoltage());
-                                angle.mut_setMagnitude(canSparkBase.getEncoder().getPosition());
-                                absoluteAngle.mut_setMagnitude(
-                                                canSparkBase.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
-                                angularVelocity.mut_setMagnitude(canSparkBase.getEncoder().getVelocity());
-                        };
+                public static final Function<Double, Function<CANSparkBase, Motor>> createMotorFromCANSparkBase = (
+                                gearing) -> (canSparkBase) -> {
+                                        MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
+                                        MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
+                                        MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
+                                        MutableMeasure<Velocity<Angle>> angularVelocity = MutableMeasure.zero(RPM);
+                                        MutableMeasure<Velocity<Angle>> maxAngularVelocity = MutableMeasure.zero(RPM);
+                                        Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> canSparkBase
+                                                        .getEncoder()
+                                                        .setPosition(setpoint.in(Rotations));
+                                        Consumer<Measure<Angle>> turn = (setpoint) -> canSparkBase.getPIDController()
+                                                        .setReference(setpoint.in(Rotations), ControlType.kPosition, 1);
+                                        Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> canSparkBase
+                                                        .getPIDController()
+                                                        .setReference(setpoint.in(RPM), ControlType.kVelocity, 0);
+                                        Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
+                                                canSparkBase.getPIDController().setReference(setpoint.in(Volts),
+                                                                ControlType.kVoltage);
+                                        };
+                                        Runnable stop = () -> canSparkBase.getPIDController()
+                                                        .setReference(0.0, ControlType.kVelocity);
+                                        Runnable update = () -> {
+                                                voltage.mut_setMagnitude(
+                                                                canSparkBase.getAppliedOutput()
+                                                                                * canSparkBase.getBusVoltage());
+                                                angle.mut_setMagnitude(canSparkBase.getEncoder().getPosition());
 
-                        return new Motor(voltage, angle, absoluteAngle, angularVelocity, maxAngularVelocity,
-                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
-                };
+                                                angularVelocity.mut_setMagnitude(
+                                                                canSparkBase.getEncoder().getVelocity());
+                                                if (RobotBase.isSimulation()) {
+                                                        absoluteAngle.mut_setMagnitude(angle.in(Rotations) / gearing);
+                                                } else {
+                                                        absoluteAngle.mut_setMagnitude(
+                                                                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
+                                                                                        .getPosition());
+                                                }
+
+                                        };
+
+                                        return new Motor(voltage, angle, absoluteAngle, angularVelocity,
+                                                        maxAngularVelocity,
+                                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
+                                };
                 // #endregion
 
                 // #region setMaxVelocities

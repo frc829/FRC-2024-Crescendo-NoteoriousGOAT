@@ -3,7 +3,6 @@ package com.compLevel1;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Value;
 import java.util.function.Consumer;
 import java.util.function.Function;
