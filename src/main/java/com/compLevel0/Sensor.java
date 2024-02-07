@@ -6,11 +6,12 @@ import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Function;
 
-import com.ctre.phoenix6.hardware.CANcoder;
+import com.hardwareSims.CANcoderWithSim;
 import com.playingwithfusion.TimeOfFlight;
 
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Voltage;
@@ -43,15 +44,19 @@ public class Sensor<T extends Unit<T>> {
     }
 
     public static final class CTRE {
-        public static final Function<Integer, Function<String, CANcoder>> createCancoder = (
-                deviceId) -> (canbus) -> new CANcoder(deviceId, canbus);
+        public static final Function<Integer, Function<String, Function<Measure<Angle>, CANcoderWithSim>>> createCancoder = (
+                deviceId) -> (canbus) -> (simAbsoluteAngle) -> CANcoderWithSim.create
+                        .apply(deviceId)
+                        .apply(canbus)
+                        .apply(simAbsoluteAngle);
 
-        public static final Function<CANcoder, Sensor<Angle>> createAngleSensor = (cancoder) -> {
+        public static final Function<CANcoderWithSim, Sensor<Angle>> createAngleSensor = (cancoderWithSim) -> {
             MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
             MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
             Runnable update = () -> {
-                voltage.mut_setMagnitude(cancoder.getSupplyVoltage().getValueAsDouble());
-                angle.mut_setMagnitude(cancoder.getAbsolutePosition().getValueAsDouble());
+                cancoderWithSim.update.run();
+                voltage.mut_setMagnitude(cancoderWithSim.cancoder.getSupplyVoltage().getValueAsDouble());
+                angle.mut_setMagnitude(cancoderWithSim.cancoder.getAbsolutePosition().getValueAsDouble());
             };
             return new Sensor<>(voltage, angle, update);
         };

@@ -247,11 +247,15 @@ public class Motor {
 
                 // #region Handle REV Sim Control
                 @SuppressWarnings({ "resource" })
-                public static final Function<Double, Function<Double, Function<Double, Function<Motor, Motor>>>> setTurnSim = (
-                                kP) -> (kI) -> (kD) -> (motor) -> {
+                public static final Function<Double, Function<Double, Function<Double, Function<Boolean, Function<Double, Function<Motor, Motor>>>>>> setTurnSim = (
+                                kP) -> (kI) -> (kD) -> (enableWrap) -> (gearing) -> (motor) -> {
 
                                         if (RobotBase.isSimulation()) {
                                                 PIDController pidController = new PIDController(kP, kI, kD);
+                                                if (enableWrap) {
+                                                        pidController.enableContinuousInput(-0.5 * gearing,
+                                                                        0.5 * gearing);
+                                                }
                                                 MutableMeasure<Voltage> voltageSetpoint = MutableMeasure.zero(Volts);
                                                 Consumer<Measure<Angle>> turn = (setpoint) -> {
                                                         double measurement = motor.angle.in(Rotations);

@@ -138,7 +138,9 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setTurnSim
             .apply(Constants.slot1kP)
             .apply(Constants.slot1kI)
-            .apply(Constants.slot1kD))
+            .apply(Constants.slot1kD)
+            .apply(true)
+            .apply(Constants.gearing))
         .andThen(Motor.REV.setSpinSim)
         .andThen(Turner.create.apply(Constants.gearing))
         .apply(Constants.deviceId);
@@ -153,6 +155,5 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         turner.resetRelEncoderFromAbsolute,
         turner.hold,
         turner.update);
-
   };
 }

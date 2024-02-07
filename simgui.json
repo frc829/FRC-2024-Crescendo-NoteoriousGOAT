@@ -40,6 +40,9 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Elevator": {
+          "open": true
+        },
         "Shooter Tilt": {
           "open": true
         },
