@@ -139,7 +139,7 @@ public class CommandBinder {
                                                                 .apply(rotationDelayDistance);
 
                                                 trigger.whileTrue(pathFindToPoseCommand);
-                                                trigger.onFalse(Commands.runOnce(drive.stop, drive));
+                                                // trigger.onFalse(Commands.runOnce(drive.stop, drive));
 
                                         };
 }
