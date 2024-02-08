@@ -409,8 +409,7 @@ public class DriveSubsystem extends SubsystemBase {
                                         (i) -> modules.get(i).stopAndHold.run());
                 };
 
-                Telemetry telemetry = Gyroscope.KauaiLabs.createNavxXMPWithSim
-                                .andThen(Gyroscope.KauaiLabs.createNavxXMP)
+                Telemetry telemetry = (Gyroscope.KauaiLabs.createNavxXMP)
                                 .andThen(Telemetry.create)
                                 .apply(robotSpeeds)
                                 .apply(Constants.kinematics)

@@ -67,6 +67,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.velocity = velocity;
     this.update = update;
 
+    resetRelEncoderFromAbsolute.run();
+
     createHoldCommand = () -> {
       Command holdCommand = run(hold);
       holdCommand.setName("HOLD");

@@ -66,7 +66,7 @@ public class CommandBinder {
 
         public static final Function<DriveSubsystem, Consumer<Trigger>> bindManualResetSteerEncodersCommand = (
                         drive) -> (trigger) -> {
-                                trigger.whileTrue(drive.createSteerEncodersResetCommand.get());
+                                trigger.onTrue(drive.createSteerEncodersResetCommand.get());
                         };
 
         public static final Function<DriveSubsystem, Consumer<Trigger>> bindManualModuleZeroCommand = (

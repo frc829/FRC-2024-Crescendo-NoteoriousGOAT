@@ -3,11 +3,19 @@ package com.compLevel0;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
@@ -17,10 +25,14 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Time;
+
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class Motor {
         public final MutableMeasure<Voltage> voltage;
@@ -32,8 +44,6 @@ public class Motor {
         public final Consumer<Measure<Angle>> turn;
         public final Consumer<Measure<Velocity<Angle>>> spin;
         public final Consumer<Measure<Voltage>> setVoltage;
-        public final Runnable enableBrakeMode;
-        public final Runnable invert;
         public final Runnable stop;
         public final Runnable update;
 
@@ -47,8 +57,6 @@ public class Motor {
                         Consumer<Measure<Angle>> turn,
                         Consumer<Measure<Velocity<Angle>>> spin,
                         Consumer<Measure<Voltage>> setVoltage,
-                        Runnable enableBrakeMode,
-                        Runnable invert,
                         Runnable stop,
                         Runnable update) {
                 this.voltage = voltage;
@@ -60,8 +68,6 @@ public class Motor {
                 this.turn = turn;
                 this.spin = spin;
                 this.setVoltage = setVoltage;
-                this.enableBrakeMode = enableBrakeMode;
-                this.invert = invert;
                 this.stop = stop;
                 this.update = update;
         }
@@ -157,6 +163,19 @@ public class Motor {
                                         return canSparkBase;
                                 };
                 // #endregion
+
+                // #region Set Inverse and Set Brake
+                public static final Function<CANSparkBase, CANSparkBase> enableBrake = (canSparkBase) -> {
+                        canSparkBase.setIdleMode(IdleMode.kBrake);
+                        return canSparkBase;
+                };
+
+                public static final Function<CANSparkBase, CANSparkBase> invert = (canSparkBase) -> {
+                        canSparkBase.setInverted(true);
+                        return canSparkBase;
+                };
+
+                //// #endregion
 
                 // #region createMotorFromCANSparkMax
                 public static final Function<Double, Function<CANSparkBase, Motor>> createMotorFromCANSparkBase = (
@@ -320,6 +339,176 @@ public class Motor {
                 };
                 // #endregion
         };
-        // #endregion
+
+        public static final class CTRE {
+
+                // #region createTalonFX
+
+                public static final Function<Integer, Function<String, TalonFX>> createTalonFX = (
+                                deviceId) -> (canbus) -> {
+                                        return new TalonFX(deviceId, canbus);
+                                };
+                // #endregion
+
+                // #region pidSetters
+                public static final Function<Integer, Function<Double, Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>>>> setkP = (
+                                slotID) -> (gain) -> (talonFX) -> (talonFXConfiguration) -> {
+                                        if (slotID == 0) {
+                                                talonFXConfiguration.Slot0.kP = gain;
+                                        } else if (slotID == 1) {
+                                                talonFXConfiguration.Slot1.kP = gain;
+                                        }
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                public static final Function<Integer, Function<Double, Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>>>> setkI = (
+                                slotID) -> (gain) -> (talonFX) -> (talonFXConfiguration) -> {
+                                        if (slotID == 0) {
+                                                talonFXConfiguration.Slot0.kI = gain;
+                                        } else if (slotID == 1) {
+                                                talonFXConfiguration.Slot1.kI = gain;
+                                        }
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                public static final Function<Integer, Function<Double, Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>>>> setkD = (
+                                slotID) -> (gain) -> (talonFX) -> (talonFXConfiguration) -> {
+                                        if (slotID == 0) {
+                                                talonFXConfiguration.Slot0.kD = gain;
+                                        } else if (slotID == 1) {
+                                                talonFXConfiguration.Slot1.kD = gain;
+                                        }
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                public static final Function<Integer, Function<Double, Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>>>> setkV = (
+                                slotID) -> (gain) -> (talonFX) -> (talonFXConfiguration) -> {
+                                        if (slotID == 0) {
+                                                talonFXConfiguration.Slot0.kV = gain;
+                                        } else if (slotID == 1) {
+                                                talonFXConfiguration.Slot1.kV = gain;
+                                        }
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                // #endregion
+
+                // #region Set Inverse and Set Brake
+                public static final Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>> setBrake = (
+                                talonFX) -> (talonFXConfiguration) -> {
+                                        talonFXConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                public static final Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>> setCWPositive = (
+                                talonFX) -> (talonFXConfiguration) -> {
+                                        talonFXConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                public static final Function<TalonFX, Function<TalonFXConfiguration, TalonFXConfiguration>> setCCWPositive = (
+                                talonFX) -> (talonFXConfiguration) -> {
+                                        talonFXConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+                                        talonFX.getConfigurator().apply(talonFXConfiguration);
+                                        return talonFXConfiguration;
+                                };
+
+                // #endregion
+
+                // #region createMotorFromTalonFX
+                public static final Function<Double, Function<TalonFX, Motor>> createMotorFromTalonFX = (
+                                gearing) -> (talonFX) -> {
+
+                                        TalonFXSimState talonFXSimState = talonFX.getSimState();
+                                        DCMotorSim dcMotorSim = new DCMotorSim(
+                                                        DCMotor.getKrakenX60Foc(1),
+                                                        1,
+                                                        0.001);
+
+                                        MutableMeasure<Time> lastTime = MutableMeasure
+                                                        .ofBaseUnits(Timer.getFPGATimestamp(), Seconds);
+                                        MutableMeasure<Time> currentTime = MutableMeasure
+                                                        .ofBaseUnits(Timer.getFPGATimestamp(), Seconds);
+
+                                        MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
+                                        MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
+                                        MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
+                                        MutableMeasure<Velocity<Angle>> angularVelocity = MutableMeasure
+                                                        .zero(RotationsPerSecond);
+                                        MutableMeasure<Velocity<Angle>> maxAngularVelocity = MutableMeasure
+                                                        .zero(RotationsPerSecond);
+
+                                        Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> {
+                                        };
+                                        Consumer<Measure<Angle>> turn = (setpoint) -> {
+                                        };
+                                        VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(0.0);
+                                        VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(
+                                                        0.0);
+                                        Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
+                                                if(RobotBase.isSimulation()){
+                                                        velocityDutyCycle.withVelocity(setpoint.in(RotationsPerSecond));
+                                                        talonFX.setControl(velocityDutyCycle);
+                                                }else{
+                                                        velocityTorqueCurrentFOC.withVelocity(setpoint.in(RotationsPerSecond));
+                                                        talonFX.setControl(velocityTorqueCurrentFOC);
+                                                }
+                                        };
+                                        Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
+                                        };
+                                        Runnable stop = () -> {
+                                        };
+                                        Runnable update = () -> {
+                                                if (RobotBase.isSimulation()) {
+                                                        currentTime.mut_setMagnitude(Timer.getFPGATimestamp());
+                                                        double deltaTime = currentTime.in(Seconds)
+                                                                        - lastTime.in(Seconds);
+                                                        dcMotorSim.setInputVoltage(talonFXSimState.getMotorVoltage());
+                                                        dcMotorSim.update(deltaTime);
+                                                        talonFXSimState.setRawRotorPosition(
+                                                                        dcMotorSim.getAngularPositionRotations());
+                                                        talonFXSimState.setRotorVelocity(
+                                                                        dcMotorSim.getAngularVelocityRPM() / 60.0);
+                                                        talonFXSimState.setSupplyVoltage(12
+                                                                        - talonFXSimState.getSupplyCurrent() * 0.002);
+                                                        lastTime.mut_setMagnitude(currentTime.in(Seconds));
+                                                }
+                                                voltage.mut_setMagnitude(talonFX.getSupplyVoltage().getValueAsDouble());
+                                                angle.mut_setMagnitude(talonFX.getPosition().getValueAsDouble());
+                                                angularVelocity.mut_setMagnitude(
+                                                                talonFX.getVelocity().getValueAsDouble());
+                                        };
+
+                                        return new Motor(voltage, angle, absoluteAngle, angularVelocity,
+                                                        maxAngularVelocity,
+                                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
+                                };
+                // #endregion
+
+                // #region setMaxVelocities
+                public static final Function<Motor, Motor> setKrakenX60FOCMaxVelocity = (motor) -> {
+                        return new Motor(
+                                        motor.voltage,
+                                        motor.angle,
+                                        motor.absoluteAngle,
+                                        motor.angularVelocity,
+                                        RadiansPerSecond.of(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec),
+                                        motor.setRelativeEncoderAngle,
+                                        motor.turn,
+                                        motor.spin,
+                                        motor.setVoltage,
+                                        motor.stop,
+                                        motor.update);
+                };
+
+                // #endregion
+
+        };
 
 }
