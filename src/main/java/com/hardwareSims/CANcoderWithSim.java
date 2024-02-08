@@ -27,6 +27,8 @@ public class CANcoderWithSim {
 
                 CANcoder cancoder = new CANcoder(deviceId, canbus);
                 CANcoderSimState cancoderSimState = cancoder.getSimState();
+                cancoderSimState.setRawPosition(0.0);
+                cancoder.setPosition(0.0);
                 Runnable update = () -> {
                     if (RobotBase.isSimulation()) {
                         cancoderSimState.setRawPosition(simAbsoluteAngle.in(Rotations));
