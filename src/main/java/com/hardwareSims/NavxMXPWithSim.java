@@ -36,20 +36,19 @@ public class NavxMXPWithSim {
         SimDouble simYaw = new SimDouble(SimDeviceDataJNI.getSimValueHandle(dev, "Yaw"));
         MutableMeasure<Time> lastTime = MutableMeasure.ofBaseUnits(Timer.getFPGATimestamp(), Seconds);
         MutableMeasure<Time> currentTime = MutableMeasure.ofBaseUnits(Timer.getFPGATimestamp(), Seconds);
+        simYaw.set(0.0);
 
         Runnable update = () -> {
             if (RobotBase.isSimulation()) {
                 currentTime.mut_setMagnitude(Timer.getFPGATimestamp());
                 double deltaTime = currentTime.in(Seconds) - lastTime.in(Seconds);
-                simYaw.set(0.0);
                 double yawAngularVelocity = Math.toDegrees(simChassisSpeeds.omegaRadiansPerSecond);
                 double yaw = simYaw.get();
                 double deltaYaw = yawAngularVelocity * deltaTime;
-                yaw += deltaYaw;
+                yaw -= deltaYaw;
                 yaw = MathUtil.inputModulus(yaw, -180, 180);
                 simYaw.set(yaw);
                 lastTime.mut_setMagnitude(currentTime.in(Seconds));
-
             }
         };
 

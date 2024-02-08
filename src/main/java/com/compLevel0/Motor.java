@@ -262,7 +262,7 @@ public class Motor {
                                                         double goal = setpoint.in(Rotations);
                                                         double volts = pidController.calculate(measurement, goal);
                                                         volts = MathUtil.clamp(volts, -12.0, 12.0);
-                                                        voltageSetpoint.mut_setMagnitude(volts);
+                                                        voltageSetpoint.mut_setMagnitude(volts / 12.0);
                                                         motor.setVoltage.accept(voltageSetpoint);
                                                 };
                                                 return new Motor(

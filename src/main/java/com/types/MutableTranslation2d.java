@@ -31,8 +31,8 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class MutableTranslation2d extends Translation2d {
-  private double m_x;
-  private double m_y;
+  private double mutable_x;
+  private double mutable_y;
 
   /** Constructs a Translation2d with X and Y components equal to zero. */
   public MutableTranslation2d() {
@@ -49,8 +49,8 @@ public class MutableTranslation2d extends Translation2d {
   public MutableTranslation2d(
       @JsonProperty(required = true, value = "x") double x,
       @JsonProperty(required = true, value = "y") double y) {
-    m_x = x;
-    m_y = y;
+    mutable_x = x;
+    mutable_y = y;
   }
 
   /**
@@ -61,8 +61,8 @@ public class MutableTranslation2d extends Translation2d {
    * @param angle The angle between the x-axis and the translation vector.
    */
   public MutableTranslation2d(double distance, Rotation2d angle) {
-    m_x = distance * angle.getCos();
-    m_y = distance * angle.getSin();
+    mutable_x = distance * angle.getCos();
+    mutable_y = distance * angle.getSin();
   }
 
   /**
@@ -84,8 +84,8 @@ public class MutableTranslation2d extends Translation2d {
    * @param other The translation to compute the distance to.
    * @return The distance between the two translations.
    */
-  public double getDistance(Translation2d other) {
-    return Math.hypot(other.getX() - m_x, other.getY() - m_y);
+  public double getDistance(MutableTranslation2d other) {
+    return Math.hypot(other.mutable_x - mutable_x, other.mutable_y - mutable_y);
   }
 
   /**
@@ -95,7 +95,7 @@ public class MutableTranslation2d extends Translation2d {
    */
   @JsonProperty
   public double getX() {
-    return m_x;
+    return mutable_x;
   }
 
   /**
@@ -105,7 +105,7 @@ public class MutableTranslation2d extends Translation2d {
    */
   @JsonProperty
   public double getY() {
-    return m_y;
+    return mutable_y;
   }
 
   /**
@@ -114,7 +114,7 @@ public class MutableTranslation2d extends Translation2d {
    * @return The norm of the translation.
    */
   public double getNorm() {
-    return Math.hypot(m_x, m_y);
+    return Math.hypot(mutable_x, mutable_y);
   }
 
   /**
@@ -123,7 +123,7 @@ public class MutableTranslation2d extends Translation2d {
    * @return The angle of the translation
    */
   public Rotation2d getAngle() {
-    return new Rotation2d(m_x, m_y);
+    return new Rotation2d(mutable_x, mutable_y);
   }
 
   /**
@@ -145,7 +145,7 @@ public class MutableTranslation2d extends Translation2d {
    */
   public MutableTranslation2d rotateBy(Rotation2d other) {
     return new MutableTranslation2d(
-        m_x * other.getCos() - m_y * other.getSin(), m_x * other.getSin() + m_y * other.getCos());
+        mutable_x * other.getCos() - mutable_y * other.getSin(), mutable_x * other.getSin() + mutable_y * other.getCos());
   }
 
   /**
@@ -156,8 +156,8 @@ public class MutableTranslation2d extends Translation2d {
    * @param other The translation to add.
    * @return The sum of the translations.
    */
-  public MutableTranslation2d plus(Translation2d other) {
-    return new MutableTranslation2d(m_x + other.getX(), m_y + other.getY());
+  public MutableTranslation2d plus(MutableTranslation2d other) {
+    return new MutableTranslation2d(mutable_x + other.mutable_x, mutable_y + other.mutable_y);
   }
 
   /**
@@ -168,8 +168,8 @@ public class MutableTranslation2d extends Translation2d {
    * @param other The translation to subtract.
    * @return The difference between the two translations.
    */
-  public MutableTranslation2d minus(Translation2d other) {
-    return new MutableTranslation2d(m_x - other.getX(), m_y - other.getY());
+  public MutableTranslation2d minus(MutableTranslation2d other) {
+    return new MutableTranslation2d(mutable_x - other.mutable_x, mutable_y - other.mutable_y);
   }
 
   /**
@@ -179,7 +179,7 @@ public class MutableTranslation2d extends Translation2d {
    * @return The inverse of the current translation.
    */
   public MutableTranslation2d unaryMinus() {
-    return new MutableTranslation2d(-m_x, -m_y);
+    return new MutableTranslation2d(-mutable_x, -mutable_y);
   }
 
   /**
@@ -191,7 +191,7 @@ public class MutableTranslation2d extends Translation2d {
    * @return The scaled translation.
    */
   public MutableTranslation2d times(double scalar) {
-    return new MutableTranslation2d(m_x * scalar, m_y * scalar);
+    return new MutableTranslation2d(mutable_x * scalar, mutable_y * scalar);
   }
 
   /**
@@ -203,7 +203,7 @@ public class MutableTranslation2d extends Translation2d {
    * @return The reference to the new mutated object.
    */
   public MutableTranslation2d div(double scalar) {
-    return new MutableTranslation2d(m_x / scalar, m_y / scalar);
+    return new MutableTranslation2d(mutable_x / scalar, mutable_y / scalar);
   }
 
   /**
@@ -218,7 +218,7 @@ public class MutableTranslation2d extends Translation2d {
 
   @Override
   public String toString() {
-    return String.format("MutableTranslation2d(X: %.2f, Y: %.2f)", m_x, m_y);
+    return String.format("Translation2d(X: %.2f, Y: %.2f)", mutable_x, mutable_y);
   }
 
   /**
@@ -229,30 +229,29 @@ public class MutableTranslation2d extends Translation2d {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof Translation2d) {
-      return Math.abs(((Translation2d) obj).getX() - m_x) < 1E-9
-          && Math.abs(((Translation2d) obj).getY() - m_y) < 1E-9;
+    if (obj instanceof MutableTranslation2d) {
+      return Math.abs(((MutableTranslation2d) obj).mutable_x - mutable_x) < 1E-9
+          && Math.abs(((MutableTranslation2d) obj).mutable_y - mutable_y) < 1E-9;
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_x, m_y);
+    return Objects.hash(mutable_x, mutable_y);
   }
 
   @Override
-  public Translation2d interpolate(Translation2d endValue, double t) {
+  public MutableTranslation2d interpolate(Translation2d endValue, double t) {
     return new MutableTranslation2d(
         MathUtil.interpolate(this.getX(), endValue.getX(), t),
         MathUtil.interpolate(this.getY(), endValue.getY(), t));
   }
 
   public void mut_set(double x, double y){
-    m_x = x;
-    m_y = y;
+    mutable_x = x;
+    mutable_y = y;
   }
-
 
   /** Translation2d protobuf for serialization. */
   public static final Translation2dProto proto = new Translation2dProto();

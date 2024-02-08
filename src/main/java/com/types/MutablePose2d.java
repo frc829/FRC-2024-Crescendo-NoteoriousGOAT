@@ -1,14 +1,8 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package com.types;
 
 import static edu.wpi.first.units.Units.Meters;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,22 +14,20 @@ import edu.wpi.first.math.geometry.proto.Pose2dProto;
 import edu.wpi.first.math.geometry.struct.Pose2dStruct;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-/** Represents a 2D pose containing translational and rotational elements. */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
-public class MutablePose2d extends Pose2d{
-  private final MutableTranslation2d m_translation;
-  private final MutableRotation2d m_rotation;
+public class MutablePose2d extends Pose2d {
+  private MutableTranslation2d mutable_translation;
+  private MutableRotation2d mutable_rotation;
 
   /** Constructs a pose at the origin facing toward the positive X axis. */
   public MutablePose2d() {
-    m_translation = new MutableTranslation2d();
-    m_rotation = new MutableRotation2d();
+    mutable_translation = new MutableTranslation2d();
+    mutable_rotation = new MutableRotation2d();
   }
 
   /**
@@ -46,10 +38,10 @@ public class MutablePose2d extends Pose2d{
    */
   @JsonCreator
   public MutablePose2d(
-      @JsonProperty(required = true, value = "translation") MutableTranslation2d translation,
-      @JsonProperty(required = true, value = "rotation") MutableRotation2d rotation) {
-    m_translation = translation;
-    m_rotation = rotation;
+      @JsonProperty(required = true, value = "translation") Translation2d translation,
+      @JsonProperty(required = true, value = "rotation") Rotation2d rotation) {
+    mutable_translation = new MutableTranslation2d(translation.getX(), translation.getY());
+    mutable_rotation = new MutableRotation2d(rotation.getRadians());
   }
 
   /**
@@ -60,8 +52,8 @@ public class MutablePose2d extends Pose2d{
    * @param rotation The rotational component of the pose.
    */
   public MutablePose2d(double x, double y, Rotation2d rotation) {
-    m_translation = new MutableTranslation2d(x, y);
-    m_rotation = new MutableRotation2d(rotation.getRadians());
+    mutable_translation = new MutableTranslation2d(x, y);
+    mutable_rotation = new MutableRotation2d(rotation.getRadians());
   }
 
   /**
@@ -98,7 +90,7 @@ public class MutablePose2d extends Pose2d{
    * @param other The initial pose of the transformation.
    * @return The transform that maps the other pose to the current pose.
    */
-  public Transform2d minus(MutablePose2d other) {
+  public Transform2d minus(Pose2d other) {
     final var pose = this.relativeTo(other);
     return new Transform2d(pose.getTranslation(), pose.getRotation());
   }
@@ -110,7 +102,7 @@ public class MutablePose2d extends Pose2d{
    */
   @JsonProperty
   public Translation2d getTranslation() {
-    return m_translation;
+    return mutable_translation;
   }
 
   /**
@@ -119,7 +111,7 @@ public class MutablePose2d extends Pose2d{
    * @return The x component of the pose's translation.
    */
   public double getX() {
-    return m_translation.getX();
+    return mutable_translation.getX();
   }
 
   /**
@@ -128,7 +120,7 @@ public class MutablePose2d extends Pose2d{
    * @return The y component of the pose's translation.
    */
   public double getY() {
-    return m_translation.getY();
+    return mutable_translation.getY();
   }
 
   /**
@@ -137,8 +129,8 @@ public class MutablePose2d extends Pose2d{
    * @return The rotational component of the pose.
    */
   @JsonProperty
-  public Rotation2d getRotation() {
-    return m_rotation;
+  public MutableRotation2d getRotation() {
+    return mutable_rotation;
   }
 
   /**
@@ -147,8 +139,8 @@ public class MutablePose2d extends Pose2d{
    * @param scalar The scalar.
    * @return The new scaled Pose2d.
    */
-  public MutablePose2d times(double scalar) {
-    return new MutablePose2d(m_translation.times(scalar), m_rotation.times(scalar));
+  public Pose2d times(double scalar) {
+    return new Pose2d(mutable_translation.times(scalar), mutable_rotation.times(scalar));
   }
 
   /**
@@ -157,7 +149,7 @@ public class MutablePose2d extends Pose2d{
    * @param scalar The scalar.
    * @return The new scaled Pose2d.
    */
-  public MutablePose2d div(double scalar) {
+  public Pose2d div(double scalar) {
     return times(1.0 / scalar);
   }
 
@@ -167,8 +159,8 @@ public class MutablePose2d extends Pose2d{
    * @param other The rotation to transform the pose by.
    * @return The transformed pose.
    */
-  public MutablePose2d rotateBy(Rotation2d other) {
-    return new MutablePose2d(m_translation.rotateBy(other), m_rotation.rotateBy(other));
+  public Pose2d rotateBy(Rotation2d other) {
+    return new Pose2d(mutable_translation.rotateBy(other), mutable_rotation.rotateBy(other));
   }
 
   /**
@@ -179,9 +171,9 @@ public class MutablePose2d extends Pose2d{
    * @return The transformed pose.
    */
   public Pose2d transformBy(Transform2d other) {
-    return new Pose2d(
-        m_translation.plus(other.getTranslation().rotateBy(m_rotation)),
-        other.getRotation().plus(m_rotation));
+    return new MutablePose2d(
+        mutable_translation.plus(other.getTranslation().rotateBy(mutable_rotation)),
+        other.getRotation().plus(mutable_rotation));
   }
 
   /**
@@ -196,7 +188,7 @@ public class MutablePose2d extends Pose2d{
    */
   public Pose2d relativeTo(Pose2d other) {
     var transform = new Transform2d(other, this);
-    return new Pose2d(transform.getTranslation(), transform.getRotation());
+    return new MutablePose2d(transform.getTranslation(), transform.getRotation());
   }
 
   /**
@@ -251,7 +243,7 @@ public class MutablePose2d extends Pose2d{
    * @param end The end pose for the transformation.
    * @return The twist that maps this to end.
    */
-  public Twist2d log(MutablePose2d end) {
+  public Twist2d log(Pose2d end) {
     final var transform = end.relativeTo(this);
     final var dtheta = transform.getRotation().getRadians();
     final var halfDtheta = dtheta / 2.0;
@@ -293,7 +285,7 @@ public class MutablePose2d extends Pose2d{
 
   @Override
   public String toString() {
-    return String.format("MutablePose2d(%s, %s)", m_translation, m_rotation);
+    return String.format("Pose2d(%s, %s)", mutable_translation, mutable_rotation);
   }
 
   /**
@@ -304,16 +296,16 @@ public class MutablePose2d extends Pose2d{
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof MutablePose2d) {
-      return ((MutablePose2d) obj).m_translation.equals(m_translation)
-          && ((MutablePose2d) obj).m_rotation.equals(m_rotation);
+    if (obj instanceof Pose2d) {
+      return ((MutablePose2d) obj).mutable_translation.equals(mutable_translation)
+          && ((MutablePose2d) obj).mutable_rotation.equals(mutable_rotation);
     }
     return false;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(m_translation, m_rotation);
+    return Objects.hash(mutable_translation, mutable_rotation);
   }
 
   @Override
@@ -329,9 +321,9 @@ public class MutablePose2d extends Pose2d{
     }
   }
 
-  public void mut_set(double x, double y, double radians){
-    m_translation.mut_set(x, y);
-    m_rotation.mut_set(radians);
+  public void mut_set(double x, double y, Rotation2d rotation2d){
+    mutable_translation.mut_set(x, y);
+    mutable_rotation.mut_set(rotation2d.getRadians());
   }
 
   /** Pose2d protobuf for serialization. */

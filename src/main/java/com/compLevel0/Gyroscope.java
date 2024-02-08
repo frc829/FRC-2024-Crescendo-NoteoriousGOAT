@@ -1,13 +1,13 @@
 package com.compLevel0;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Gs;
 
 import java.util.function.Function;
 
 import com.hardwareSims.NavxMXPWithSim;
-import com.types.MutableRotation2d;
-
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -15,14 +15,14 @@ import edu.wpi.first.units.Velocity;
 
 public class Gyroscope {
 
-    public final MutableRotation2d yaw;
+    public final Measure<Angle> yaw;
     public final Measure<Velocity<Velocity<Distance>>> accelerationX;
     public final Measure<Velocity<Velocity<Distance>>> accelerationY;
     public final Measure<Velocity<Velocity<Distance>>> accelerationZ;
     public final Runnable update;
 
     private Gyroscope(
-            MutableRotation2d yaw,
+            Measure<Angle> yaw,
             Measure<Velocity<Velocity<Distance>>> accelerationX,
             Measure<Velocity<Velocity<Distance>>> accelerationY,
             Measure<Velocity<Velocity<Distance>>> accelerationZ,
@@ -40,13 +40,14 @@ public class Gyroscope {
         };
 
         public static Function<NavxMXPWithSim, Gyroscope> createNavxXMP = (navxMXPWithSim) -> {
-            MutableRotation2d yaw = new MutableRotation2d();
+            MutableMeasure<Angle> yaw = MutableMeasure.zero(Degrees);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationX = MutableMeasure.zero(Gs);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationY = MutableMeasure.zero(Gs);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationZ = MutableMeasure.zero(Gs);
 
             Runnable update = () -> {
-                yaw.mut_set(-Math.toRadians(navxMXPWithSim.navx.getYaw()));
+                navxMXPWithSim.update.run();
+                yaw.mut_setMagnitude(-navxMXPWithSim.navx.getYaw());
                 accelerationX.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelX());
                 accelerationY.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelY());
                 accelerationZ.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelZ());

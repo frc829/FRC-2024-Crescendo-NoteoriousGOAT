@@ -54,6 +54,8 @@ public class SwerveModule {
         this.resetSteerEncoderFromAbsolute = resetSteerEncoderFromAbsolute;
         this.stopAndHold = stopAndHold;
         this.update = update;
+
+        resetSteerEncoderFromAbsolute.run();
     }
 
     public static final Function<Motor, Function<Motor, Function<Double, Function<Double, Function<Measure<Distance>, Function<Integer, Function<String, SwerveModule>>>>>>> create = (
@@ -72,7 +74,10 @@ public class SwerveModule {
                         MutableMeasure<Velocity<Angle>> wheelSetpoint = MutableMeasure.zero(RadiansPerSecond);
                         Consumer<SwerveModuleState> controlState = (state) -> {
                             steerSetpoint.mut_setMagnitude(state.angle.getRadians());
+                            steerSetpoint.mut_times(steerGearing);
                             wheelSetpoint.mut_setMagnitude(state.speedMetersPerSecond);
+                            wheelSetpoint.mut_divide(wheelRadius.in(Meters));
+                            wheelSetpoint.mut_times(wheelGearing);
                             steerMotor.turn.accept(steerSetpoint);
                             wheelMotor.spin.accept(wheelSetpoint);
                         };

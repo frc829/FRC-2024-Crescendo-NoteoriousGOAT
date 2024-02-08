@@ -33,15 +33,15 @@ import java.util.Objects;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE)
 public class MutableRotation2d extends Rotation2d {
-    private double m_value;
-    private double m_cos;
-    private double m_sin;
+    private double mutable_value;
+    private double mutable_cos;
+    private double mutable_sin;
 
     /** Constructs a Rotation2d with a default angle of 0 degrees. */
     public MutableRotation2d() {
-        m_value = 0.0;
-        m_cos = 1.0;
-        m_sin = 0.0;
+        mutable_value = 0.0;
+        mutable_cos = 1.0;
+        mutable_sin = 0.0;
     }
 
     /**
@@ -51,9 +51,9 @@ public class MutableRotation2d extends Rotation2d {
      */
     @JsonCreator
     public MutableRotation2d(@JsonProperty(required = true, value = "radians") double value) {
-        m_value = value;
-        m_cos = Math.cos(value);
-        m_sin = Math.sin(value);
+        mutable_value = value;
+        mutable_cos = Math.cos(value);
+        mutable_sin = Math.sin(value);
     }
 
     /**
@@ -65,13 +65,13 @@ public class MutableRotation2d extends Rotation2d {
     public MutableRotation2d(double x, double y) {
         double magnitude = Math.hypot(x, y);
         if (magnitude > 1e-6) {
-            m_sin = y / magnitude;
-            m_cos = x / magnitude;
+            mutable_sin = y / magnitude;
+            mutable_cos = x / magnitude;
         } else {
-            m_sin = 0.0;
-            m_cos = 1.0;
+            mutable_sin = 0.0;
+            mutable_cos = 1.0;
         }
-        m_value = Math.atan2(m_sin, m_cos);
+        mutable_value = Math.atan2(mutable_sin, mutable_cos);
     }
 
     /**
@@ -126,7 +126,7 @@ public class MutableRotation2d extends Rotation2d {
      * @param other The rotation to add.
      * @return The sum of the two rotations.
      */
-    public Rotation2d plus(Rotation2d other) {
+    public MutableRotation2d plus(MutableRotation2d other) {
         return rotateBy(other);
     }
 
@@ -142,7 +142,7 @@ public class MutableRotation2d extends Rotation2d {
      * @param other The rotation to subtract.
      * @return The difference between the two rotations.
      */
-    public Rotation2d minus(Rotation2d other) {
+    public MutableRotation2d minus(MutableRotation2d other) {
         return rotateBy(other.unaryMinus());
     }
 
@@ -154,7 +154,7 @@ public class MutableRotation2d extends Rotation2d {
      * @return The inverse of the current rotation.
      */
     public MutableRotation2d unaryMinus() {
-        return new MutableRotation2d(-m_value);
+        return new MutableRotation2d(-mutable_value);
     }
 
     /**
@@ -164,7 +164,7 @@ public class MutableRotation2d extends Rotation2d {
      * @return The new scaled Rotation2d.
      */
     public MutableRotation2d times(double scalar) {
-        return new MutableRotation2d(m_value * scalar);
+        return new MutableRotation2d(mutable_value * scalar);
     }
 
     /**
@@ -192,9 +192,10 @@ public class MutableRotation2d extends Rotation2d {
      * @param other The rotation to rotate by.
      * @return The new rotated Rotation2d.
      */
-    public MutableRotation2d rotateBy(Rotation2d other) {
+    public MutableRotation2d rotateBy(MutableRotation2d other) {
         return new MutableRotation2d(
-                m_cos * other.getCos() - m_sin * other.getSin(), m_cos * other.getSin() + m_sin * other.getCos());
+                mutable_cos * other.mutable_cos - mutable_sin * other.mutable_sin,
+                mutable_cos * other.mutable_sin + mutable_sin * other.mutable_cos);
     }
 
     /**
@@ -206,7 +207,7 @@ public class MutableRotation2d extends Rotation2d {
      */
     @JsonProperty
     public double getRadians() {
-        return m_value;
+        return mutable_value;
     }
 
     /**
@@ -218,7 +219,7 @@ public class MutableRotation2d extends Rotation2d {
      *      within (-180, 180]
      */
     public double getDegrees() {
-        return Math.toDegrees(m_value);
+        return Math.toDegrees(mutable_value);
     }
 
     /**
@@ -227,7 +228,7 @@ public class MutableRotation2d extends Rotation2d {
      * @return The number of rotations of the Rotation2d.
      */
     public double getRotations() {
-        return Units.radiansToRotations(m_value);
+        return Units.radiansToRotations(mutable_value);
     }
 
     /**
@@ -236,7 +237,7 @@ public class MutableRotation2d extends Rotation2d {
      * @return The cosine of the Rotation2d.
      */
     public double getCos() {
-        return m_cos;
+        return mutable_cos;
     }
 
     /**
@@ -245,7 +246,7 @@ public class MutableRotation2d extends Rotation2d {
      * @return The sine of the Rotation2d.
      */
     public double getSin() {
-        return m_sin;
+        return mutable_sin;
     }
 
     /**
@@ -254,12 +255,12 @@ public class MutableRotation2d extends Rotation2d {
      * @return The tangent of the Rotation2d.
      */
     public double getTan() {
-        return m_sin / m_cos;
+        return mutable_sin / mutable_cos;
     }
 
     @Override
     public String toString() {
-        return String.format("MutableRotation2d(Rads: %.2f, Deg: %.2f)", m_value, Math.toDegrees(m_value));
+        return String.format("Rotation2d(Rads: %.2f, Deg: %.2f)", mutable_value, Math.toDegrees(mutable_value));
     }
 
     /**
@@ -270,16 +271,16 @@ public class MutableRotation2d extends Rotation2d {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Rotation2d) {
-            var other = (Rotation2d) obj;
-            return Math.hypot(m_cos - other.getCos(), m_sin - other.getSin()) < 1E-9;
+        if (obj instanceof MutableRotation2d) {
+            var other = (MutableRotation2d) obj;
+            return Math.hypot(mutable_cos - other.mutable_cos, mutable_sin - other.mutable_sin) < 1E-9;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(m_value);
+        return Objects.hash(mutable_value);
     }
 
     @Override
@@ -287,15 +288,15 @@ public class MutableRotation2d extends Rotation2d {
         return plus(endValue.minus(this).times(MathUtil.clamp(t, 0, 1)));
     }
 
-    public void mut_set(double radians) {
-        m_value = radians;
-        m_cos = Math.cos(radians);
-        m_sin = Math.sin(radians);
-    }
-
     /** Rotation2d protobuf for serialization. */
     public static final Rotation2dProto proto = new Rotation2dProto();
 
     /** Rotation2d struct for serialization. */
     public static final Rotation2dStruct struct = new Rotation2dStruct();
+
+    public void mut_set(@JsonProperty(required = true, value = "radians") double value) {
+        mutable_value = value;
+        mutable_cos = Math.cos(value);
+        mutable_sin = Math.sin(value);
+    }
 }

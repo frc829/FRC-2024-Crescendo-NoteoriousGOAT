@@ -4,16 +4,24 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Value;
 
 import java.util.function.Supplier;
+
+import com.controllers.Controller;
+
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PickupSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -167,4 +175,48 @@ public class CommandBinder {
                                 trigger.whileTrue(manualShooterTiltCommand);
                         };
 
+        public static final Function<DriveSubsystem, Consumer<Trigger>> bindManualModuleZeroCommand = (
+                        drive) -> (trigger) -> {
+                                Command zeroModulesCommand = drive.createControlModulesCommand
+                                                .apply(new SwerveDriveWheelStates(new SwerveModuleState[] {
+                                                                new SwerveModuleState(),
+                                                                new SwerveModuleState(),
+                                                                new SwerveModuleState(),
+                                                                new SwerveModuleState()
+                                                }));
+                                trigger.whileTrue(zeroModulesCommand);
+                        };
+
+        public static final Function<DriveSubsystem, Consumer<Controller>> bindManualRobotCentricDriveCommand = (
+                        drive) -> (controller) -> {
+                                BooleanSupplier fieldCentricCondition = () -> controller.leftX.getAsBoolean()
+                                                || controller.leftY.getAsBoolean();
+                                BooleanSupplier robotCentricCondition = () -> !fieldCentricCondition.getAsBoolean()
+                                                &&
+                                                (controller.rightX.getAsBoolean() ||
+                                                                controller.rightY.getAsBoolean() ||
+                                                                controller.fullTrigger.getAsBoolean());
+                                Trigger robotCentricTrigger = new Trigger(robotCentricCondition);
+                                Command robotCentricCommand = drive.createManualRobotChassisSpeedsCommand
+                                                .apply(new Translation2d())
+                                                .apply(controller.rightYValue)
+                                                .apply(controller.rightXValue)
+                                                .apply(controller.fullTriggerValue);
+                                robotCentricTrigger.whileTrue(robotCentricCommand);
+
+                        };
+
+        public static final Function<DriveSubsystem, Consumer<Controller>> bindManualFieldCentricDriveCommand = (
+                        drive) -> (controller) -> {
+                                BooleanSupplier fieldCentricCondition = () -> controller.leftX.getAsBoolean()
+                                                || controller.leftY.getAsBoolean();
+                                Trigger fieldCentricTrigger = new Trigger(fieldCentricCondition);
+                                Command fieldCentricCommand = drive.createManualFieldChassisSpeedsCommand
+                                                .apply(new Translation2d())
+                                                .apply(controller.leftYValue)
+                                                .apply(controller.leftXValue)
+                                                .apply(controller.fullTriggerValue);
+                                fieldCentricTrigger.whileTrue(fieldCentricCommand);
+
+                        };
 }

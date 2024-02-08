@@ -33,7 +33,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     private static final double slot0kD = 0.0;
     private static final double slot0kF = 1.0
         / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec);
-    private static final double slot1kP = 0.5;
+    private static final double slot1kP = 2;
     private static final double slot1kI = 0.0;
     private static final double slot1kD = 0.0;
     private static final double slot1kF = 0.0;

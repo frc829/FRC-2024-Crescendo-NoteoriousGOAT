@@ -1,10 +1,10 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Second;
 
@@ -20,8 +20,7 @@ import com.compLevel0.Gyroscope;
 import com.compLevel0.Motor;
 import com.compLevel1.SwerveModule;
 import com.compLevel1.Telemetry;
-import com.types.MutableRotation2d;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -90,7 +89,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         public final Supplier<Command> createStopCommand;
         public final Function<SwerveDriveWheelStates, Command> createControlModulesCommand;
-        public final Function<Translation2d, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createControlRobotChassisSpeedsCommand;
+        public final Function<Translation2d, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualRobotChassisSpeedsCommand;
+        public final Function<Translation2d, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualFieldChassisSpeedsCommand;
 
         private DriveSubsystem(
                         List<Measure<Voltage>> steerVoltages,
@@ -102,6 +102,7 @@ public class DriveSubsystem extends SubsystemBase {
                         Measure<Velocity<Velocity<Angle>>> angularAcceleration,
                         Consumer<SwerveDriveWheelStates> controlModules,
                         Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds,
+                        Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds,
                         Runnable resetSteerEncodersFromAbsolutes,
                         Runnable stop,
                         Runnable update) {
@@ -130,9 +131,41 @@ public class DriveSubsystem extends SubsystemBase {
 
                 };
 
-                createControlRobotChassisSpeedsCommand = (centerOfRotation) -> (forward) -> (strafe) -> (rotation) -> {
-                        return null; // TODO:
+                ChassisSpeeds robotChassisSpeedsSetpoint = new ChassisSpeeds();
+                createManualRobotChassisSpeedsCommand = (centerOfRotation) -> (forward) -> (strafe) -> (rotation) -> {
+                        Runnable setRobotChassisSpeeds = () -> {
+                                robotChassisSpeedsSetpoint.vxMetersPerSecond = forward.getAsDouble()
+                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
+                                robotChassisSpeedsSetpoint.vyMetersPerSecond = strafe.getAsDouble()
+                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
+                                robotChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
+                                                * Constants.maxAngularVelocity.in(RadiansPerSecond);
+                                controlRobotChassisSpeeds.apply(centerOfRotation)
+                                                .accept(robotChassisSpeedsSetpoint);
+                        };
+                        Command setRobotChassisSpeedsCommand = run(setRobotChassisSpeeds);
+                        setRobotChassisSpeedsCommand.setName("Manual Robot Chassis Speeds");
+                        return setRobotChassisSpeedsCommand;
                 };
+
+                ChassisSpeeds fieldChassisSpeedsSetpoint = new ChassisSpeeds();
+                createManualFieldChassisSpeedsCommand = (centerOfRotation) -> (forward) -> (strafe) -> (rotation) -> {
+                        Runnable setFieldChassisSpeeds = () -> {
+                                fieldChassisSpeedsSetpoint.vxMetersPerSecond = forward.getAsDouble()
+                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
+                                fieldChassisSpeedsSetpoint.vyMetersPerSecond = strafe.getAsDouble()
+                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
+                                fieldChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
+                                                * Constants.maxAngularVelocity.in(RadiansPerSecond);
+                                controlFieldChassisSpeeds.apply(centerOfRotation)
+                                                .accept(fieldChassisSpeedsSetpoint);
+                        };
+                        Command setFieldChassisSpeedsCommand = run(setFieldChassisSpeeds);
+                        setFieldChassisSpeedsCommand.setName("Manual Field Chassis Speeds");
+                        return setFieldChassisSpeedsCommand;
+                };
+
+                setDefaultCommand(createStopCommand.get());
 
         }
 
@@ -144,6 +177,15 @@ public class DriveSubsystem extends SubsystemBase {
         @Override
         public void initSendable(SendableBuilder builder) {
                 super.initSendable(builder);
+                builder.addDoubleProperty(
+                                "Max Linear Velocity (mps)",
+                                () -> Constants.maxLinearVelocity.in(MetersPerSecond),
+                                null);
+
+                builder.addDoubleProperty(
+                                "Max Angular Velocity (mps)",
+                                () -> Constants.maxAngularVelocity.in(RadiansPerSecond),
+                                null);
         }
 
         public static final Supplier<DriveSubsystem> create = () -> {
@@ -189,7 +231,7 @@ public class DriveSubsystem extends SubsystemBase {
                                                                                         Constants.wheelkFs.get(i)))
                                                                         .andThen(
                                                                                         Motor.REV.createMotorFromCANSparkBase
-                                                                                                        .apply(Constants.steerGearings
+                                                                                                        .apply(Constants.wheelGearings
                                                                                                                         .get(i)))
                                                                         .andThen(Motor.REV.setNEOMaxVelocity)
                                                                         .andThen(Motor.REV.setSpinSim)
@@ -216,57 +258,51 @@ public class DriveSubsystem extends SubsystemBase {
                 MutableMeasure<Velocity<Velocity<Angle>>> angularAcceleration = MutableMeasure
                                 .zero(RadiansPerSecond.per(Second));
 
-                MutableRotation2d currentModule0Angle = new MutableRotation2d();
-                MutableRotation2d currentModule1Angle = new MutableRotation2d();
-                MutableRotation2d currentModule2Angle = new MutableRotation2d();
-                MutableRotation2d currentModule3Angle = new MutableRotation2d();
-                MutableRotation2d[] currentModuleAngles = new MutableRotation2d[] {
-                                currentModule0Angle,
-                                currentModule0Angle,
-                                currentModule0Angle,
-                                currentModule0Angle
+                Supplier<SwerveDriveWheelPositions> currentWheelPositions = () -> {
+                        var modulePositions = Arrays.asList(0, 1, 2, 3).stream().map(
+                                        (i) -> {
+                                                return new SwerveModulePosition(modules.get(i).wheelPosition, Rotation2d
+                                                                .fromDegrees(modules.get(i).angle.in(Degrees)));
+                                        }).toList().toArray(SwerveModulePosition[]::new);
+                        return new SwerveDriveWheelPositions(modulePositions);
                 };
-                SwerveModuleState currentModule0State = new SwerveModuleState(0, currentModule0Angle);
-                SwerveModuleState currentModule1State = new SwerveModuleState(0, currentModule1Angle);
-                SwerveModuleState currentModule2State = new SwerveModuleState(0, currentModule2Angle);
-                SwerveModuleState currentModule3State = new SwerveModuleState(0, currentModule3Angle);
-                SwerveModuleState[] currentModuleStates = new SwerveModuleState[] {
-                                currentModule0State,
-                                currentModule1State,
-                                currentModule2State,
-                                currentModule3State
-                };
-                SwerveModulePosition currentModule0Position = new SwerveModulePosition(0, currentModule0Angle);
-                SwerveModulePosition currentModule1Position = new SwerveModulePosition(0, currentModule1Angle);
-                SwerveModulePosition currentModule2Position = new SwerveModulePosition(0, currentModule2Angle);
-                SwerveModulePosition currentModule3Position = new SwerveModulePosition(0, currentModule3Angle);
-                SwerveModulePosition[] currentModulePositions = new SwerveModulePosition[] {
-                                currentModule0Position,
-                                currentModule1Position,
-                                currentModule2Position,
-                                currentModule3Position
+                Supplier<SwerveDriveWheelStates> currentWheelStates = () -> {
+                        var moduleStates = Arrays.asList(0, 1, 2, 3).stream().map(
+                                        (i) -> {
+                                                return new SwerveModuleState(modules.get(i).wheelVelocity, Rotation2d
+                                                                .fromDegrees(modules.get(i).angle.in(Degrees)));
+                                        }).toList().toArray(SwerveModuleState[]::new);
+                        return new SwerveDriveWheelStates(moduleStates);
                 };
                 ChassisSpeeds robotSpeeds = new ChassisSpeeds();
 
-                Consumer<SwerveDriveWheelStates> controlModules = (wheelStates) -> {
+                Consumer<SwerveDriveWheelStates> controlModuleStates = (wheelStates) -> {
                         Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
-                                        (i) -> modules.get(i).controlState.accept(wheelStates.states[i]));
+                                        (i) -> {
+                                                modules.get(i).controlState.accept(wheelStates.states[i]);
+                                        });
                 };
 
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
-                                        chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.20);
+                                        chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.020);
                                         SwerveDriveWheelStates wheelSpeeds = new SwerveDriveWheelStates(
-                                                        Constants.kinematics.toSwerveModuleStates(chassisSpeeds,
+                                                        Constants.kinematics.toSwerveModuleStates(
+                                                                        chassisSpeeds,
                                                                         centerOfRotation));
                                         Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
                                                         (i) -> wheelSpeeds.states[i] = SwerveModuleState.optimize(
                                                                         wheelSpeeds.states[i],
-                                                                        currentModuleAngles[i]));
+                                                                        currentWheelStates.get().states[i].angle));
                                         Arrays.asList(0, 1, 2, 3).stream().forEachOrdered(
-                                                        (i) -> wheelSpeeds.states[i].speedMetersPerSecond *= wheelSpeeds.states[i].angle
-                                                                        .minus(currentModuleAngles[i]).getCos());
-                                        controlModules.accept(wheelSpeeds);
+                                                        (i) -> {
+                                                                Rotation2d difference = wheelSpeeds.states[i].angle
+                                                                                .minus(currentWheelStates
+                                                                                                .get().states[i].angle);
+                                                                double cosine = difference.getCos();
+                                                                wheelSpeeds.states[i].speedMetersPerSecond *= cosine;
+                                                        });
+                                        controlModuleStates.accept(wheelSpeeds);
 
                                 };
 
@@ -285,18 +321,23 @@ public class DriveSubsystem extends SubsystemBase {
                                 .andThen(Telemetry.create)
                                 .apply(robotSpeeds)
                                 .apply(Constants.kinematics)
-                                .apply(new SwerveDriveWheelPositions(currentModulePositions));
+                                .apply(currentWheelPositions);
+
+                Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds = (
+                                centerOfRotation) -> (chassisSpeeds) -> {
+                                        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds,
+                                                        telemetry.fieldPoseEstimate.getRotation());
+                                        controlRobotChassisSpeeds.apply(centerOfRotation).accept(chassisSpeeds);
+
+                                };
 
                 Runnable update = () -> {
                         Arrays.asList(0, 1, 2, 3).stream().forEachOrdered((i) -> {
                                 modules.get(i).update.run();
-                                currentModuleAngles[i].mut_set(modules.get(i).angle.in(Radians));
-                                currentModuleStates[i].speedMetersPerSecond = modules.get(i).wheelVelocity
-                                                .in(MetersPerSecond);
-                                currentModulePositions[i].distanceMeters = modules.get(i).wheelPosition.in(Meters);
                         });
 
-                        ChassisSpeeds currentRobotSpeeds = Constants.kinematics.toChassisSpeeds(currentModuleStates);
+                        ChassisSpeeds currentRobotSpeeds = Constants.kinematics
+                                        .toChassisSpeeds(currentWheelStates.get());
                         robotSpeeds.vxMetersPerSecond = currentRobotSpeeds.vyMetersPerSecond;
                         robotSpeeds.vyMetersPerSecond = currentRobotSpeeds.vyMetersPerSecond;
                         robotSpeeds.omegaRadiansPerSecond = currentRobotSpeeds.omegaRadiansPerSecond;
@@ -306,18 +347,9 @@ public class DriveSubsystem extends SubsystemBase {
                                                         / Constants.driveRadius.in(Meters));
                 };
 
-                return new DriveSubsystem(
-                                steerVoltages,
-                                wheelVoltages,
-                                angleSensorVoltages,
-                                sensorAngles,
-                                robotSpeeds,
-                                telemetry.accelerationMag,
-                                angularAcceleration,
-                                controlModules,
-                                controlRobotChassisSpeeds,
-                                resetSteerEncodersFromAbsolutes,
-                                stop,
-                                update);
+                return new DriveSubsystem(steerVoltages, wheelVoltages, angleSensorVoltages, sensorAngles, robotSpeeds,
+                                telemetry.accelerationMag, angularAcceleration, controlModuleStates,
+                                controlRobotChassisSpeeds, controlFieldChassisSpeeds, resetSteerEncodersFromAbsolutes,
+                                stop, update);
         };
 }
