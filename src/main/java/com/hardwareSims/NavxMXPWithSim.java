@@ -3,6 +3,7 @@ package com.hardwareSims;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -18,17 +19,23 @@ import edu.wpi.first.wpilibj.SerialPort.Port;
 
 public class NavxMXPWithSim {
 
-    public final AHRS navx;
+    public final Supplier<Double> yawDegrees;
+    public final Supplier<Double> worldLinearAccelXGs;
+    public final Supplier<Double> worldLinearAccelYGs;
+    public final Supplier<Double> worldLinearAccelZGs;
     public final Runnable update;
 
     private NavxMXPWithSim(
             AHRS navx,
             Runnable update) {
-        this.navx = navx;
+        this.yawDegrees = () -> (double) navx.getYaw();
+        this.worldLinearAccelXGs = () -> (double) navx.getWorldLinearAccelX();
+        this.worldLinearAccelYGs = () -> (double) navx.getWorldLinearAccelY();
+        this.worldLinearAccelZGs = () -> (double) navx.getWorldLinearAccelZ();
         this.update = update;
     }
 
-    public static final Function<ChassisSpeeds, NavxMXPWithSim> create = (
+    public static final Function<Supplier<ChassisSpeeds>, NavxMXPWithSim> create = (
             simChassisSpeeds) -> {
 
         AHRS navx = new AHRS(Port.kMXP);
@@ -42,7 +49,7 @@ public class NavxMXPWithSim {
             if (RobotBase.isSimulation()) {
                 currentTime.mut_setMagnitude(Timer.getFPGATimestamp());
                 double deltaTime = currentTime.in(Seconds) - lastTime.in(Seconds);
-                double yawAngularVelocity = Math.toDegrees(simChassisSpeeds.omegaRadiansPerSecond);
+                double yawAngularVelocity = Math.toDegrees(simChassisSpeeds.get().omegaRadiansPerSecond);
                 double yaw = simYaw.get();
                 double deltaYaw = yawAngularVelocity * deltaTime;
                 yaw -= deltaYaw;

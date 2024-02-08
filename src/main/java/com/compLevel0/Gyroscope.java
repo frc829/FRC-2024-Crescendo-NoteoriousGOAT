@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Gs;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.hardwareSims.NavxMXPWithSim;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -35,7 +36,7 @@ public class Gyroscope {
     }
 
     public static final class KauaiLabs {
-        public static Function<ChassisSpeeds, NavxMXPWithSim> createNavxXMPWithSim = (simChassisSpeeds) -> {
+        public static Function<Supplier<ChassisSpeeds>, NavxMXPWithSim> createNavxXMPWithSim = (simChassisSpeeds) -> {
             return NavxMXPWithSim.create.apply(simChassisSpeeds);
         };
 
@@ -47,10 +48,10 @@ public class Gyroscope {
 
             Runnable update = () -> {
                 navxMXPWithSim.update.run();
-                yaw.mut_setMagnitude(-navxMXPWithSim.navx.getYaw());
-                accelerationX.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelX());
-                accelerationY.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelY());
-                accelerationZ.mut_setMagnitude(navxMXPWithSim.navx.getWorldLinearAccelZ());
+                yaw.mut_setMagnitude(-navxMXPWithSim.yawDegrees.get());
+                accelerationX.mut_setMagnitude(navxMXPWithSim.worldLinearAccelXGs.get());
+                accelerationY.mut_setMagnitude(navxMXPWithSim.worldLinearAccelYGs.get());
+                accelerationZ.mut_setMagnitude(navxMXPWithSim.worldLinearAccelZGs.get());
             };
 
             return new Gyroscope(yaw, accelerationX, accelerationY, accelerationZ, update);

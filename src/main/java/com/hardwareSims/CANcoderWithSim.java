@@ -1,6 +1,7 @@
 package com.hardwareSims;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.sim.CANcoderSimState;
@@ -12,13 +13,15 @@ import edu.wpi.first.wpilibj.RobotBase;
 
 public class CANcoderWithSim {
 
-    public final CANcoder cancoder;
+    public final Supplier<Double> supplyVoltage;
+    public final Supplier<Double> absoluteAngleRotations;
     public final Runnable update;
 
     private CANcoderWithSim(
             CANcoder cancoder,
             Runnable update) {
-        this.cancoder = cancoder;
+        this.supplyVoltage = () -> cancoder.getSupplyVoltage().getValueAsDouble();
+        this.absoluteAngleRotations = () -> cancoder.getAbsolutePosition().getValueAsDouble();
         this.update = update;
     }
 

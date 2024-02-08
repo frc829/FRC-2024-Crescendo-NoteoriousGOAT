@@ -32,6 +32,8 @@ public class Motor {
         public final Consumer<Measure<Angle>> turn;
         public final Consumer<Measure<Velocity<Angle>>> spin;
         public final Consumer<Measure<Voltage>> setVoltage;
+        public final Runnable enableBrakeMode;
+        public final Runnable invert;
         public final Runnable stop;
         public final Runnable update;
 
@@ -45,6 +47,8 @@ public class Motor {
                         Consumer<Measure<Angle>> turn,
                         Consumer<Measure<Velocity<Angle>>> spin,
                         Consumer<Measure<Voltage>> setVoltage,
+                        Runnable enableBrakeMode,
+                        Runnable invert,
                         Runnable stop,
                         Runnable update) {
                 this.voltage = voltage;
@@ -56,6 +60,8 @@ public class Motor {
                 this.turn = turn;
                 this.spin = spin;
                 this.setVoltage = setVoltage;
+                this.enableBrakeMode = enableBrakeMode;
+                this.invert = invert;
                 this.stop = stop;
                 this.update = update;
         }

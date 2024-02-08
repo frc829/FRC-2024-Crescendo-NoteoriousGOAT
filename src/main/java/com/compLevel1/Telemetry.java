@@ -8,8 +8,6 @@ import java.util.function.Supplier;
 import java.util.function.Function;
 
 import com.compLevel0.Gyroscope;
-import com.types.MutablePose2d;
-
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -26,14 +24,14 @@ public class Telemetry {
 
         public final Field2d field2d;
         public final Measure<Velocity<Velocity<Distance>>> accelerationMag;
-        public final Pose2d fieldPoseEstimate;
+        public final Supplier<Pose2d> fieldPoseEstimate;
         public final Consumer<Pose2d> resetFieldPosition;
         public final Runnable update;
 
         private Telemetry(
                         Field2d field2d,
                         Measure<Velocity<Velocity<Distance>>> accelerationMag,
-                        Pose2d fieldPoseEstimate,
+                        Supplier<Pose2d> fieldPoseEstimate,
                         Consumer<Pose2d> resetFieldPosition,
                         Runnable update) {
                 this.field2d = field2d;
@@ -57,7 +55,8 @@ public class Telemetry {
                                                 wheelPositions.get().positions,
                                                 new Pose2d());
 
-                                MutablePose2d fieldPoseEstimate = new MutablePose2d();
+                                Supplier<Pose2d> fieldPoseEstimate = () -> swerveDrivePoseEstimator
+                                                .getEstimatedPosition();
 
                                 Consumer<Pose2d> resetFieldPosition = (resetPose) -> {
                                         swerveDrivePoseEstimator.resetPosition(
@@ -68,7 +67,7 @@ public class Telemetry {
 
                                 Runnable update = () -> {
                                         gyroscope.update.run();
-                                        field2d.setRobotPose(fieldPoseEstimate);
+                                        field2d.setRobotPose(fieldPoseEstimate.get());
                                         accelerationMag.mut_setMagnitude(
                                                         Math.pow(gyroscope.accelerationX.in(MetersPerSecondPerSecond),
                                                                         2)
@@ -79,10 +78,6 @@ public class Telemetry {
                                         swerveDrivePoseEstimator.update(
                                                         Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
                                                         wheelPositions.get().positions);
-                                        fieldPoseEstimate.mut_set(
-                                                        swerveDrivePoseEstimator.getEstimatedPosition().getX(),
-                                                        swerveDrivePoseEstimator.getEstimatedPosition().getY(),
-                                                        swerveDrivePoseEstimator.getEstimatedPosition().getRotation());
                                 };
 
                                 return new Telemetry(

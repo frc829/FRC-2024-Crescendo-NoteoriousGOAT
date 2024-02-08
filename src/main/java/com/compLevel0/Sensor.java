@@ -55,8 +55,8 @@ public class Sensor<T extends Unit<T>> {
             MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
             Runnable update = () -> {
                 cancoderWithSim.update.run();
-                voltage.mut_setMagnitude(cancoderWithSim.cancoder.getSupplyVoltage().getValueAsDouble());
-                angle.mut_setMagnitude(cancoderWithSim.cancoder.getAbsolutePosition().getValueAsDouble());
+                voltage.mut_setMagnitude(cancoderWithSim.supplyVoltage.get());
+                angle.mut_setMagnitude(cancoderWithSim.absoluteAngleRotations.get());
             };
             return new Sensor<>(voltage, angle, update);
         };
