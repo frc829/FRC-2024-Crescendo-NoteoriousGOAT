@@ -21,6 +21,7 @@ import com.compLevel0.Gyroscope;
 import com.compLevel0.Motor;
 import com.compLevel1.SwerveModule;
 import com.compLevel1.Telemetry;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -36,7 +37,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -45,6 +45,7 @@ import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -64,11 +65,14 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final List<Double> steerkIs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkDs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkFs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkPs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkIs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkFs = Collections.nCopies(4,
-                                1.0 / Units.radiansPerSecondToRotationsPerMinute(driveDCMotor.freeSpeedRadPerSec));
+                private static final List<Double> wheelkPs = Collections.nCopies(4, 0.11);
+                private static final List<Double> wheelkIs = Collections.nCopies(4, 0.5);
+                private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0001);
+                private static final List<Double> wheelkFs = Collections.nCopies(4, 0.12);
+                private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 5.0);
+                private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.1);
+                private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.001);
+                private static final List<Double> wheelFOCkFs = Collections.nCopies(4, 0.0);
                 private static final Measure<Distance> moduleX = Inches.of(13);
                 private static final Measure<Distance> moduleY = Inches.of(13);
                 private static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
@@ -84,8 +88,9 @@ public class DriveSubsystem extends SubsystemBase {
                                 maxLinearVelocity.in(MetersPerSecond) / driveRadius.in(Meters));
 
                 private static final class PathPlannerConfigs {
-                        private static final PIDConstants translationConstants = new PIDConstants(5, 0, 0);
-                        private static final PIDConstants rotationConstants = new PIDConstants(5, 0, 0);
+                        private static final PIDConstants translationConstants = new PIDConstants(8, 0, 0);
+                        private static final PIDConstants rotationConstants = new PIDConstants(
+                                        8, 0, 0);
                         private static final ReplanningConfig replanningConfig = new ReplanningConfig(
                                         true,
                                         true,
@@ -264,6 +269,7 @@ public class DriveSubsystem extends SubsystemBase {
 
                 List<SwerveModule> modules = Arrays.asList(0, 1, 2, 3).stream().map(
                                 (i) -> {
+                                        TalonFXConfiguration config = new TalonFXConfiguration();
                                         return SwerveModule.create
                                                         .apply(Motor.REV.createCANSparkBaseNEO
                                                                         .andThen(Motor.REV.setkP.apply(1).apply(
@@ -282,6 +288,7 @@ public class DriveSubsystem extends SubsystemBase {
                                                                                         .apply(
                                                                                                         Constants.steerGearings
                                                                                                                         .get(i)))
+                                                                        .andThen(Motor.REV.enableBrake)
                                                                         .andThen(
                                                                                         Motor.REV.createMotorFromCANSparkBase
                                                                                                         .apply(Constants.steerGearings
@@ -298,25 +305,42 @@ public class DriveSubsystem extends SubsystemBase {
                                                                                         .apply(Constants.steerGearings
                                                                                                         .get(i)))
                                                                         .apply(Constants.steerDeviceIds.get(i)))
-                                                        .apply(Motor.REV.createCANSparkBaseNEO
-                                                                        .andThen(Motor.REV.setkP.apply(0).apply(
-                                                                                        Constants.wheelkPs.get(
-                                                                                                        i)))
-                                                                        .andThen(Motor.REV.setkI.apply(0).apply(
-                                                                                        Constants.wheelkIs.get(
-                                                                                                        i)))
-                                                                        .andThen(Motor.REV.setkD.apply(0).apply(
-                                                                                        Constants.wheelkDs.get(
-                                                                                                        i)))
-                                                                        .andThen(Motor.REV.setkF.apply(0).apply(
-                                                                                        Constants.wheelkFs.get(
-                                                                                                        i)))
-                                                                        .andThen(
-                                                                                        Motor.REV.createMotorFromCANSparkBase
-                                                                                                        .apply(Constants.wheelGearings
-                                                                                                                        .get(i)))
-                                                                        .andThen(Motor.REV.setNEOMaxVelocity)
-                                                                        .andThen(Motor.REV.setSpinSim)
+                                                        .apply(Motor.CTRE.createTalonFX.apply("rio")
+                                                                        .andThen(Motor.CTRE.setkP.apply(0)
+                                                                                        .apply(Constants.wheelkPs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkI.apply(0)
+                                                                                        .apply(Constants.wheelkIs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkD.apply(0)
+                                                                                        .apply(Constants.wheelkDs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkV.apply(0)
+                                                                                        .apply(Constants.wheelkFs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkP.apply(2)
+                                                                                        .apply(Constants.wheelFOCkPs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkI.apply(2)
+                                                                                        .apply(Constants.wheelFOCkIs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkD.apply(2)
+                                                                                        .apply(Constants.wheelFOCkDs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setkV.apply(2)
+                                                                                        .apply(Constants.wheelFOCkFs
+                                                                                                        .get(i))
+                                                                                        .apply(config))
+                                                                        .andThen(Motor.CTRE.setBrake.apply(config))
+                                                                        .andThen(Motor.CTRE.createMotorFromTalonFX)
+                                                                        .andThen(Motor.CTRE.setKrakenX60FOCMaxVelocity)
                                                                         .apply(Constants.wheelDeviceIds.get(i)))
                                                         .apply(Constants.steerGearings.get(i))
                                                         .apply(Constants.wheelGearings.get(i))
@@ -376,7 +400,11 @@ public class DriveSubsystem extends SubsystemBase {
 
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
-                                        chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.020);
+                                        if (RobotBase.isSimulation()) {
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.06);
+                                        } else {
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+                                        }
                                         SwerveDriveWheelStates wheelSpeeds = new SwerveDriveWheelStates(
                                                         Constants.kinematics.toSwerveModuleStates(
                                                                         chassisSpeeds,

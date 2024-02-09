@@ -135,6 +135,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setAbsolutEencoderScaleFactor.apply(Constants.absoluteAngleScaleFactor))
         .andThen(Motor.REV.setInvertAbsoluteEncoder)
         .andThen(Motor.REV.setAbsoluteEncoderOffset.apply(Constants.absoluteEncoderOffset))
+        .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))
         .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setTurnSim
