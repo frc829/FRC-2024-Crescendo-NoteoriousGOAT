@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -127,17 +128,18 @@ public class CommandBinder {
 
                                         };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Consumer<Trigger>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
+        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Consumer<Trigger>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
                         drive) -> (targetPose) -> (constraints) -> (
-                                        goalEndVelocityMPS) -> (rotationDelayDistance) -> (trigger) -> {
-                                                Command pathFindToPoseCommand = CommandCreators.createPathFindToSuppliedOptPoseCommand
+                                        goalEndVelocityMPS) -> (rotationDelayDistance) -> (pathFlip) -> (trigger) -> {
+                                                Command setPathFindCommand = CommandCreators.createSetPathFindCommand
                                                                 .apply(drive)
                                                                 .apply(targetPose)
                                                                 .apply(constraints)
                                                                 .apply(goalEndVelocityMPS)
-                                                                .apply(rotationDelayDistance);
+                                                                .apply(rotationDelayDistance)
+                                                                .apply(pathFlip);
 
-                                                trigger.whileTrue(pathFindToPoseCommand);
 
+                                                trigger.whileTrue(setPathFindCommand.andThen(Commands.deferredProxy(() -> CommandCreators.pathFindToSuppliedOptPoseCommand[0])));
                                         };
 }

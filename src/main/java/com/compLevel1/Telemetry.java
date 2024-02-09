@@ -176,10 +176,10 @@ public class Telemetry {
 
                                                 objectTranslation = currentFieldPosition.getTranslation()
                                                                 .plus(objectTranslation);
-                                                Rotation2d objectRotation = telemetry.fieldPoseEstimate.get()
-                                                                .getRotation();
-                                                objectRotation = objectRotation.plus(objectTranslation.getAngle());
-                                                Pose2d objectPose = new Pose2d(objectTranslation, objectRotation);
+                                                Translation2d pathTranslation = objectTranslation
+                                                                .minus(currentFieldPosition.getTranslation());
+                                                Rotation2d objectRotation2d = pathTranslation.getAngle();
+                                                Pose2d objectPose = new Pose2d(objectTranslation, objectRotation2d);
 
                                                 return Optional.of(objectPose);
                                         } else {

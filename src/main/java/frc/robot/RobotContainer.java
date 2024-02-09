@@ -101,26 +101,27 @@ public class RobotContainer {
                 Random randTheta = new Random();
 
                 Supplier<Optional<Pose2d>> targetPoseOptionalTest = () -> {
-                double x = 15 * randX.nextDouble();
-                double y = 7.5 * randY.nextDouble();
-                double thetaDegrees = 360 * randTheta.nextDouble();
-                Rotation2d theta = Rotation2d.fromDegrees(thetaDegrees);
+                        double x = 15 * randX.nextDouble();
+                        double y = 7.5 * randY.nextDouble();
+                        double thetaDegrees = 360 * randTheta.nextDouble();
+                        Rotation2d theta = Rotation2d.fromDegrees(thetaDegrees);
 
-                return Optional.of(new Pose2d(
-                x,
-                y,
-                theta));
+                        return Optional.of(new Pose2d(
+                                        x,
+                                        y,
+                                        theta));
                 };
 
                 CommandBinder.bindPathFindToSuppliedPoseCommandToTrigger
-                .apply(driveSubsystem)
-                .apply(targetPoseOptionalTest)
-                .apply(new PathConstraints(
-                3.0, 4.0,
-                Units.degreesToRadians(540), Units.degreesToRadians(720)))
-                .apply(0.0)
-                .apply(0.0)
-                .accept(driver.b);
+                                .apply(driveSubsystem)
+                                .apply(targetPoseOptionalTest)
+                                .apply(new PathConstraints(
+                                                3.0, 4.0,
+                                                Units.degreesToRadians(540), Units.degreesToRadians(720)))
+                                .apply(0.0)
+                                .apply(0.0)
+                                .apply(false)
+                                .accept(driver.b);
 
                 Supplier<Optional<Pose2d>> goToNoteSupplier = () -> {
                         var optionalPose = driveSubsystem.objectPositions.get(0).getSecond().get();
@@ -130,7 +131,7 @@ public class RobotContainer {
                                 return Optional.of(new Pose2d(
                                                 optionalPose.get().getTranslation(),
                                                 optionalPose.get().getRotation()
-                                                                .rotateBy(Rotation2d.fromDegrees(0))));
+                                                                .rotateBy(Rotation2d.fromDegrees(180))));
                         }
                 };
 
@@ -142,6 +143,7 @@ public class RobotContainer {
                                                 Units.degreesToRadians(540), Units.degreesToRadians(720)))
                                 .apply(0.0)
                                 .apply(0.0)
+                                .apply(false)
                                 .accept(driver.x);
 
                 SmartDashboard.putData("Operator", operator);
@@ -164,7 +166,7 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand(
                                 "TestGoToNote",
-                                CommandCreators.createPathFindToSuppliedOptPoseCommand
+                                CommandCreators.createSetPathFindCommand
                                                 .apply(driveSubsystem)
                                                 .apply(targetPoseOptionalTest)
                                                 .apply(new PathConstraints(
@@ -172,7 +174,9 @@ public class RobotContainer {
                                                                 Units.degreesToRadians(540),
                                                                 Units.degreesToRadians(720)))
                                                 .apply(0.0)
-                                                .apply(0.0));
+                                                .apply(0.0)
+                                                .apply(true)
+                                                .andThen(CommandCreators.pathFindToSuppliedOptPoseCommand[0]));
                 autoChooser = AutoBuilder.buildAutoChooser();
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);

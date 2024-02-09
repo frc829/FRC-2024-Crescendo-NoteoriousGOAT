@@ -38,6 +38,9 @@ public class CommandCreators {
                 }
 
                 private static final class Shoot {
+                        private static final double bottomOfSpeakerMeters = 2.0;
+                        private static final double topOfSpeakerMeters = 2.13;
+                        private static final double shooterWheelRadiusInches = 2.0;
                         private static final double shutOffTime = 5;
 
                         private static final class Fender {
@@ -147,39 +150,87 @@ public class CommandCreators {
 
                         };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Command>>>>> createPathFindToSuppliedOptPoseCommand = (
+        public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
+
+        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Command>>>>>> createSetPathFindCommand = (
                         drive) -> (targetPoseSupplier) -> (
-                                        constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
-                                                Command[] pathFindToSuppliedOptPoseCommand = new Command[] {
-                                                                Commands.none()
-                                                };
+                                        constraints) -> (goalEndVelocityMPS) -> (
+                                                        rotationDelayDistance) -> (pathFlip) -> {
+                                                                Runnable setPathFind = () -> {
+                                                                        Optional<Pose2d> targetPoseOptional = targetPoseSupplier
+                                                                                        .get();
+                                                                        if (targetPoseOptional.isPresent()) {
+                                                                                Pose2d targetPose = targetPoseOptional
+                                                                                                .get();
+                                                                                if (pathFlip) {
+                                                                                        pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
+                                                                                                        .pathfindToPoseFlipped(
+                                                                                                                        targetPose,
+                                                                                                                        constraints,
+                                                                                                                        goalEndVelocityMPS,
+                                                                                                                        rotationDelayDistance)
+                                                                                                        .handleInterrupt(
+                                                                                                                        drive.stop);
+                                                                                } else {
+                                                                                        pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
+                                                                                                        .pathfindToPose(
+                                                                                                                        targetPose,
+                                                                                                                        constraints,
+                                                                                                                        goalEndVelocityMPS,
+                                                                                                                        rotationDelayDistance)
+                                                                                                        .handleInterrupt(
+                                                                                                                        drive.stop);
+                                                                                }
 
-                                                Runnable setPathFindToSuppliedOptPoseCommand = () -> {
-                                                        Optional<Pose2d> targetPoseOptional = targetPoseSupplier.get();
-                                                        if (targetPoseOptional.isPresent()) {
-                                                                Pose2d targetPose = targetPoseOptional.get();
-                                                                pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
-                                                                                .pathfindToPoseFlipped(
-                                                                                                targetPose,
-                                                                                                constraints,
-                                                                                                goalEndVelocityMPS,
-                                                                                                rotationDelayDistance)
-                                                                                .handleInterrupt(drive.stop);
+                                                                        } else {
+                                                                                pathFindToSuppliedOptPoseCommand[0] = Commands
+                                                                                                .none();
+                                                                        }
+                                                                        pathFindToSuppliedOptPoseCommand[0]
+                                                                                        .setName("PathFindToSuppliedPose");
+                                                                        pathFindToSuppliedOptPoseCommand[0].schedule();
+                                                                };
+                                                                Command setPathFindCommand = Commands
+                                                                                .runOnce(setPathFind);
+                                                                return setPathFindCommand;
+                                                        };
 
-                                                        } else {
-                                                                pathFindToSuppliedOptPoseCommand[0] = Commands.none();
-                                                        }
-                                                        pathFindToSuppliedOptPoseCommand[0]
-                                                                        .setName("PathFindToSuppliedPose");
-                                                        pathFindToSuppliedOptPoseCommand[0].schedule();
-                                                };
+        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Supplier<Command>>>>>>> createSetPathFindCommandSupplier = (
+                        drive) -> (targetPoseSupplier) -> (
+                                        constraints) -> (goalEndVelocityMPS) -> (
+                                                        rotationDelayDistance) -> (pathFlip) -> {
+                                                                Supplier<Command> pathFindCommand = () -> {
+                                                                        Optional<Pose2d> targetPoseOptional = targetPoseSupplier
+                                                                                        .get();
+                                                                        if (targetPoseOptional.isPresent()) {
+                                                                                Pose2d targetPose = targetPoseOptional
+                                                                                                .get();
+                                                                                if (pathFlip) {
+                                                                                        return AutoBuilder
+                                                                                                        .pathfindToPoseFlipped(
+                                                                                                                        targetPose,
+                                                                                                                        constraints,
+                                                                                                                        goalEndVelocityMPS,
+                                                                                                                        rotationDelayDistance)
+                                                                                                        .handleInterrupt(
+                                                                                                                        drive.stop);
+                                                                                } else {
+                                                                                        return AutoBuilder
+                                                                                                        .pathfindToPose(
+                                                                                                                        targetPose,
+                                                                                                                        constraints,
+                                                                                                                        goalEndVelocityMPS,
+                                                                                                                        rotationDelayDistance)
+                                                                                                        .handleInterrupt(
+                                                                                                                        drive.stop);
+                                                                                }
 
-                                                Command command = Commands.runOnce(setPathFindToSuppliedOptPoseCommand)
-                                                                .andThen(pathFindToSuppliedOptPoseCommand[0]
-                                                                .handleInterrupt(() -> pathFindToSuppliedOptPoseCommand[0].cancel()));
+                                                                        } else {
+                                                                                return Commands.none();
+                                                                        }
+                                                                };
+                                                                return pathFindCommand;
 
-                                                return command;
-
-                                        };
+                                                        };
 
 }
