@@ -72,6 +72,20 @@
       },
       "/SmartDashboard/Field": {
         "height": 8.013679504394531,
+        "limelightFront-Pose": {
+          "style": "Hidden"
+        },
+        "limelightPickup-ObjectPose": {
+          "color": [
+            58.101253509521484,
+            0.0,
+            255.0,
+            255.0
+          ]
+        },
+        "limelightPickup-Pose": {
+          "style": "Hidden"
+        },
         "path": {
           "arrowSize": 0,
           "style": "Line"
@@ -112,9 +126,28 @@
         "Field": {
           "double[]##v_/SmartDashboard/Field/Robot": {
             "open": true
-          }
+          },
+          "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
+            "open": true
+          },
+          "open": true
         },
         "Shooter Tilt": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/objectCamSpace": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/objectCamSpaceRotatedIntoRobotFrame": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/objectTranslation": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/objectTranslationAfterRot": {
+          "open": true
+        },
+        "double[]##v_/SmartDashboard/objectTranslationRobot": {
           "open": true
         },
         "open": true

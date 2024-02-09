@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -24,16 +25,19 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class FieldDetector {
 
+    public final String name;
     public final Supplier<Optional<Pose2d>> fieldPosition;
     public final Supplier<Optional<Measure<Time>>> latency;
     public final Runnable enable;
     public final Runnable update;
 
     private FieldDetector(
+            String name,
             Supplier<Optional<Pose2d>> fieldPosition,
             Supplier<Optional<Measure<Time>>> latency,
             Runnable enable,
             Runnable update) {
+        this.name = name;
         this.fieldPosition = fieldPosition;
         this.latency = latency;
         this.enable = enable;
@@ -56,9 +60,19 @@ public class FieldDetector {
                     MutableMeasure<Angle> fieldYaw = MutableMeasure.zero(Degrees);
                     MutableMeasure<Time> latencyMeasure = MutableMeasure.zero(Milliseconds);
 
+                    Random randX = new Random();
+                    Random randY = new Random();
+                    Random randTheta = new Random();
+
                     Supplier<Optional<Pose2d>> fieldPosition = () -> {
                         if (RobotBase.isSimulation()) {
-                            return Optional.of(simFieldPose.get());
+                            Pose2d simPose = simFieldPose.get();
+                            Pose2d newPose = new Pose2d(
+                                    randX.nextDouble() * 0.2 - 0.1 + simPose.getX(),
+                                    randY.nextDouble() * 0.2 - 0.1 + simPose.getY(),
+                                    Rotation2d.fromDegrees(
+                                            randTheta.nextDouble() * 2 - 1 + simPose.getRotation().getDegrees()));
+                            return Optional.of(newPose);
                         }
                         if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
                             return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
@@ -100,6 +114,7 @@ public class FieldDetector {
                     };
 
                     return new FieldDetector(
+                            name,
                             fieldPosition,
                             latency,
                             enable,

@@ -17,8 +17,10 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.compLevel0.FieldDetector;
 import com.compLevel0.Gyroscope;
 import com.compLevel0.Motor;
+import com.compLevel0.ObjectDetector;
 import com.compLevel1.SwerveModule;
 import com.compLevel1.Telemetry;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -28,7 +30,9 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -37,6 +41,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -443,6 +448,33 @@ public class DriveSubsystem extends SubsystemBase {
                                 .apply(Constants.kinematics)
                                 .apply(currentWheelPositions);
 
+                // Telemetry.addFieldDetectorToTelemetry
+                //                 .apply(FieldDetector.Limelight.createLimelight
+                //                                 .apply("limelightFront")
+                //                                 .apply(telemetry.fieldPoseEstimate))
+                //                 .apply(telemetry);
+
+                // Telemetry.addFieldDetectorToTelemetry
+                //                 .apply(FieldDetector.Limelight.createLimelight
+                //                                 .apply("limelightPickup")
+                //                                 .apply(telemetry.fieldPoseEstimate))
+                //                 .apply(telemetry);
+
+                Pose3d cameraPosition = new Pose3d(
+                                Units.inchesToMeters(13),
+                                Units.inchesToMeters(-13),
+                                Units.inchesToMeters(4),
+                                new Rotation3d(
+                                                0,
+                                                0,
+                                                Math.toRadians(0)));
+
+                Telemetry.addObjectDetectorToTelemetry
+                                .apply(ObjectDetector.Limelight.createLimelight
+                                                .apply("limelightPickup")
+                                                .apply(cameraPosition))
+                                .apply(telemetry);
+
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
                                         chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds,
@@ -467,23 +499,10 @@ public class DriveSubsystem extends SubsystemBase {
                                                         / Constants.driveRadius.in(Meters));
                 };
 
-                return new DriveSubsystem(
-                                telemetry.field2d,
-                                steerVoltages,
-                                wheelVoltages,
-                                angleSensorVoltages,
-                                sensorAngles,
-                                telemetry.fieldPoseEstimate,
-                                fieldSpeeds,
-                                robotSpeeds,
-                                telemetry.accelerationMag,
-                                angularAcceleration,
-                                telemetry.resetFieldPosition,
-                                controlModuleStates,
-                                controlRobotChassisSpeeds,
-                                controlFieldChassisSpeeds,
-                                resetSteerEncodersFromAbsolutes,
-                                stop,
-                                update);
+                return new DriveSubsystem(telemetry.field2d, steerVoltages, wheelVoltages, angleSensorVoltages,
+                                sensorAngles, telemetry.fieldPoseEstimate, fieldSpeeds, robotSpeeds,
+                                telemetry.accelerationMag, angularAcceleration, telemetry.resetFieldPosition,
+                                controlModuleStates, controlRobotChassisSpeeds, controlFieldChassisSpeeds,
+                                resetSteerEncodersFromAbsolutes, stop, update);
         };
 }
