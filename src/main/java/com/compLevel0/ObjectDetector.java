@@ -3,7 +3,6 @@ package com.compLevel0;
 import static edu.wpi.first.units.Units.Milliseconds;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -52,19 +51,17 @@ public class ObjectDetector {
                     NetworkTableEntry clSupplier = table.getEntry("cl");
                     NetworkTableEntry pipelineConsumer = table.getEntry("pipeline");
 
-                    Random txRandom = new Random();
-                    Random tyRandom = new Random();
                     Supplier<Double> txDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            return 0.0; // -txRandom.nextDouble() * 59.6 - 29.8;
+                            return 25.0; 
                         } else {
-                            return 0.0; // -txSupplier.getDouble(0);
+                            return -txSupplier.getDouble(0);
                         }
                     };
 
                     Supplier<Double> tyDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            return 5.0; // tyRandom.nextDouble() * 29.8 - 59.6;
+                            return 2.0;
                         } else {
                             return tySupplier.getDouble(0);
                         }

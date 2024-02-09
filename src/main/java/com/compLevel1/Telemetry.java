@@ -169,13 +169,17 @@ public class Telemetry {
                                                                 objectTranslation.getX(), objectTranslation.getY() });
                                                 objectTranslation = objectTranslation.rotateBy(
                                                                 currentFieldPosition.getRotation());
-                                                SmartDashboard.putNumberArray("objectTranslationAfterRot", new double[] {
-                                                                objectTranslation.getX(), objectTranslation.getY() });
+                                                SmartDashboard.putNumberArray("objectTranslationAfterRot",
+                                                                new double[] {
+                                                                                objectTranslation.getX(),
+                                                                                objectTranslation.getY() });
 
                                                 objectTranslation = currentFieldPosition.getTranslation()
                                                                 .plus(objectTranslation);
-                                                Pose2d objectPose = new Pose2d(objectTranslation,
-                                                                objectTranslation.getAngle());
+                                                Rotation2d objectRotation = telemetry.fieldPoseEstimate.get()
+                                                                .getRotation();
+                                                objectRotation = objectRotation.plus(objectTranslation.getAngle());
+                                                Pose2d objectPose = new Pose2d(objectTranslation, objectRotation);
 
                                                 return Optional.of(objectPose);
                                         } else {

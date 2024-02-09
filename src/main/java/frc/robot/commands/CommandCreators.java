@@ -175,8 +175,8 @@ public class CommandCreators {
                                                 };
 
                                                 Command command = Commands.runOnce(setPathFindToSuppliedOptPoseCommand)
-                                                                .andThen(pathFindToSuppliedOptPoseCommand[0])
-                                                                .handleInterrupt(() -> pathFindToSuppliedOptPoseCommand[0].cancel());
+                                                                .andThen(pathFindToSuppliedOptPoseCommand[0]
+                                                                .handleInterrupt(() -> pathFindToSuppliedOptPoseCommand[0].cancel()));
 
                                                 return command;
 

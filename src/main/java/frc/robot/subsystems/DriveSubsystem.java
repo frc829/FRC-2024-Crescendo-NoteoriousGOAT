@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Second;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
@@ -29,6 +30,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -121,6 +123,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
 
         public final Field2d field2d;
+        public final Supplier<Pose2d> fieldPose;
         public final List<Measure<Voltage>> steerVoltages;
         public final List<Measure<Voltage>> wheelVoltages;
         public final List<Measure<Voltage>> angleSensorVoltages;
@@ -129,6 +132,7 @@ public class DriveSubsystem extends SubsystemBase {
         public final Supplier<ChassisSpeeds> fieldSpeeds;
         public final Measure<Velocity<Velocity<Distance>>> linearAcceleration;
         public final Measure<Velocity<Velocity<Angle>>> angularAcceleration;
+        public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions;
         public final Runnable resetSteerEncodersFromAbsolutes;
         public final Runnable stop;
         public final Runnable update;
@@ -154,10 +158,12 @@ public class DriveSubsystem extends SubsystemBase {
                         Consumer<SwerveDriveWheelStates> controlModules,
                         Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds,
                         Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds,
+                        List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions,
                         Runnable resetSteerEncodersFromAbsolutes,
                         Runnable stop,
                         Runnable update) {
                 this.field2d = field2d;
+                this.fieldPose = fieldPose;
                 this.steerVoltages = steerVoltages;
                 this.wheelVoltages = wheelVoltages;
                 this.angleSensorVoltages = angleSensorVoltages;
@@ -166,6 +172,7 @@ public class DriveSubsystem extends SubsystemBase {
                 this.fieldSpeeds = fieldSpeeds;
                 this.linearAcceleration = linearAcceleration;
                 this.angularAcceleration = angularAcceleration;
+                this.objectPositions = objectPositions;
                 this.resetSteerEncodersFromAbsolutes = resetSteerEncodersFromAbsolutes;
                 this.stop = stop;
                 this.update = update;
@@ -448,26 +455,26 @@ public class DriveSubsystem extends SubsystemBase {
                                 .apply(Constants.kinematics)
                                 .apply(currentWheelPositions);
 
-                // Telemetry.addFieldDetectorToTelemetry
-                //                 .apply(FieldDetector.Limelight.createLimelight
-                //                                 .apply("limelightFront")
-                //                                 .apply(telemetry.fieldPoseEstimate))
-                //                 .apply(telemetry);
+                Telemetry.addFieldDetectorToTelemetry
+                                .apply(FieldDetector.Limelight.createLimelight
+                                                .apply("limelightFront")
+                                                .apply(telemetry.fieldPoseEstimate))
+                                .apply(telemetry);
 
-                // Telemetry.addFieldDetectorToTelemetry
-                //                 .apply(FieldDetector.Limelight.createLimelight
-                //                                 .apply("limelightPickup")
-                //                                 .apply(telemetry.fieldPoseEstimate))
-                //                 .apply(telemetry);
+                Telemetry.addFieldDetectorToTelemetry
+                                .apply(FieldDetector.Limelight.createLimelight
+                                                .apply("limelightPickup")
+                                                .apply(telemetry.fieldPoseEstimate))
+                                .apply(telemetry);
 
                 Pose3d cameraPosition = new Pose3d(
-                                Units.inchesToMeters(13),
                                 Units.inchesToMeters(-13),
+                                Units.inchesToMeters(13),
                                 Units.inchesToMeters(4),
                                 new Rotation3d(
                                                 0,
                                                 0,
-                                                Math.toRadians(0)));
+                                                Math.toRadians(180)));
 
                 Telemetry.addObjectDetectorToTelemetry
                                 .apply(ObjectDetector.Limelight.createLimelight
@@ -503,6 +510,6 @@ public class DriveSubsystem extends SubsystemBase {
                                 sensorAngles, telemetry.fieldPoseEstimate, fieldSpeeds, robotSpeeds,
                                 telemetry.accelerationMag, angularAcceleration, telemetry.resetFieldPosition,
                                 controlModuleStates, controlRobotChassisSpeeds, controlFieldChassisSpeeds,
-                                resetSteerEncodersFromAbsolutes, stop, update);
+                                telemetry.objectDetectorOptPositions, resetSteerEncodersFromAbsolutes, stop, update);
         };
 }
