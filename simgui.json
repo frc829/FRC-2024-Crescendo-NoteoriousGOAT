@@ -71,7 +71,9 @@
         }
       },
       "/SmartDashboard/Field": {
-        "height": 8.013679504394531,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
         "limelightFront-Pose": {
           "style": "Hidden"
         },
@@ -90,6 +92,7 @@
           "arrowSize": 0,
           "style": "Line"
         },
+        "right": 2961,
         "target pose": {
           "arrowColor": [
             0.0,
@@ -107,6 +110,7 @@
           ],
           "style": "Line"
         },
+        "top": 79,
         "width": 16.541748046875,
         "window": {
           "visible": true
