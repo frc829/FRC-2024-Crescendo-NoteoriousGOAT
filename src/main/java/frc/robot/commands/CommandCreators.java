@@ -41,6 +41,9 @@ public class CommandCreators {
                         private static final double bottomOfSpeakerMeters = 2.0;
                         private static final double topOfSpeakerMeters = 2.13;
                         private static final double shooterWheelRadiusInches = 2.0;
+                        private static final double shooterTiltX = 0.0; // TODO:
+                        private static final double shooterTiltY = 0.0; // TODO:
+                        private static final double shooterRadius = 0.0; // TODO:
                         private static final double shutOffTime = 5;
 
                         private static final class Fender {
