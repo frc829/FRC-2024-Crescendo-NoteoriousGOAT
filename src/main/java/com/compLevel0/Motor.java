@@ -34,6 +34,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import frc.robot.RobotContainer;
 
 public class Motor {
         public final MutableMeasure<Voltage> voltage;
@@ -349,6 +350,15 @@ public class Motor {
                                 canbus) -> (deviceId) -> {
                                         TalonFX talonFX = new TalonFX(deviceId, canbus);
                                         TalonFXConfiguration config = new TalonFXConfiguration();
+                                        RobotContainer.orchestra.addInstrument(talonFX);
+                                        // Attempt to load the chrp
+                                        var status = RobotContainer.orchestra.loadMusic("rhapsody.chrp");
+
+                                        if (!status.isOK()) {
+                                                        // log error
+                                        }else{
+                                                System.out.println(status.getDescription());
+                                        }
                                         config.Voltage.PeakForwardVoltage = 12.0;
                                         config.Voltage.PeakReverseVoltage = -12.0;
                                         config.TorqueCurrent.PeakForwardTorqueCurrent = 40;

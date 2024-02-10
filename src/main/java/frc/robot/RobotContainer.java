@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 import com.controllers.Controller;
+import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandBinder;
 import frc.robot.commands.CommandCreators;
 import frc.robot.subsystems.DriveSubsystem;
@@ -37,6 +39,8 @@ public class RobotContainer {
                         private static final int operatorPort = 1;
                 }
         }
+
+        public static final Orchestra orchestra = new Orchestra();
 
         private final SendableChooser<Command> autoChooser;
 
@@ -83,9 +87,9 @@ public class RobotContainer {
                 CommandBinder.bindManualRobotCentricDriveCommand
                                 .apply(driveSubsystem)
                                 .accept(driver);
-                CommandBinder.bindManualFieldCentricDriveCommand
+                Command fieldCentricCommand = CommandBinder.bindManualFieldCentricDriveCommand
                                 .apply(driveSubsystem)
-                                .accept(driver);
+                                .apply(driver);
                 CommandBinder.bindPathFindToPoseCommandToTrigger
                                 .apply(driveSubsystem)
                                 .apply(new Pose2d(4, 1, Rotation2d.fromDegrees(180)))
@@ -121,6 +125,7 @@ public class RobotContainer {
                                 .apply(0.0)
                                 .apply(0.0)
                                 .apply(false)
+                                .apply(fieldCentricCommand)
                                 .accept(driver.b);
 
                 Supplier<Optional<Pose2d>> goToNoteSupplier = () -> {
@@ -144,6 +149,7 @@ public class RobotContainer {
                                 .apply(0.0)
                                 .apply(0.0)
                                 .apply(false)
+                                .apply(fieldCentricCommand)
                                 .accept(driver.x);
 
                 SmartDashboard.putData("Operator", operator);
@@ -177,6 +183,21 @@ public class RobotContainer {
                                                 .apply(0.0)
                                                 .apply(true)
                                                 .andThen(CommandCreators.pathFindToSuppliedOptPoseCommand[0]));
+                Runnable playOrchestra = () -> {
+                        orchestra.play();
+                };
+                Command playOrchestraCommand = Commands.runOnce(playOrchestra);
+
+                Runnable stopOrchestra = () -> {
+                        orchestra.stop();
+                };
+                Command stopOrchestraCommand = Commands.runOnce(stopOrchestra);
+
+                driver.y.whileTrue(playOrchestraCommand);
+                driver.y.onFalse(stopOrchestraCommand);
+
+
+                
                 autoChooser = AutoBuilder.buildAutoChooser();
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);

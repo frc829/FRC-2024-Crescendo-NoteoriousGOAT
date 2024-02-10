@@ -3,6 +3,8 @@ package frc.robot.commands;
 import com.controllers.Controller;
 import com.pathplanner.lib.path.PathConstraints;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -91,8 +93,17 @@ public class CommandBinder {
                                                                 controller.rightY.getAsBoolean() ||
                                                                 controller.fullTrigger.getAsBoolean());
                                 Trigger robotCentricTrigger = new Trigger(robotCentricCondition);
+                                Supplier<Translation2d> corSupplier = () -> {
+                                        if (controller.rightBumper.getAsBoolean()) {
+                                                return new Translation2d(Inches.of(13), Inches.of(-13));
+                                        } else if (controller.leftBumper.getAsBoolean()) {
+                                                return new Translation2d(Inches.of(13), Inches.of(13));
+                                        } else {
+                                                return new Translation2d();
+                                        }
+                                };
                                 Command robotCentricCommand = drive.createManualRobotChassisSpeedsCommand
-                                                .apply(new Translation2d())
+                                                .apply(corSupplier)
                                                 .apply(controller.rightYValue)
                                                 .apply(controller.rightXValue)
                                                 .apply(controller.fullTriggerValue);
@@ -100,17 +111,27 @@ public class CommandBinder {
 
                         };
 
-        public static final Function<DriveSubsystem, Consumer<Controller>> bindManualFieldCentricDriveCommand = (
+        public static final Function<DriveSubsystem, Function<Controller, Command>> bindManualFieldCentricDriveCommand = (
                         drive) -> (controller) -> {
                                 BooleanSupplier fieldCentricCondition = () -> controller.leftX.getAsBoolean()
                                                 || controller.leftY.getAsBoolean();
                                 Trigger fieldCentricTrigger = new Trigger(fieldCentricCondition);
+                                Supplier<Translation2d> corSupplier = () -> {
+                                        if (controller.rightBumper.getAsBoolean()) {
+                                                return new Translation2d(Inches.of(13), Inches.of(-13));
+                                        } else if (controller.leftBumper.getAsBoolean()) {
+                                                return new Translation2d(Inches.of(13), Inches.of(13));
+                                        } else {
+                                                return new Translation2d();
+                                        }
+                                };
                                 Command fieldCentricCommand = drive.createManualFieldChassisSpeedsCommand
-                                                .apply(new Translation2d())
+                                                .apply(corSupplier)
                                                 .apply(controller.leftYValue)
                                                 .apply(controller.leftXValue)
                                                 .apply(controller.fullTriggerValue);
                                 fieldCentricTrigger.whileTrue(fieldCentricCommand);
+                                return fieldCentricCommand;
 
                         };
 
@@ -128,18 +149,20 @@ public class CommandBinder {
 
                                         };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Consumer<Trigger>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
+        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Function<Command, Consumer<Trigger>>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
                         drive) -> (targetPose) -> (constraints) -> (
-                                        goalEndVelocityMPS) -> (rotationDelayDistance) -> (pathFlip) -> (trigger) -> {
-                                                Command setPathFindCommand = CommandCreators.createSetPathFindCommand
-                                                                .apply(drive)
-                                                                .apply(targetPose)
-                                                                .apply(constraints)
-                                                                .apply(goalEndVelocityMPS)
-                                                                .apply(rotationDelayDistance)
-                                                                .apply(pathFlip);
+                                        goalEndVelocityMPS) -> (rotationDelayDistance) -> (
+                                                        pathFlip) -> (fieldCentricCommand) -> (trigger) -> {
+                                                                Command setPathFindCommand = CommandCreators.createSetPathFindCommand
+                                                                                .apply(drive)
+                                                                                .apply(targetPose)
+                                                                                .apply(constraints)
+                                                                                .apply(goalEndVelocityMPS)
+                                                                                .apply(rotationDelayDistance)
+                                                                                .apply(pathFlip);
 
-
-                                                trigger.whileTrue(setPathFindCommand.andThen(Commands.deferredProxy(() -> CommandCreators.pathFindToSuppliedOptPoseCommand[0])));
-                                        };
+                                                                trigger.whileTrue(setPathFindCommand.andThen(Commands
+                                                                                .deferredProxy(() -> CommandCreators.pathFindToSuppliedOptPoseCommand[0])));
+                                                                trigger.onFalse(fieldCentricCommand);
+                                                        };
 }

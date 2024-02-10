@@ -198,42 +198,4 @@ public class CommandCreators {
                                                                 return setPathFindCommand;
                                                         };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Supplier<Command>>>>>>> createSetPathFindCommandSupplier = (
-                        drive) -> (targetPoseSupplier) -> (
-                                        constraints) -> (goalEndVelocityMPS) -> (
-                                                        rotationDelayDistance) -> (pathFlip) -> {
-                                                                Supplier<Command> pathFindCommand = () -> {
-                                                                        Optional<Pose2d> targetPoseOptional = targetPoseSupplier
-                                                                                        .get();
-                                                                        if (targetPoseOptional.isPresent()) {
-                                                                                Pose2d targetPose = targetPoseOptional
-                                                                                                .get();
-                                                                                if (pathFlip) {
-                                                                                        return AutoBuilder
-                                                                                                        .pathfindToPoseFlipped(
-                                                                                                                        targetPose,
-                                                                                                                        constraints,
-                                                                                                                        goalEndVelocityMPS,
-                                                                                                                        rotationDelayDistance)
-                                                                                                        .handleInterrupt(
-                                                                                                                        drive.stop);
-                                                                                } else {
-                                                                                        return AutoBuilder
-                                                                                                        .pathfindToPose(
-                                                                                                                        targetPose,
-                                                                                                                        constraints,
-                                                                                                                        goalEndVelocityMPS,
-                                                                                                                        rotationDelayDistance)
-                                                                                                        .handleInterrupt(
-                                                                                                                        drive.stop);
-                                                                                }
-
-                                                                        } else {
-                                                                                return Commands.none();
-                                                                        }
-                                                                };
-                                                                return pathFindCommand;
-
-                                                        };
-
 }

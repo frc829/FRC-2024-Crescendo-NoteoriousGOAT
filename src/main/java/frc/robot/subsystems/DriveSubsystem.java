@@ -140,8 +140,8 @@ public class DriveSubsystem extends SubsystemBase {
         public final Supplier<Command> createStopCommand;
         public final Supplier<Command> createSteerEncodersResetCommand;
         public final Function<SwerveDriveWheelStates, Command> createControlModulesCommand;
-        public final Function<Translation2d, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualRobotChassisSpeedsCommand;
-        public final Function<Translation2d, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualFieldChassisSpeedsCommand;
+        public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualRobotChassisSpeedsCommand;
+        public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualFieldChassisSpeedsCommand;
 
         private DriveSubsystem(
                         Field2d field2d,
@@ -206,7 +206,8 @@ public class DriveSubsystem extends SubsystemBase {
                                                 * Constants.maxLinearVelocity.in(MetersPerSecond);
                                 robotChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
                                                 * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                                controlRobotChassisSpeeds.apply(centerOfRotation)
+                                Translation2d cor = centerOfRotation.get();
+                                controlRobotChassisSpeeds.apply(cor)
                                                 .accept(robotChassisSpeedsSetpoint);
                         };
                         Command setRobotChassisSpeedsCommand = run(setRobotChassisSpeeds);
@@ -223,7 +224,8 @@ public class DriveSubsystem extends SubsystemBase {
                                                 * Constants.maxLinearVelocity.in(MetersPerSecond);
                                 fieldChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
                                                 * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                                controlFieldChassisSpeeds.apply(centerOfRotation)
+                                Translation2d cor = centerOfRotation.get();
+                                controlFieldChassisSpeeds.apply(cor)
                                                 .accept(fieldChassisSpeedsSetpoint);
                         };
                         Command setFieldChassisSpeedsCommand = run(setFieldChassisSpeeds);
