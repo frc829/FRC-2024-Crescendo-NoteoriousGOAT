@@ -78,7 +78,6 @@ public class RobotContainer {
                                 .apply(driveSubsystem)
                                 .apply(driver);
                 CommandBinder.bindPathFindToPoseCommandToTrigger
-                                .apply(driveSubsystem)
                                 .apply(new Pose2d(4, 1, Rotation2d.fromDegrees(180)))
                                 .apply(new PathConstraints(
                                                 3.0, 4.0,
@@ -104,7 +103,6 @@ public class RobotContainer {
                 };
 
                 CommandBinder.bindPathFindToSuppliedPoseCommandToTrigger
-                                .apply(driveSubsystem)
                                 .apply(targetPoseOptionalTest)
                                 .apply(new PathConstraints(
                                                 3.0, 4.0,
@@ -128,7 +126,6 @@ public class RobotContainer {
                 };
 
                 CommandBinder.bindPathFindToSuppliedPoseCommandToTrigger
-                                .apply(driveSubsystem)
                                 .apply(goToNoteSupplier)
                                 .apply(new PathConstraints(
                                                 3.0, 4.0,
@@ -160,7 +157,6 @@ public class RobotContainer {
                 NamedCommands.registerCommand(
                                 "TestGoToNote",
                                 CommandCreator.createSetPathFindCommand
-                                                .apply(driveSubsystem)
                                                 .apply(targetPoseOptionalTest)
                                                 .apply(new PathConstraints(
                                                                 3.0, 4.0,

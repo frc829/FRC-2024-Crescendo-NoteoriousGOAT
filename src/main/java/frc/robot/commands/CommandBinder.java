@@ -122,11 +122,10 @@ public class CommandBinder {
 
                         };
 
-        public static final Function<DriveSubsystem, Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Consumer<Trigger>>>>>> bindPathFindToPoseCommandToTrigger = (
-                        drive) -> (targetPose) -> (constraints) -> (
+        public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Consumer<Trigger>>>>> bindPathFindToPoseCommandToTrigger = (
+                        targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (trigger) -> {
                                                 Command pathFindToPoseCommand = CommandCreator.createPathFindToPoseCommand
-                                                                .apply(drive)
                                                                 .apply(targetPose)
                                                                 .apply(constraints)
                                                                 .apply(goalEndVelocityMPS)
@@ -136,12 +135,11 @@ public class CommandBinder {
 
                                         };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Function<Command, Consumer<Trigger>>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
-                        drive) -> (targetPose) -> (constraints) -> (
+        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Function<Command, Consumer<Trigger>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
+                        targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (
                                                         pathFlip) -> (fieldCentricCommand) -> (trigger) -> {
                                                                 Command setPathFindCommand = CommandCreator.createSetPathFindCommand
-                                                                                .apply(drive)
                                                                                 .apply(targetPose)
                                                                                 .apply(constraints)
                                                                                 .apply(goalEndVelocityMPS)

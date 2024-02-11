@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveSubsystem;
 
 public class CommandCreator implements Sendable {
 
@@ -145,8 +144,8 @@ public class CommandCreator implements Sendable {
                 return shootCommand;
         };
 
-        public static final Function<DriveSubsystem, Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Command>>>>> createPathFindToPoseCommand = (
-                        drive) -> (targetPose) -> (constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
+        public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Command>>>> createPathFindToPoseCommand = (
+                        targetPose) -> (constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
                                 Command pathFindToPoseCommand = AutoBuilder.pathfindToPoseFlipped(
                                                 targetPose,
                                                 constraints,
@@ -154,13 +153,12 @@ public class CommandCreator implements Sendable {
                                                 rotationDelayDistance);
                                 pathFindToPoseCommand.setName("PathFindToFixedPose");
                                 return pathFindToPoseCommand;
-
                         };
 
         public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
 
-        public static final Function<DriveSubsystem, Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Command>>>>>> createSetPathFindCommand = (
-                        drive) -> (targetPoseSupplier) -> (
+        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Command>>>>> createSetPathFindCommand = (
+                        targetPoseSupplier) -> (
                                         constraints) -> (goalEndVelocityMPS) -> (
                                                         rotationDelayDistance) -> (pathFlip) -> {
                                                                 Runnable setPathFind = () -> {
@@ -177,7 +175,7 @@ public class CommandCreator implements Sendable {
                                                                                                                         goalEndVelocityMPS,
                                                                                                                         rotationDelayDistance)
                                                                                                         .handleInterrupt(
-                                                                                                                        drive.stop);
+                                                                                                                        RobotContainer.driveSubsystem.stop);
                                                                                 } else {
                                                                                         pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
                                                                                                         .pathfindToPose(
@@ -186,7 +184,7 @@ public class CommandCreator implements Sendable {
                                                                                                                         goalEndVelocityMPS,
                                                                                                                         rotationDelayDistance)
                                                                                                         .handleInterrupt(
-                                                                                                                        drive.stop);
+                                                                                                                        RobotContainer.driveSubsystem.stop);
                                                                                 }
 
                                                                         } else {
