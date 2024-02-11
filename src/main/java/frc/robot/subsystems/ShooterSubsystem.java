@@ -1,15 +1,15 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Spinner;
+import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -19,6 +19,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -46,10 +47,12 @@ public class ShooterSubsystem extends SubsystemBase {
   public final Measure<Voltage> bottomVoltage;
   public final Measure<Dimensionless> topVelocity;
   public final Measure<Dimensionless> bottomVelocity;
+  public final Consumer<Double> spinTop;
+  public final Consumer<Double> spinBottom;
   public final Runnable update;
 
-  public final Supplier<Command> createStopCommand;
-  public final Function<DoubleSupplier, Function<DoubleSupplier, Command>> createSpinShootersCommand;
+  public final Command stopCommand;
+  public final Command manualShootCommand;
 
   private ShooterSubsystem(
       Measure<Voltage> topVoltage,
@@ -64,25 +67,21 @@ public class ShooterSubsystem extends SubsystemBase {
     this.bottomVoltage = bottomVoltage;
     this.topVelocity = topVelocity;
     this.bottomVelocity = bottomVelocity;
+    this.spinTop = spinTop;
+    this.spinBottom = spinBottom;
     this.update = update;
 
-    createStopCommand = () -> {
-      Command stopCommand = run(stop);
-      stopCommand.setName("STOP");
-      return stopCommand;
-    };
+    stopCommand = run(stop);
+    stopCommand.setName("STOP");
 
-    createSpinShootersCommand = (topSetpoint) -> (bottomSetpoint) -> {
-      Runnable spin = () -> {
-        spinTop.accept(topSetpoint.getAsDouble());
-        spinBottom.accept(bottomSetpoint.getAsDouble());
-      };
-      Command spinCommand = run(spin);
-      spinCommand.setName("Shooter Control");
-      return spinCommand;
+    Runnable spin = () -> {
+      spinTop.accept(RobotContainer.operator.leftTriggerValue.getAsDouble());
+      spinBottom.accept(RobotContainer.operator.rightTriggerValue.getAsDouble());
     };
+    manualShootCommand = run(spin);
+    manualShootCommand.setName("Shooter Control");
 
-    this.setDefaultCommand(createStopCommand.get());
+    this.setDefaultCommand(stopCommand);
 
   }
 
@@ -96,22 +95,22 @@ public class ShooterSubsystem extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty(
         "Top Velocity",
-        () -> topVelocity.in(Value),
+        () -> GoatMath.round(topVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Top Voltage",
-        () -> topVoltage.in(Volts),
+        () -> GoatMath.round(topVoltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Bottom Velocity",
-        () -> topVelocity.in(Value),
+        () -> GoatMath.round(bottomVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Bottom Voltage",
-        () -> bottomVoltage.in(Volts),
+        () -> GoatMath.round(bottomVoltage.in(Volts), 2),
         null);
   }
 

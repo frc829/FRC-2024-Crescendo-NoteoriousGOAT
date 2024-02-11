@@ -2,16 +2,16 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Value;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Elevator;
+import com.utility.GoatMath;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Dimensionless;
@@ -21,6 +21,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class ElevatorSubsystem extends SubsystemBase {
 
@@ -42,11 +43,12 @@ public class ElevatorSubsystem extends SubsystemBase {
   public final Measure<Voltage> voltage;
   public final Measure<Distance> position;
   public final Measure<Dimensionless> velocity;
+  public final Consumer<Measure<Distance>> move;
+  public final Consumer<Double> drive;
   public final Runnable update;
 
-  public final Supplier<Command> createHoldCommand;
-  public final Function<DoubleSupplier, Command> createDriveElevatorcommand;
-  public final Function<Supplier<Measure<Distance>>, Command> createMoveElevatorCommand;
+  public final Command holdCommand;
+  public final Command manualDriveCommand;
 
   private ElevatorSubsystem(
       Measure<Voltage> voltage,
@@ -59,29 +61,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.voltage = voltage;
     this.position = position;
     this.velocity = velocity;
+    this.move = move;
+    this.drive = drive;
     this.update = update;
 
-    createHoldCommand = () -> {
-      Command holdCommand = run(hold);
-      holdCommand.setName("HOLD");
-      return holdCommand;
-    };
+    holdCommand = run(hold);
+    holdCommand.setName("HOLD");
 
-    createDriveElevatorcommand = (setpoint) -> {
-      Runnable driveElevator = () -> drive.accept(setpoint.getAsDouble());
-      Command driveElevatorCommand = run(driveElevator);
-      driveElevatorCommand.setName("Drive Elevator Control");
-      return driveElevatorCommand;
-    };
+    manualDriveCommand = run(() -> drive.accept(RobotContainer.operator.leftYValue.getAsDouble()));
+    manualDriveCommand.setName("Drive Elevator Control");
 
-    createMoveElevatorCommand = (setpoint) -> {
-      Runnable moveElevator = () -> move.accept(setpoint.get());
-      Command moveElevatorCommand = run(moveElevator);
-      moveElevatorCommand.setName("Move Elevator Control");
-      return moveElevatorCommand;
-    };
-
-    this.setDefaultCommand(createHoldCommand.get());
+    this.setDefaultCommand(holdCommand);
   }
 
   @Override
@@ -94,17 +84,17 @@ public class ElevatorSubsystem extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty(
         "Voltage",
-        () -> voltage.in(Volts),
+        () -> GoatMath.round(voltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Position",
-        () -> position.in(Meters),
+        () -> GoatMath.round(position.in(Meters), 2),
         null);
 
     builder.addDoubleProperty(
         "Velocity",
-        () -> velocity.in(Value),
+        () -> GoatMath.round(velocity.in(Percent), 2),
         null);
   }
 

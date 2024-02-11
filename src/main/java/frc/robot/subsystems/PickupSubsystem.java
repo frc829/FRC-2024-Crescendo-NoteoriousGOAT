@@ -1,25 +1,26 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel0.Sensor;
 import com.compLevel1.PositionSwitch;
 import com.compLevel1.Spinner;
+import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Per;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +35,7 @@ public class PickupSubsystem extends SubsystemBase {
       private static final double slot0kI = 0.0;
       private static final double slot0kD = 0.0;
       private static final double slot0kF = 1.0
-          / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNeo550(1).freeSpeedRadPerSec);
+          / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec);
     }
 
     private static final class Inner {
@@ -80,10 +81,13 @@ public class PickupSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> transportVelocity;
   public final Measure<Dimensionless> singulatorVelocity;
   public final BooleanSupplier hasNote;
+  public final Consumer<Double> spinOuter;
+  public final Consumer<Double> spinInner;
+  public final Consumer<Double> spinTransport;
+  public final Consumer<Double> spinSingulator;
   public final Runnable update;
 
-  public final Supplier<Command> createStopCommand;
-  public final Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createPickupControlCommand;
+  public final Command stopCommand;
 
   private PickupSubsystem(
       Measure<Voltage> outerVoltage,
@@ -110,28 +114,16 @@ public class PickupSubsystem extends SubsystemBase {
     this.transportVelocity = transportVelocity;
     this.singulatorVelocity = singulatorVelocity;
     this.hasNote = hasNote;
+    this.spinOuter = spinOuter;
+    this.spinInner = spinInner;
+    this.spinTransport = spinTransport;
+    this.spinSingulator = spinSingulator;
     this.update = update;
 
-    createStopCommand = () -> {
-      Command stopCommand = run(stop);
-      stopCommand.setName("STOP");
-      return stopCommand;
-    };
+    stopCommand = run(stop);
+    stopCommand.setName("STOP");
 
-    createPickupControlCommand = (
-        outerSetpoint) -> (innerSetpoint) -> (transportSetpoint) -> (singulatorControl) -> {
-          Runnable spin = () -> {
-            spinOuter.accept(outerSetpoint.getAsDouble());
-            spinInner.accept(innerSetpoint.getAsDouble());
-            spinTransport.accept(transportSetpoint.getAsDouble());
-            spinSingulator.accept(singulatorControl.getAsDouble());
-          };
-          Command spinCommand = run(spin);
-          spinCommand.setName("Pickup Control");
-          return spinCommand;
-        };
-
-    this.setDefaultCommand(createStopCommand.get());
+    this.setDefaultCommand(stopCommand);
 
   }
 
@@ -145,59 +137,59 @@ public class PickupSubsystem extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty(
         "Outer Velocity",
-        () -> outerVelocity.in(Value),
+        () -> GoatMath.round(outerVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Outer Voltage",
-        () -> outerVoltage.in(Volts),
+        () -> GoatMath.round(outerVoltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Inner Velocity",
-        () -> innerVelocity.in(Value),
+        () -> GoatMath.round(innerVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Inner Voltage",
-        () -> innerVoltage.in(Volts),
+        () -> GoatMath.round(innerVoltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Transport Velocity",
-        () -> transportVelocity.in(Value),
+        () -> GoatMath.round(transportVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Transport Voltage",
-        () -> transportVoltage.in(Volts),
+        () -> GoatMath.round(transportVoltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Singulator Velocity",
-        () -> singulatorVelocity.in(Value),
+        () -> GoatMath.round(singulatorVelocity.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
         "Singulator Voltage",
-        () -> singulatorVoltage.in(Volts),
+        () -> GoatMath.round(singulatorVoltage.in(Volts), 2),
         null);
 
     builder.addBooleanProperty(
-        "Has Notes",
+        "Has Note",
         hasNote,
         null);
   }
 
   public static final Supplier<PickupSubsystem> create = () -> {
-    Spinner outer = Motor.REV.createCANSparkBaseNEO550
+    Spinner outer = Motor.REV.createCANSparkBaseNEO
         .andThen(Motor.REV.setkP.apply(0).apply(Constants.Outer.slot0kP))
         .andThen(Motor.REV.setkI.apply(0).apply(Constants.Outer.slot0kI))
         .andThen(Motor.REV.setkD.apply(0).apply(Constants.Outer.slot0kD))
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.Outer.slot0kF))
         .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.createMotorFromCANSparkBase.apply(1.0))
-        .andThen(Motor.REV.setNEO550MaxVelocity)
+        .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.Outer.deviceId);

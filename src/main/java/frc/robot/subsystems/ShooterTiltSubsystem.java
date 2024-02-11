@@ -1,16 +1,16 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Turner;
+import com.utility.GoatMath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -22,6 +22,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class ShooterTiltSubsystem extends SubsystemBase {
 
@@ -45,11 +46,12 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Measure<Angle> angle;
   public final Measure<Angle> absoluteAngle;
   public final Measure<Dimensionless> velocity;
+  public final Consumer<Measure<Angle>> turn;
+  public final Consumer<Double> drive;
   public final Runnable update;
 
-  public final Supplier<Command> createHoldCommand;
-  public final Function<DoubleSupplier, Command> createDriveTiltCommand;
-  public final Function<Supplier<Measure<Angle>>, Command> createTurnTiltCommand;
+  public final Command holdCommand;
+  public final Command manualDriveCommand;
 
   private ShooterTiltSubsystem(
       Measure<Voltage> voltage,
@@ -65,31 +67,19 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.angle = angle;
     this.absoluteAngle = absoluteAngle;
     this.velocity = velocity;
+    this.turn = turn;
+    this.drive = drive;
     this.update = update;
 
     resetRelEncoderFromAbsolute.run();
 
-    createHoldCommand = () -> {
-      Command holdCommand = run(hold);
-      holdCommand.setName("HOLD");
-      return holdCommand;
-    };
+    holdCommand = run(hold);
+    holdCommand.setName("HOLD");
 
-    createDriveTiltCommand = (setpoint) -> {
-      Runnable driveTilt = () -> drive.accept(setpoint.getAsDouble());
-      Command driveTiltCommand = run(driveTilt);
-      driveTiltCommand.setName("Drive Tilt Control");
-      return driveTiltCommand;
-    };
+    manualDriveCommand = run(() -> drive.accept(RobotContainer.operator.rightYValue.getAsDouble()));
+    manualDriveCommand.setName("Manual Drive");
 
-    createTurnTiltCommand = (setpoint) -> {
-      Runnable turnTilt = () -> turn.accept(setpoint.get());
-      Command turnTiltCommand = run(turnTilt);
-      turnTiltCommand.setName("Turn Tilt Control");
-      return turnTiltCommand;
-    };
-
-    this.setDefaultCommand(createHoldCommand.get());
+    this.setDefaultCommand(holdCommand);
   }
 
   @Override
@@ -102,22 +92,22 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     super.initSendable(builder);
     builder.addDoubleProperty(
         "Voltage",
-        () -> voltage.in(Volts),
+        () -> GoatMath.round(voltage.in(Volts), 2),
         null);
 
     builder.addDoubleProperty(
         "Angle",
-        () -> MathUtil.inputModulus(angle.in(Degrees), -180, 180),
+        () -> GoatMath.round(MathUtil.inputModulus(angle.in(Degrees), -180, 180), 2),
         null);
 
     builder.addDoubleProperty(
         "Absolute Angle",
-        () -> absoluteAngle.in(Degrees),
+        () -> GoatMath.round(absoluteAngle.in(Degrees), 2),
         null);
 
     builder.addDoubleProperty(
         "Velocity",
-        () -> velocity.in(Value),
+        () -> GoatMath.round(velocity.in(Percent), 2),
         null);
   }
 
@@ -136,6 +126,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setInvertAbsoluteEncoder)
         .andThen(Motor.REV.setAbsoluteEncoderOffset.apply(Constants.absoluteEncoderOffset))
         .andThen(Motor.REV.enableBrake)
+        .andThen(Motor.REV.invert)
         .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))
         .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setTurnSim

@@ -1,26 +1,25 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Value;
-
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
-import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class CommandCreator implements Sendable {
@@ -47,12 +46,12 @@ public class CommandCreator implements Sendable {
                         private static final double shutOffTime = 5;
 
                         private static final class Fender {
-                                private static final DoubleSupplier outerSpeed = () -> 0.0;
-                                private static final DoubleSupplier innerSpeed = () -> 0.0;
-                                private static final DoubleSupplier transportSpeed = () -> 0.5;
-                                private static final DoubleSupplier singulatorSpeed = () -> 0.5;
-                                private static final DoubleSupplier topShooterSpeed = () -> 0.5;
-                                private static final DoubleSupplier bottomShooterSpeed = () -> 0.5;
+                                private static final double outerSpeed = 0.0;
+                                private static final double innerSpeed = 0.0;
+                                private static final double transportSpeed = 0.5;
+                                private static final double singulatorSpeed = 0.5;
+                                private static final double topShooterSpeed = 0.5;
+                                private static final double bottomShooterSpeed = 0.5;
                                 private static final double speedTolerance = 0.05;
                                 private static final Supplier<Measure<Angle>> tiltAngle = () -> Degrees.of(80.0);
                                 private static final Supplier<Measure<Angle>> angleTolerance = () -> Degrees.of(1.0);
@@ -61,88 +60,91 @@ public class CommandCreator implements Sendable {
                 }
         }
 
+        static {
+                new CommandCreator();
+        }
+
         private CommandCreator() {
                 SmartDashboard.putData("CommandCreator", this);
         }
 
         public static final Supplier<Command> createPickupCommand = () -> {
-                Command pickupCommand = Commands.either(
-                                Commands.parallel(
-                                                RobotContainer.shooterTiltSubsystem.createHoldCommand.get(),
-                                                RobotContainer.pickupSubsystem.createStopCommand.get(),
-                                                RobotContainer.shooterSubsystem.createSpinShootersCommand
-                                                                .apply(() -> Constants.Pickup.topShooterSpeed)
-                                                                .apply(() -> Constants.Pickup.bottomShooterSpeed)),
-                                RobotContainer.shooterTiltSubsystem.createTurnTiltCommand
-                                                .apply(Constants.Pickup.tiltAngle)
-                                                .until(() -> MathUtil.isNear(
-                                                                Constants.Pickup.tiltAngle.get()
-                                                                                .in(Degrees),
-                                                                RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
-                                                                Constants.Pickup.angleTolerance.get()
-                                                                                .in(Degrees)))
-                                                .andThen(Commands.parallel(
-                                                                RobotContainer.shooterTiltSubsystem.createHoldCommand
-                                                                                .get(),
-                                                                RobotContainer.pickupSubsystem.createPickupControlCommand
-                                                                                .apply(() -> Constants.Pickup.outerSpeed)
-                                                                                .apply(() -> Constants.Pickup.innerSpeed)
-                                                                                .apply(() -> Constants.Pickup.transportSpeed)
-                                                                                .apply(() -> Constants.Pickup.singulatorSpeed)
-                                                                                .until(RobotContainer.pickupSubsystem.hasNote)
-                                                                                .andThen(RobotContainer.pickupSubsystem.createStopCommand
-                                                                                                .get()),
-                                                                RobotContainer.shooterSubsystem.createSpinShootersCommand
-                                                                                .apply(() -> Constants.Pickup.topShooterSpeed)
-                                                                                .apply(() -> Constants.Pickup.bottomShooterSpeed))),
+                Runnable spinShooters = () -> {
+                        RobotContainer.shooterSubsystem.spinTop.accept(Constants.Shoot.Fender.topShooterSpeed);
+                        RobotContainer.shooterSubsystem.spinBottom.accept(Constants.Shoot.Fender.bottomShooterSpeed);
+                };
+                Command spinShooterCommandHasNote = Commands.run(spinShooters, RobotContainer.shooterSubsystem);
 
-                                RobotContainer.pickupSubsystem.hasNote);
-                pickupCommand.setName("Pickup");
-                return pickupCommand;
+                Runnable spinPickup = () -> {
+                        RobotContainer.pickupSubsystem.spinOuter.accept(Constants.Pickup.outerSpeed);
+                        RobotContainer.pickupSubsystem.spinInner.accept(Constants.Pickup.innerSpeed);
+                        RobotContainer.pickupSubsystem.spinTransport.accept(Constants.Pickup.transportSpeed);
+                        RobotContainer.pickupSubsystem.spinSingulator.accept(Constants.Pickup.singulatorSpeed);
+                };
+
+                Command spinPickupCommand = Commands.run(spinPickup, RobotContainer.pickupSubsystem);
+                Command spinShooterCommandNoHasNote = Commands.run(spinShooters, RobotContainer.shooterSubsystem);
+                Command spinPickupAndShooter = Commands.parallel(spinPickupCommand, spinShooterCommandNoHasNote);
+
+                BooleanSupplier hasNote = () -> {
+                        if (RobotBase.isSimulation()) {
+                                return false;
+                        } else {
+                                return RobotContainer.pickupSubsystem.hasNote.getAsBoolean();
+
+                        }
+                };
+
+                Command command = Commands.either(
+                                spinShooterCommandHasNote,
+                                spinPickupAndShooter,
+                                hasNote);
+                command.setName("Pickup Command");
+                return command;
         };
 
-        public static final Supplier<Command> createFenderShootCommand = () -> {
-                Command shootCommand = Commands.deadline(
-                                RobotContainer.shooterTiltSubsystem.createTurnTiltCommand
-                                                .apply(Constants.Shoot.Fender.tiltAngle)
-                                                .until(() -> MathUtil.isNear(
-                                                                Constants.Shoot.Fender.tiltAngle.get()
-                                                                                .in(Degrees),
-                                                                RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
-                                                                Constants.Shoot.Fender.angleTolerance
-                                                                                .get()
-                                                                                .in(Degrees))),
-                                RobotContainer.shooterSubsystem.createSpinShootersCommand
-                                                .apply(Constants.Shoot.Fender.topShooterSpeed)
-                                                .apply(Constants.Shoot.Fender.bottomShooterSpeed))
-                                .andThen(Commands.deadline(
-                                                RobotContainer.shooterSubsystem.createSpinShootersCommand
-                                                                .apply(Constants.Shoot.Fender.topShooterSpeed)
-                                                                .apply(Constants.Shoot.Fender.bottomShooterSpeed)
-                                                                .until(() -> MathUtil.isNear(
-                                                                                Constants.Shoot.Fender.topShooterSpeed
-                                                                                                .getAsDouble(),
-                                                                                RobotContainer.shooterSubsystem.topVelocity
-                                                                                                .in(
-                                                                                                                Value),
-                                                                                Constants.Shoot.Fender.speedTolerance)),
-                                                RobotContainer.shooterTiltSubsystem.createHoldCommand.get()))
-                                .andThen(Commands.waitSeconds(Constants.Shoot.shutOffTime)
-                                                .deadlineWith(
-                                                                RobotContainer.shooterTiltSubsystem.createHoldCommand
-                                                                                .get(),
-                                                                RobotContainer.pickupSubsystem.createPickupControlCommand
-                                                                                .apply(Constants.Shoot.Fender.outerSpeed)
-                                                                                .apply(Constants.Shoot.Fender.innerSpeed)
-                                                                                .apply(Constants.Shoot.Fender.transportSpeed)
-                                                                                .apply(Constants.Shoot.Fender.singulatorSpeed),
-                                                                RobotContainer.shooterSubsystem.createSpinShootersCommand
-                                                                                .apply(Constants.Shoot.Fender.topShooterSpeed)
-                                                                                .apply(Constants.Shoot.Fender.bottomShooterSpeed)));
+        // public static final Supplier<Command> createFenderShootCommand = () -> {
+        // Command shootCommand = Commands.deadline(
+        // RobotContainer.shooterTiltSubsystem.createTurnTiltCommand
+        // .apply(Constants.Shoot.Fender.tiltAngle)
+        // .until(() -> MathUtil.isNear(
+        // Constants.Shoot.Fender.tiltAngle.get()
+        // .in(Degrees),
+        // RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
+        // Constants.Shoot.Fender.angleTolerance
+        // .get()
+        // .in(Degrees))),
+        // RobotContainer.shooterSubsystem.createSpinShootersCommand
+        // .apply(Constants.Shoot.Fender.topShooterSpeed)
+        // .apply(Constants.Shoot.Fender.bottomShooterSpeed))
+        // .andThen(Commands.deadline(
+        // RobotContainer.shooterSubsystem.createSpinShootersCommand
+        // .apply(Constants.Shoot.Fender.topShooterSpeed)
+        // .apply(Constants.Shoot.Fender.bottomShooterSpeed)
+        // .until(() -> MathUtil.isNear(
+        // Constants.Shoot.Fender.topShooterSpeed
+        // .getAsDouble(),
+        // RobotContainer.shooterSubsystem.topVelocity
+        // .in(
+        // Value),
+        // Constants.Shoot.Fender.speedTolerance)),
+        // RobotContainer.shooterTiltSubsystem.createHoldCommand.get()))
+        // .andThen(Commands.waitSeconds(Constants.Shoot.shutOffTime)
+        // .deadlineWith(
+        // RobotContainer.shooterTiltSubsystem.createHoldCommand
+        // .get(),
+        // RobotContainer.pickupSubsystem.createPickupControlCommand
+        // .apply(Constants.Shoot.Fender.outerSpeed)
+        // .apply(Constants.Shoot.Fender.innerSpeed)
+        // .apply(Constants.Shoot.Fender.transportSpeed)
+        // .apply(Constants.Shoot.Fender.singulatorSpeed),
+        // RobotContainer.shooterSubsystem.createSpinShootersCommand
+        // .apply(Constants.Shoot.Fender.topShooterSpeed)
+        // .apply(Constants.Shoot.Fender.bottomShooterSpeed)));
 
-                shootCommand.setName("Fender Shoot");
-                return shootCommand;
-        };
+        // shootCommand.setName("Fender Shoot");
+        // return shootCommand;
+        // };
 
         public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Supplier<Command>>>>> createPathFindToPoseCommand = (
                         targetPose) -> (constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
@@ -157,59 +159,69 @@ public class CommandCreator implements Sendable {
 
         public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
 
-        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Supplier<Command>>>>>> createSetPathFindCommand = (
-                        targetPoseSupplier) -> (
-                                        constraints) -> (goalEndVelocityMPS) -> (
-                                                        rotationDelayDistance) -> (pathFlip) -> {
-                                                                return () -> {
-                                                                        Optional<Pose2d> targetPoseOptional = targetPoseSupplier
-                                                                                        .get();
-                                                                        if (targetPoseOptional.isPresent()) {
-                                                                                Pose2d targetPose = targetPoseOptional
-                                                                                                .get();
-                                                                                if (pathFlip) {
-                                                                                        return AutoBuilder
-                                                                                                        .pathfindToPoseFlipped(
-                                                                                                                        targetPose,
-                                                                                                                        constraints,
-                                                                                                                        goalEndVelocityMPS,
-                                                                                                                        rotationDelayDistance)
-                                                                                                        .handleInterrupt(
-                                                                                                                        RobotContainer.driveSubsystem.stop);
-                                                                                } else {
-                                                                                        return AutoBuilder
-                                                                                                        .pathfindToPose(
-                                                                                                                        targetPose,
-                                                                                                                        constraints,
-                                                                                                                        goalEndVelocityMPS,
-                                                                                                                        rotationDelayDistance)
-                                                                                                        .handleInterrupt(
-                                                                                                                        RobotContainer.driveSubsystem.stop);
-                                                                                }
+        // public static final Function<Supplier<Optional<Pose2d>>,
+        // Function<PathConstraints, Function<Double, Function<Double, Function<Boolean,
+        // Supplier<Command>>>>>> createSetPathFindCommand = (
+        // targetPoseSupplier) -> (
+        // constraints) -> (goalEndVelocityMPS) -> (
+        // rotationDelayDistance) -> (pathFlip) -> {
+        // return () -> {
+        // Optional<Pose2d> targetPoseOptional = targetPoseSupplier
+        // .get();
+        // if (targetPoseOptional.isPresent()) {
+        // Pose2d targetPose = targetPoseOptional
+        // .get();
+        // if (pathFlip) {
+        // return AutoBuilder
+        // .pathfindToPoseFlipped(
+        // targetPose,
+        // constraints,
+        // goalEndVelocityMPS,
+        // rotationDelayDistance)
+        // .handleInterrupt(
+        // RobotContainer.driveSubsystem.stop);
+        // } else {
+        // return AutoBuilder
+        // .pathfindToPose(
+        // targetPose,
+        // constraints,
+        // goalEndVelocityMPS,
+        // rotationDelayDistance)
+        // .handleInterrupt(
+        // RobotContainer.driveSubsystem.stop);
+        // }
 
-                                                                        } else {
-                                                                                return Commands.none();
-                                                                        }
-                                                                };
-                                                        };
+        // } else {
+        // return Commands.none();
+        // }
+        // };
+        // };
 
         @Override
         public void initSendable(SendableBuilder builder) {
                 builder.addDoubleProperty(
                                 "Outer Percent",
                                 () -> Constants.Pickup.outerSpeed,
-                                (percent) -> Constants.Pickup.outerSpeed = percent);
+                                (percent) -> Constants.Pickup.outerSpeed = percent / 100);
                 builder.addDoubleProperty(
                                 "Inner Percent",
                                 () -> Constants.Pickup.innerSpeed,
-                                (percent) -> Constants.Pickup.innerSpeed = percent);
+                                (percent) -> Constants.Pickup.innerSpeed = percent / 100);
                 builder.addDoubleProperty(
                                 "Transport Percent",
                                 () -> Constants.Pickup.transportSpeed,
-                                (percent) -> Constants.Pickup.transportSpeed = percent);
+                                (percent) -> Constants.Pickup.transportSpeed = percent / 100);
                 builder.addDoubleProperty(
                                 "Singulator Percent",
                                 () -> Constants.Pickup.singulatorSpeed,
-                                (percent) -> Constants.Pickup.singulatorSpeed = percent);
+                                (percent) -> Constants.Pickup.singulatorSpeed = percent / 100);
+                builder.addDoubleProperty(
+                                "Top Shooter Percent",
+                                () -> Constants.Pickup.topShooterSpeed,
+                                (percent) -> Constants.Pickup.topShooterSpeed = percent / 100);
+                builder.addDoubleProperty(
+                                "Bottom Shooter Percent",
+                                () -> Constants.Pickup.bottomShooterSpeed,
+                                (percent) -> Constants.Pickup.bottomShooterSpeed = percent / 100);
         }
 }

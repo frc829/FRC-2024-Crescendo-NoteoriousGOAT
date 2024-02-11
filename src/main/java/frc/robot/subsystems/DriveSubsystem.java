@@ -168,8 +168,8 @@ public class DriveSubsystem extends SubsystemBase {
         public final Runnable update;
 
         public final Supplier<Command> createStopCommand;
-        public final Supplier<Command> createSteerEncodersResetCommand;
-        public final Function<SwerveDriveWheelStates, Command> createControlModulesCommand;
+        public final Command resetSteerEncodersCommand;
+        public final Command zeroModulesCommand;
         public final Command robotCentricOriginCommand;
         public final Command fieldCentricOriginCommand;
 
@@ -215,19 +215,12 @@ public class DriveSubsystem extends SubsystemBase {
                         return stopCommand;
                 };
 
-                createSteerEncodersResetCommand = () -> {
-                        Command resetSteerEncodersCommand = runOnce(resetSteerEncodersFromAbsolutes);
-                        resetSteerEncodersCommand.setName("Reset Steer Encoders");
-                        return resetSteerEncodersCommand;
-                };
+                resetSteerEncodersCommand = runOnce(resetSteerEncodersFromAbsolutes);
+                resetSteerEncodersCommand.setName("Reset Steer Encoders");
 
-                createControlModulesCommand = (states) -> {
-                        Runnable control = () -> controlModules.accept(states);
-                        Command controlCommand = run(control);
-                        controlCommand.setName("Direct Module Control");
-                        return controlCommand;
-
-                };
+                Runnable control = () -> controlModules.accept(Constants.ModuleStates.zeroing);
+                zeroModulesCommand = run(control);
+                zeroModulesCommand.setName("Zero Module");
 
                 ChassisSpeeds setChassisSpeeds = new ChassisSpeeds();
                 Runnable setRobotChassisSpeeds = () -> {
