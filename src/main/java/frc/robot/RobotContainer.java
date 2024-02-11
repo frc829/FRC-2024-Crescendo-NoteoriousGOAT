@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandBinder;
-import frc.robot.commands.CommandCreators;
+import frc.robot.commands.CommandCreator;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PickupSubsystem;
@@ -41,48 +41,35 @@ public class RobotContainer {
         }
 
         public static final Orchestra orchestra = new Orchestra();
+        public static final Controller driver = Controller.createFromXBox
+                        .apply(Constants.Controller.driverPort)
+                        .apply(Constants.Controller.deadband);
+        public static final Controller operator = Controller.createFromXBox
+                        .apply(Constants.Controller.operatorPort)
+                        .apply(Constants.Controller.deadband);
+
+        public static final PickupSubsystem pickupSubsystem = PickupSubsystem.create.get();
+        public static final ShooterSubsystem shooterSubsystem = ShooterSubsystem.create.get();
+        public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
+        public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
+        public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
 
         private final SendableChooser<Command> autoChooser;
 
-        private final DriveSubsystem driveSubsystem;
-
         public RobotContainer() {
-                Controller driver = Controller.createFromXBox
-                                .apply(Constants.Controller.driverPort)
-                                .apply(Constants.Controller.deadband);
-                Controller operator = Controller.createFromXBox
-                                .apply(Constants.Controller.operatorPort)
-                                .apply(Constants.Controller.deadband);
 
-                PickupSubsystem pickupSubsystem = PickupSubsystem.create.get();
-                ShooterSubsystem shooterSubsystem = ShooterSubsystem.create.get();
-                ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
-                ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
-                driveSubsystem = DriveSubsystem.create.get();
+                CommandBinder.bindManualPickupCommand.accept(operator.a);
+                CommandBinder.bindManualFenderShootCommand.accept(operator.b);
 
-                CommandBinder.bindManualPickupCommand
-                                .apply(pickupSubsystem)
-                                .apply(shooterSubsystem)
-                                .apply(shooterTiltSubsystem)
-                                .accept(operator.a);
-                CommandBinder.bindManualFenderShootCommand
-                                .apply(pickupSubsystem)
-                                .apply(shooterSubsystem)
-                                .apply(shooterTiltSubsystem)
-                                .accept(operator.b);
                 CommandBinder.bindManualShooterTiltCommand
-                                .apply(shooterTiltSubsystem)
                                 .apply(operator.rightYValue)
                                 .accept(operator.rightY);
                 CommandBinder.bindManualElevatorCommand
-                                .apply(elevatorSubsystem)
                                 .apply(operator.leftYValue)
                                 .accept(operator.leftY);
                 CommandBinder.bindManualResetSteerEncodersCommand
-                                .apply(driveSubsystem)
                                 .accept(driver.start);
                 CommandBinder.bindManualModuleZeroCommand
-                                .apply(driveSubsystem)
                                 .accept(driver.back);
                 CommandBinder.bindManualRobotCentricDriveCommand
                                 .apply(driveSubsystem)
@@ -172,7 +159,7 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand(
                                 "TestGoToNote",
-                                CommandCreators.createSetPathFindCommand
+                                CommandCreator.createSetPathFindCommand
                                                 .apply(driveSubsystem)
                                                 .apply(targetPoseOptionalTest)
                                                 .apply(new PathConstraints(
@@ -182,7 +169,7 @@ public class RobotContainer {
                                                 .apply(0.0)
                                                 .apply(0.0)
                                                 .apply(true)
-                                                .andThen(CommandCreators.pathFindToSuppliedOptPoseCommand[0]));
+                                                .andThen(CommandCreator.pathFindToSuppliedOptPoseCommand[0]));
                 Runnable playOrchestra = () -> {
                         orchestra.play();
                 };
@@ -196,8 +183,6 @@ public class RobotContainer {
                 driver.y.whileTrue(playOrchestraCommand);
                 driver.y.onFalse(stopOrchestraCommand);
 
-
-                
                 autoChooser = AutoBuilder.buildAutoChooser();
 
                 SmartDashboard.putData("Auto Chooser", autoChooser);

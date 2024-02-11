@@ -19,69 +19,56 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelState
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.PickupSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.ShooterTiltSubsystem;
 
 public class CommandBinder {
 
         private CommandBinder() {
         }
 
-        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Function<ShooterTiltSubsystem, Consumer<Trigger>>>> bindManualPickupCommand = (
-                        pickup) -> (shooter) -> (tilt) -> (trigger) -> {
-                                Command manualPickupCommand = CommandCreators.createPickupCommand
-                                                .apply(pickup)
-                                                .apply(shooter)
-                                                .apply(tilt);
-                                manualPickupCommand.setName("Manual Pickup");
-                                trigger.whileTrue(manualPickupCommand);
-                        };
+        public static final Consumer<Trigger> bindManualPickupCommand = (trigger) -> {
+                Command manualPickupCommand = CommandCreator.createPickupCommand.get();
+                manualPickupCommand.setName("Manual Pickup");
+                trigger.whileTrue(manualPickupCommand);
+        };
 
-        public static final Function<PickupSubsystem, Function<ShooterSubsystem, Function<ShooterTiltSubsystem, Consumer<Trigger>>>> bindManualFenderShootCommand = (
-                        pickup) -> (shooter) -> (tilt) -> (trigger) -> {
-                                Command manualShooterCommand = CommandCreators.createFenderShootCommand
-                                                .apply(pickup)
-                                                .apply(shooter)
-                                                .apply(tilt);
-                                manualShooterCommand.setName("Manual Fender Shoot");
-                                trigger.whileTrue(manualShooterCommand);
-                        };
+        public static final Consumer<Trigger> bindManualFenderShootCommand = (trigger) -> {
+                Command manualShooterCommand = CommandCreator.createFenderShootCommand.get();
+                manualShooterCommand.setName("Manual Fender Shoot");
+                trigger.whileTrue(manualShooterCommand);
+        };
 
-        public static final Function<ShooterTiltSubsystem, Function<DoubleSupplier, Consumer<Trigger>>> bindManualShooterTiltCommand = (
-                        shooterTilt) -> (driveSpeed) -> (trigger) -> {
-                                Command manualShooterTiltCommand = shooterTilt.createDriveTiltCommand
+        public static final Function<DoubleSupplier, Consumer<Trigger>> bindManualShooterTiltCommand = (
+                        driveSpeed) -> (trigger) -> {
+                                Command manualShooterTiltCommand = RobotContainer.shooterTiltSubsystem.createDriveTiltCommand
                                                 .apply(driveSpeed);
                                 manualShooterTiltCommand.setName("Manual Shooter Tilt Drive");
                                 trigger.whileTrue(manualShooterTiltCommand);
                         };
 
-        public static final Function<ElevatorSubsystem, Function<DoubleSupplier, Consumer<Trigger>>> bindManualElevatorCommand = (
-                        elevator) -> (driveSpeed) -> (trigger) -> {
-                                Command manualShooterTiltCommand = elevator.createDriveElevatorcommand
+        public static final Function<DoubleSupplier, Consumer<Trigger>> bindManualElevatorCommand = (
+                        driveSpeed) -> (trigger) -> {
+                                Command manualShooterTiltCommand = RobotContainer.elevatorSubsystem.createDriveElevatorcommand
                                                 .apply(driveSpeed);
                                 manualShooterTiltCommand.setName("Manual Elevator Drive");
                                 trigger.whileTrue(manualShooterTiltCommand);
                         };
 
-        public static final Function<DriveSubsystem, Consumer<Trigger>> bindManualResetSteerEncodersCommand = (
-                        drive) -> (trigger) -> {
-                                trigger.onTrue(drive.createSteerEncodersResetCommand.get());
-                        };
+        public static final Consumer<Trigger> bindManualResetSteerEncodersCommand = (trigger) -> {
+                trigger.onTrue(RobotContainer.driveSubsystem.createSteerEncodersResetCommand.get());
+        };
 
-        public static final Function<DriveSubsystem, Consumer<Trigger>> bindManualModuleZeroCommand = (
-                        drive) -> (trigger) -> {
-                                Command zeroModulesCommand = drive.createControlModulesCommand
-                                                .apply(new SwerveDriveWheelStates(new SwerveModuleState[] {
-                                                                new SwerveModuleState(),
-                                                                new SwerveModuleState(),
-                                                                new SwerveModuleState(),
-                                                                new SwerveModuleState()
-                                                }));
-                                trigger.whileTrue(zeroModulesCommand);
-                        };
+        public static final Consumer<Trigger> bindManualModuleZeroCommand = (trigger) -> {
+                Command zeroModulesCommand = RobotContainer.driveSubsystem.createControlModulesCommand
+                                .apply(new SwerveDriveWheelStates(new SwerveModuleState[] {
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState()
+                                }));
+                trigger.whileTrue(zeroModulesCommand);
+        };
 
         public static final Function<DriveSubsystem, Consumer<Controller>> bindManualRobotCentricDriveCommand = (
                         drive) -> (controller) -> {
@@ -138,7 +125,7 @@ public class CommandBinder {
         public static final Function<DriveSubsystem, Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Consumer<Trigger>>>>>> bindPathFindToPoseCommandToTrigger = (
                         drive) -> (targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (trigger) -> {
-                                                Command pathFindToPoseCommand = CommandCreators.createPathFindToPoseCommand
+                                                Command pathFindToPoseCommand = CommandCreator.createPathFindToPoseCommand
                                                                 .apply(drive)
                                                                 .apply(targetPose)
                                                                 .apply(constraints)
@@ -153,7 +140,7 @@ public class CommandBinder {
                         drive) -> (targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (
                                                         pathFlip) -> (fieldCentricCommand) -> (trigger) -> {
-                                                                Command setPathFindCommand = CommandCreators.createSetPathFindCommand
+                                                                Command setPathFindCommand = CommandCreator.createSetPathFindCommand
                                                                                 .apply(drive)
                                                                                 .apply(targetPose)
                                                                                 .apply(constraints)
@@ -162,7 +149,7 @@ public class CommandBinder {
                                                                                 .apply(pathFlip);
 
                                                                 trigger.whileTrue(setPathFindCommand.andThen(Commands
-                                                                                .deferredProxy(() -> CommandCreators.pathFindToSuppliedOptPoseCommand[0])));
+                                                                                .deferredProxy(() -> CommandCreator.pathFindToSuppliedOptPoseCommand[0])));
                                                                 trigger.onFalse(fieldCentricCommand);
                                                         };
 }
