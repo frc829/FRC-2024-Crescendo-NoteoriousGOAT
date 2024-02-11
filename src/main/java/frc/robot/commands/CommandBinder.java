@@ -125,13 +125,13 @@ public class CommandBinder {
         public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Consumer<Trigger>>>>> bindPathFindToPoseCommandToTrigger = (
                         targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (trigger) -> {
-                                                Command pathFindToPoseCommand = CommandCreator.createPathFindToPoseCommand
+                                                Supplier<Command> pathFindToPoseCommand = CommandCreator.createPathFindToPoseCommand
                                                                 .apply(targetPose)
                                                                 .apply(constraints)
                                                                 .apply(goalEndVelocityMPS)
                                                                 .apply(rotationDelayDistance);
 
-                                                trigger.whileTrue(pathFindToPoseCommand);
+                                                trigger.whileTrue(pathFindToPoseCommand.get());
 
                                         };
 

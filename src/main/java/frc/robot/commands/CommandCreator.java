@@ -144,7 +144,7 @@ public class CommandCreator implements Sendable {
                 return shootCommand;
         };
 
-        public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Command>>>> createPathFindToPoseCommand = (
+        public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Supplier<Command>>>>> createPathFindToPoseCommand = (
                         targetPose) -> (constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
                                 Command pathFindToPoseCommand = AutoBuilder.pathfindToPoseFlipped(
                                                 targetPose,
@@ -152,7 +152,7 @@ public class CommandCreator implements Sendable {
                                                 goalEndVelocityMPS,
                                                 rotationDelayDistance);
                                 pathFindToPoseCommand.setName("PathFindToFixedPose");
-                                return pathFindToPoseCommand;
+                                return () -> pathFindToPoseCommand;
                         };
 
         public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
