@@ -11,19 +11,18 @@ import java.util.function.Supplier;
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.CommandBinder;
-import frc.robot.commands.CommandCreator;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PickupSubsystem;
@@ -53,6 +52,9 @@ public class RobotContainer {
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
+        public static final Command fieldCentricCommand = CommandBinder.bindManualFieldCentricDriveCommand
+                        .apply(driveSubsystem)
+                        .apply(driver);
 
         private final SendableChooser<Command> autoChooser;
 
@@ -74,9 +76,7 @@ public class RobotContainer {
                 CommandBinder.bindManualRobotCentricDriveCommand
                                 .apply(driveSubsystem)
                                 .accept(driver);
-                Command fieldCentricCommand = CommandBinder.bindManualFieldCentricDriveCommand
-                                .apply(driveSubsystem)
-                                .apply(driver);
+
                 CommandBinder.bindPathFindToPoseCommandToTrigger
                                 .apply(new Pose2d(4, 1, Rotation2d.fromDegrees(180)))
                                 .apply(new PathConstraints(
@@ -110,7 +110,6 @@ public class RobotContainer {
                                 .apply(0.0)
                                 .apply(0.0)
                                 .apply(false)
-                                .apply(fieldCentricCommand)
                                 .accept(driver.b);
 
                 Supplier<Optional<Pose2d>> goToNoteSupplier = () -> {
@@ -133,7 +132,6 @@ public class RobotContainer {
                                 .apply(0.0)
                                 .apply(0.0)
                                 .apply(false)
-                                .apply(fieldCentricCommand)
                                 .accept(driver.x);
 
                 SmartDashboard.putData("Operator", operator);
@@ -154,18 +152,6 @@ public class RobotContainer {
                         driveSubsystem.field2d.getObject("target pose").setPose(pose);
                 });
 
-                NamedCommands.registerCommand(
-                                "TestGoToNote",
-                                CommandCreator.createSetPathFindCommand
-                                                .apply(targetPoseOptionalTest)
-                                                .apply(new PathConstraints(
-                                                                3.0, 4.0,
-                                                                Units.degreesToRadians(540),
-                                                                Units.degreesToRadians(720)))
-                                                .apply(0.0)
-                                                .apply(0.0)
-                                                .apply(true)
-                                                .andThen(CommandCreator.pathFindToSuppliedOptPoseCommand[0]));
                 Runnable playOrchestra = () -> {
                         orchestra.play();
                 };
@@ -178,6 +164,8 @@ public class RobotContainer {
 
                 driver.y.whileTrue(playOrchestraCommand);
                 driver.y.onFalse(stopOrchestraCommand);
+
+                CommandBinder.bindPointToLocationCommandToTrigger.apply(new Translation2d(0, 5.484762)).accept(driver.padDown);
 
                 autoChooser = AutoBuilder.buildAutoChooser();
 

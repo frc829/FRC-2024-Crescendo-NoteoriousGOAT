@@ -30,7 +30,9 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -54,6 +56,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -120,6 +123,16 @@ public class DriveSubsystem extends SubsystemBase {
                                         0.020);
                 }
 
+                private static final class RotateInPlace {
+                        private static final double kP = 3.0;
+                        private static final PIDController pidController = new PIDController(kP, 0, 0);
+                }
+
+        }
+
+        static {
+                Constants.RotateInPlace.pidController.enableContinuousInput(-0.5, 0.5);
+                Constants.RotateInPlace.pidController.setTolerance(0.01);
         }
 
         public final Field2d field2d;
@@ -142,6 +155,8 @@ public class DriveSubsystem extends SubsystemBase {
         public final Function<SwerveDriveWheelStates, Command> createControlModulesCommand;
         public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualRobotChassisSpeedsCommand;
         public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualFieldChassisSpeedsCommand;
+
+        public final Function<Translation2d, Command> createPointToLocationCommand;
 
         private DriveSubsystem(
                         Field2d field2d,
@@ -231,6 +246,30 @@ public class DriveSubsystem extends SubsystemBase {
                         Command setFieldChassisSpeedsCommand = run(setFieldChassisSpeeds);
                         setFieldChassisSpeedsCommand.setName("Manual Field Chassis Speeds");
                         return setFieldChassisSpeedsCommand;
+                };
+
+                createPointToLocationCommand = (location) -> {
+                        Runnable rotateInPlace = () -> {
+                                Rotation2d currentRotation = fieldPose.get().getRotation();
+                                Translation2d pointingVector = location.minus(fieldPose.get().getTranslation());
+                                Rotation2d desiredRotation = pointingVector.getAngle();
+                                double rotationsPerSecond = Constants.RotateInPlace.pidController.calculate(
+                                                currentRotation.getRotations(), desiredRotation.getRotations());
+                                double omegaRadiansPerSecond = Units.rotationsToRadians(rotationsPerSecond);
+                                omegaRadiansPerSecond = MathUtil.clamp(omegaRadiansPerSecond,
+                                                -Constants.maxAngularVelocity.in(RadiansPerSecond),
+                                                Constants.maxAngularVelocity.in(RadiansPerSecond));
+                                if(Constants.RotateInPlace.pidController.atSetpoint()){
+                                        omegaRadiansPerSecond = 0;
+                                }
+                                controlRobotChassisSpeeds.apply(new Translation2d())
+                                                .accept(new ChassisSpeeds(0, 0, omegaRadiansPerSecond));
+                                SmartDashboard.putNumber("Rotate In Place radPerSec", omegaRadiansPerSecond);
+
+                        };
+                        Command rotateInPlaceCommand = run(rotateInPlace).until(() -> Constants.RotateInPlace.pidController.atSetpoint());
+                        rotateInPlaceCommand.setName("RotateInPlace");
+                        return rotateInPlaceCommand;
                 };
 
                 setDefaultCommand(createStopCommand.get());

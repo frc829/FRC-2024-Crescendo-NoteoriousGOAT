@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelState
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -131,23 +132,31 @@ public class CommandBinder {
                                                                 .apply(goalEndVelocityMPS)
                                                                 .apply(rotationDelayDistance);
 
-                                                trigger.whileTrue(pathFindToPoseCommand.get());
-
+                                                trigger.whileTrue(Commands
+                                                                .deferredProxy(pathFindToPoseCommand));
+                                                trigger.onFalse(RobotContainer.fieldCentricCommand);
                                         };
 
-        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Function<Command, Consumer<Trigger>>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
+        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Consumer<Trigger>>>>>> bindPathFindToSuppliedPoseCommandToTrigger = (
                         targetPose) -> (constraints) -> (
                                         goalEndVelocityMPS) -> (rotationDelayDistance) -> (
-                                                        pathFlip) -> (fieldCentricCommand) -> (trigger) -> {
-                                                                Command setPathFindCommand = CommandCreator.createSetPathFindCommand
+                                                        pathFlip) -> (trigger) -> {
+                                                                Supplier<Command> setPathFindCommand = CommandCreator.createSetPathFindCommand
                                                                                 .apply(targetPose)
                                                                                 .apply(constraints)
                                                                                 .apply(goalEndVelocityMPS)
                                                                                 .apply(rotationDelayDistance)
                                                                                 .apply(pathFlip);
 
-                                                                trigger.whileTrue(setPathFindCommand.andThen(Commands
-                                                                                .deferredProxy(() -> CommandCreator.pathFindToSuppliedOptPoseCommand[0])));
-                                                                trigger.onFalse(fieldCentricCommand);
+                                                                trigger.whileTrue(Commands
+                                                                                .deferredProxy(setPathFindCommand));
+                                                                trigger.onFalse(RobotContainer.fieldCentricCommand);
                                                         };
+
+        public static final Function<Translation2d, Consumer<Trigger>> bindPointToLocationCommandToTrigger = (
+                        location) -> (trigger) -> {
+                                Command pointToLocationCommand = RobotContainer.driveSubsystem.createPointToLocationCommand
+                                                .apply(location);
+                                trigger.whileTrue(pointToLocationCommand);
+                        };
 }

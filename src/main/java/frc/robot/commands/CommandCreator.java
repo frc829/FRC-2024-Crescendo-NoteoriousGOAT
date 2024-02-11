@@ -157,18 +157,18 @@ public class CommandCreator implements Sendable {
 
         public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
 
-        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Command>>>>> createSetPathFindCommand = (
+        public static final Function<Supplier<Optional<Pose2d>>, Function<PathConstraints, Function<Double, Function<Double, Function<Boolean, Supplier<Command>>>>>> createSetPathFindCommand = (
                         targetPoseSupplier) -> (
                                         constraints) -> (goalEndVelocityMPS) -> (
                                                         rotationDelayDistance) -> (pathFlip) -> {
-                                                                Runnable setPathFind = () -> {
+                                                                return () -> {
                                                                         Optional<Pose2d> targetPoseOptional = targetPoseSupplier
                                                                                         .get();
                                                                         if (targetPoseOptional.isPresent()) {
                                                                                 Pose2d targetPose = targetPoseOptional
                                                                                                 .get();
                                                                                 if (pathFlip) {
-                                                                                        pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
+                                                                                        return AutoBuilder
                                                                                                         .pathfindToPoseFlipped(
                                                                                                                         targetPose,
                                                                                                                         constraints,
@@ -177,7 +177,7 @@ public class CommandCreator implements Sendable {
                                                                                                         .handleInterrupt(
                                                                                                                         RobotContainer.driveSubsystem.stop);
                                                                                 } else {
-                                                                                        pathFindToSuppliedOptPoseCommand[0] = AutoBuilder
+                                                                                        return AutoBuilder
                                                                                                         .pathfindToPose(
                                                                                                                         targetPose,
                                                                                                                         constraints,
@@ -188,16 +188,9 @@ public class CommandCreator implements Sendable {
                                                                                 }
 
                                                                         } else {
-                                                                                pathFindToSuppliedOptPoseCommand[0] = Commands
-                                                                                                .none();
+                                                                                return Commands.none();
                                                                         }
-                                                                        pathFindToSuppliedOptPoseCommand[0]
-                                                                                        .setName("PathFindToSuppliedPose");
-                                                                        pathFindToSuppliedOptPoseCommand[0].schedule();
                                                                 };
-                                                                Command setPathFindCommand = Commands
-                                                                                .runOnce(setPathFind);
-                                                                return setPathFindCommand;
                                                         };
 
         @Override

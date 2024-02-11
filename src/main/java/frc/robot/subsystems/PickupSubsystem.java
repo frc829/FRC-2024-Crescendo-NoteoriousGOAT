@@ -257,6 +257,7 @@ public class PickupSubsystem extends SubsystemBase {
       inner.update.run();
       transport.update.run();
       singulator.update.run();
+      positionSwitch.update.run();
     };
 
     return new PickupSubsystem(

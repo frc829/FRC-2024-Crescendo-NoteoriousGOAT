@@ -28,7 +28,9 @@ public class PositionSwitch {
                     return distanceSensor.measure.in(Meters) <= maxOn.in(Meters)
                             && distanceSensor.measure.in(Meters) >= minOn.in(Meters);
                 };
-                Runnable update = () -> distanceSensor.update.run();
+                Runnable update = () -> {
+                    distanceSensor.update.run();
+                };
                 return new PositionSwitch(isOn, update);
             };
 

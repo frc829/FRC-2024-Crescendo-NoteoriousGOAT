@@ -172,6 +172,11 @@ public class Motor {
                         return canSparkBase;
                 };
 
+                public static final Function<CANSparkBase, CANSparkBase> enableCoast = (canSparkBase) -> {
+                        canSparkBase.setIdleMode(IdleMode.kCoast);
+                        return canSparkBase;
+                };
+
                 public static final Function<CANSparkBase, CANSparkBase> invert = (canSparkBase) -> {
                         canSparkBase.setInverted(true);
                         return canSparkBase;
@@ -355,8 +360,8 @@ public class Motor {
                                         var status = RobotContainer.orchestra.loadMusic("rhapsody.chrp");
 
                                         if (!status.isOK()) {
-                                                        // log error
-                                        }else{
+                                                // log error
+                                        } else {
                                                 System.out.println(status.getDescription());
                                         }
                                         config.Voltage.PeakForwardVoltage = 12.0;
