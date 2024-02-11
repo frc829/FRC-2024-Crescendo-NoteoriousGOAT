@@ -28,6 +28,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PickupSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShooterTiltSubsystem;
+import frc.robot.triggers.ComplexTriggers;
 
 public class RobotContainer {
 
@@ -52,9 +53,6 @@ public class RobotContainer {
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
-        public static final Command fieldCentricCommand = CommandBinder.bindManualFieldCentricDriveCommand
-                        .apply(driveSubsystem)
-                        .apply(driver);
 
         private final SendableChooser<Command> autoChooser;
 
@@ -73,9 +71,9 @@ public class RobotContainer {
                                 .accept(driver.start);
                 CommandBinder.bindManualModuleZeroCommand
                                 .accept(driver.back);
-                CommandBinder.bindManualRobotCentricDriveCommand
-                                .apply(driveSubsystem)
-                                .accept(driver);
+
+                ComplexTriggers.fieldCentricOriginDriveTrigger.whileTrue(driveSubsystem.fieldCentricOriginCommand);
+                ComplexTriggers.robotCentricOriginDriveTrigger.whileTrue(driveSubsystem.robotCentricOriginCommand);
 
                 CommandBinder.bindPathFindToPoseCommandToTrigger
                                 .apply(new Pose2d(4, 1, Rotation2d.fromDegrees(180)))
@@ -165,7 +163,8 @@ public class RobotContainer {
                 driver.y.whileTrue(playOrchestraCommand);
                 driver.y.onFalse(stopOrchestraCommand);
 
-                CommandBinder.bindPointToLocationCommandToTrigger.apply(new Translation2d(0, 5.484762)).accept(driver.padDown);
+                CommandBinder.bindPointToLocationCommandToTrigger.apply(new Translation2d(0, 5.484762))
+                                .accept(driver.y);
 
                 autoChooser = AutoBuilder.buildAutoChooser();
 

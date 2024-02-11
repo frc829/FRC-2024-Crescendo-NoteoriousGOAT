@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -59,6 +58,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -97,6 +97,23 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(
                                 maxLinearVelocity.in(MetersPerSecond) / driveRadius.in(Meters));
 
+                private static final class CentersOfRotation {
+                        private static final Translation2d origin = new Translation2d();
+                        private static final Translation2d frontLeft = new Translation2d(Inches.of(13), Inches.of(13));
+                        private static final Translation2d frontRight = new Translation2d(Inches.of(13),
+                                        Inches.of(-13));
+                }
+
+                private static final class ModuleStates {
+                        private static final SwerveDriveWheelStates zeroing = new SwerveDriveWheelStates(
+                                        new SwerveModuleState[] {
+                                                        new SwerveModuleState(),
+                                                        new SwerveModuleState(),
+                                                        new SwerveModuleState(),
+                                                        new SwerveModuleState(),
+                                        });
+                }
+
                 private static final class PathPlannerConfigs {
                         private static final PIDConstants translationConstants = new PIDConstants(8, 0, 0);
                         private static final PIDConstants rotationConstants = new PIDConstants(
@@ -124,7 +141,7 @@ public class DriveSubsystem extends SubsystemBase {
                 }
 
                 private static final class RotateInPlace {
-                        private static final double kP = 3.0;
+                        private static final double kP = 1.0;
                         private static final PIDController pidController = new PIDController(kP, 0, 0);
                 }
 
@@ -153,8 +170,8 @@ public class DriveSubsystem extends SubsystemBase {
         public final Supplier<Command> createStopCommand;
         public final Supplier<Command> createSteerEncodersResetCommand;
         public final Function<SwerveDriveWheelStates, Command> createControlModulesCommand;
-        public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualRobotChassisSpeedsCommand;
-        public final Function<Supplier<Translation2d>, Function<DoubleSupplier, Function<DoubleSupplier, Function<DoubleSupplier, Command>>>> createManualFieldChassisSpeedsCommand;
+        public final Command robotCentricOriginCommand;
+        public final Command fieldCentricOriginCommand;
 
         public final Function<Translation2d, Command> createPointToLocationCommand;
 
@@ -212,41 +229,36 @@ public class DriveSubsystem extends SubsystemBase {
 
                 };
 
-                ChassisSpeeds robotChassisSpeedsSetpoint = new ChassisSpeeds();
-                createManualRobotChassisSpeedsCommand = (centerOfRotation) -> (forward) -> (strafe) -> (rotation) -> {
-                        Runnable setRobotChassisSpeeds = () -> {
-                                robotChassisSpeedsSetpoint.vxMetersPerSecond = forward.getAsDouble()
-                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
-                                robotChassisSpeedsSetpoint.vyMetersPerSecond = strafe.getAsDouble()
-                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
-                                robotChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
-                                                * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                                Translation2d cor = centerOfRotation.get();
-                                controlRobotChassisSpeeds.apply(cor)
-                                                .accept(robotChassisSpeedsSetpoint);
-                        };
-                        Command setRobotChassisSpeedsCommand = run(setRobotChassisSpeeds);
-                        setRobotChassisSpeedsCommand.setName("Manual Robot Chassis Speeds");
-                        return setRobotChassisSpeedsCommand;
+                ChassisSpeeds setChassisSpeeds = new ChassisSpeeds();
+                Runnable setRobotChassisSpeeds = () -> {
+                        setChassisSpeeds.vxMetersPerSecond = RobotContainer.driver.rightYValue
+                                        .getAsDouble()
+                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
+                        setChassisSpeeds.vyMetersPerSecond = RobotContainer.driver.rightXValue
+                                        .getAsDouble()
+                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
+                        setChassisSpeeds.omegaRadiansPerSecond = RobotContainer.driver.fullTriggerValue
+                                        .getAsDouble()
+                                        * Constants.maxAngularVelocity.in(RadiansPerSecond);
+                        controlRobotChassisSpeeds.apply(Constants.CentersOfRotation.origin)
+                                        .accept(setChassisSpeeds);
                 };
+                robotCentricOriginCommand = run(setRobotChassisSpeeds);
+                robotCentricOriginCommand.setName("Manual Origin Robot Chassis Speeds");
 
-                ChassisSpeeds fieldChassisSpeedsSetpoint = new ChassisSpeeds();
-                createManualFieldChassisSpeedsCommand = (centerOfRotation) -> (forward) -> (strafe) -> (rotation) -> {
-                        Runnable setFieldChassisSpeeds = () -> {
-                                fieldChassisSpeedsSetpoint.vxMetersPerSecond = forward.getAsDouble()
-                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
-                                fieldChassisSpeedsSetpoint.vyMetersPerSecond = strafe.getAsDouble()
-                                                * Constants.maxLinearVelocity.in(MetersPerSecond);
-                                fieldChassisSpeedsSetpoint.omegaRadiansPerSecond = rotation.getAsDouble()
-                                                * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                                Translation2d cor = centerOfRotation.get();
-                                controlFieldChassisSpeeds.apply(cor)
-                                                .accept(fieldChassisSpeedsSetpoint);
-                        };
-                        Command setFieldChassisSpeedsCommand = run(setFieldChassisSpeeds);
-                        setFieldChassisSpeedsCommand.setName("Manual Field Chassis Speeds");
-                        return setFieldChassisSpeedsCommand;
+                Runnable setFieldChassisSpeeds = () -> {
+                        setChassisSpeeds.vxMetersPerSecond = RobotContainer.driver.leftYValue.getAsDouble()
+                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
+                        setChassisSpeeds.vyMetersPerSecond = RobotContainer.driver.leftXValue.getAsDouble()
+                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
+                        setChassisSpeeds.omegaRadiansPerSecond = RobotContainer.driver.fullTriggerValue
+                                        .getAsDouble()
+                                        * Constants.maxAngularVelocity.in(RadiansPerSecond);
+                        controlFieldChassisSpeeds.apply(Constants.CentersOfRotation.origin)
+                                        .accept(setChassisSpeeds);
                 };
+                fieldCentricOriginCommand = run(setFieldChassisSpeeds);
+                fieldCentricOriginCommand.setName("Manual Field Chassis Speeds");
 
                 createPointToLocationCommand = (location) -> {
                         Runnable rotateInPlace = () -> {
@@ -259,15 +271,18 @@ public class DriveSubsystem extends SubsystemBase {
                                 omegaRadiansPerSecond = MathUtil.clamp(omegaRadiansPerSecond,
                                                 -Constants.maxAngularVelocity.in(RadiansPerSecond),
                                                 Constants.maxAngularVelocity.in(RadiansPerSecond));
-                                if(Constants.RotateInPlace.pidController.atSetpoint()){
+                                if (Constants.RotateInPlace.pidController.atSetpoint()) {
                                         omegaRadiansPerSecond = 0;
                                 }
-                                controlRobotChassisSpeeds.apply(new Translation2d())
-                                                .accept(new ChassisSpeeds(0, 0, omegaRadiansPerSecond));
+                                controlFieldChassisSpeeds.apply(new Translation2d())
+                                                .accept(new ChassisSpeeds(
+                                                                RobotContainer.driver.leftYValue.getAsDouble(),
+                                                                RobotContainer.driver.leftXValue.getAsDouble(),
+                                                                omegaRadiansPerSecond));
                                 SmartDashboard.putNumber("Rotate In Place radPerSec", omegaRadiansPerSecond);
 
                         };
-                        Command rotateInPlaceCommand = run(rotateInPlace).until(() -> Constants.RotateInPlace.pidController.atSetpoint());
+                        Command rotateInPlaceCommand = run(rotateInPlace);
                         rotateInPlaceCommand.setName("RotateInPlace");
                         return rotateInPlaceCommand;
                 };
