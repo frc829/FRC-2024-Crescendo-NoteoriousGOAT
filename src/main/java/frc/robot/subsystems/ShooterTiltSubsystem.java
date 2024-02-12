@@ -46,6 +46,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> velocity;
   public final Consumer<Measure<Angle>> turn;
   public final Consumer<Double> drive;
+  public final Runnable hold;
   public final Runnable update;
 
 
@@ -65,6 +66,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.velocity = velocity;
     this.turn = turn;
     this.drive = drive;
+    this.hold = hold;
     this.update = update;
 
     resetRelEncoderFromAbsolute.run();

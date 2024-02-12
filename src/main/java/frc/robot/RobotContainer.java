@@ -49,15 +49,15 @@ public class RobotContainer {
         // private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
-
+                SmartDashboard.putData("CommandCreator", new CommandCreator());
                 // CommandBinder.bindManualFenderShootCommand.accept(operator.b);
-                operator.a.whileTrue(CommandCreator.createPickupCommand.get());
-                operator.b.whileTrue(CommandCreator.createFenderShootCommand.get());
+                operator.a.whileTrue(CommandCreator.ScoringCommands.createPickupCommand.get());
+                operator.b.whileTrue(CommandCreator.ScoringCommands.createFenderShootCommand.get());
                 operator.leftY.whileTrue(CommandCreator.ManualCommands.elevatorDriveCommand);
                 operator.rightY.whileTrue(CommandCreator.ManualCommands.tiltDriveCommand);
                 operator.fullTrigger.whileTrue(CommandCreator.ManualCommands.shooterDriveCommand);
                 // CommandBinder.bindManualResetSteerEncodersCommand
-                // .accept(driver.start); 
+                // .accept(driver.start);
                 // driver.back.whileTrue(driveSubsystem.zeroModulesCommand);
 
                 // ComplexTriggers.fieldCentricOriginDriveTrigger.whileTrue(driveSubsystem.fieldCentricOriginCommand);

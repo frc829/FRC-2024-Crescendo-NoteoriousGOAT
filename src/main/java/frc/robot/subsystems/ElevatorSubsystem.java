@@ -45,6 +45,7 @@ public class ElevatorSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> velocity;
   public final Consumer<Measure<Distance>> move;
   public final Consumer<Double> drive;
+  public final Runnable hold;
   public final Runnable update;
 
 
@@ -61,11 +62,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.velocity = velocity;
     this.move = move;
     this.drive = drive;
+    this.hold = hold;
     this.update = update;
 
     Command defaultCommand = run(hold);
     defaultCommand.setName("HOLD");
-
     this.setDefaultCommand(defaultCommand);
   }
 
