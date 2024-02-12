@@ -146,6 +146,12 @@
           },
           "open": true
         },
+        "Pickup": {
+          "open": true
+        },
+        "Shooter": {
+          "open": true
+        },
         "Shooter Tilt": {
           "open": true
         },

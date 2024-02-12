@@ -47,8 +47,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   public final Consumer<Double> drive;
   public final Runnable update;
 
-  public final Command holdCommand;
-  public final Command manualDriveCommand;
 
   private ElevatorSubsystem(
       Measure<Voltage> voltage,
@@ -65,13 +63,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     this.drive = drive;
     this.update = update;
 
-    holdCommand = run(hold);
-    holdCommand.setName("HOLD");
+    Command defaultCommand = run(hold);
+    defaultCommand.setName("HOLD");
 
-    manualDriveCommand = run(() -> drive.accept(RobotContainer.operator.leftYValue.getAsDouble()));
-    manualDriveCommand.setName("Drive Elevator Control");
-
-    this.setDefaultCommand(holdCommand);
+    this.setDefaultCommand(defaultCommand);
   }
 
   @Override

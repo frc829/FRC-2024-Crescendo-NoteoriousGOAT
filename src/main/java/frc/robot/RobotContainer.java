@@ -52,11 +52,12 @@ public class RobotContainer {
 
                 // CommandBinder.bindManualFenderShootCommand.accept(operator.b);
                 operator.a.whileTrue(CommandCreator.createPickupCommand.get());
-                operator.leftY.whileTrue(elevatorSubsystem.manualDriveCommand);
-                operator.rightY.whileTrue(shooterTiltSubsystem.manualDriveCommand);
-                operator.fullTrigger.whileTrue(shooterSubsystem.manualShootCommand);
+                operator.b.whileTrue(CommandCreator.createFenderShootCommand.get());
+                operator.leftY.whileTrue(CommandCreator.ManualCommands.elevatorDriveCommand);
+                operator.rightY.whileTrue(CommandCreator.ManualCommands.tiltDriveCommand);
+                operator.fullTrigger.whileTrue(CommandCreator.ManualCommands.shooterDriveCommand);
                 // CommandBinder.bindManualResetSteerEncodersCommand
-                // .accept(driver.start);
+                // .accept(driver.start); 
                 // driver.back.whileTrue(driveSubsystem.zeroModulesCommand);
 
                 // ComplexTriggers.fieldCentricOriginDriveTrigger.whileTrue(driveSubsystem.fieldCentricOriginCommand);

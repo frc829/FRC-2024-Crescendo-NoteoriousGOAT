@@ -1,15 +1,17 @@
 package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Value;
+
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Measure;
@@ -19,7 +21,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class CommandCreator implements Sendable {
@@ -43,7 +44,7 @@ public class CommandCreator implements Sendable {
                         private static final double shooterTiltX = 0.0; // TODO:
                         private static final double shooterTiltY = 0.0; // TODO:
                         private static final double shooterRadius = 0.0; // TODO:
-                        private static final double shutOffTime = 5;
+                        private static final double shutOffTime = 2;
 
                         private static final class Fender {
                                 private static final double outerSpeed = 0.0;
@@ -58,14 +59,29 @@ public class CommandCreator implements Sendable {
 
                         }
                 }
+                                                             
+                private static final class Amp {
+
+                }
         }
 
-        static {
-                new CommandCreator();
-        }
-
-        private CommandCreator() {
-                SmartDashboard.putData("CommandCreator", this);
+        public static final class ManualCommands {
+                public static final Runnable elevatorDrive = () -> RobotContainer.elevatorSubsystem.drive
+                                .accept(RobotContainer.operator.leftYValue.getAsDouble());
+                public static final Command elevatorDriveCommand = Commands.run(elevatorDrive,
+                                RobotContainer.elevatorSubsystem);
+                public static final Runnable tiltDrive = () -> RobotContainer.shooterTiltSubsystem.drive
+                                .accept(RobotContainer.operator.rightYValue.getAsDouble());
+                public static final Command tiltDriveCommand = Commands.run(tiltDrive,
+                                RobotContainer.shooterTiltSubsystem);
+                public static final Runnable shooterDrive = () -> {
+                        RobotContainer.shooterSubsystem.spinTop
+                                        .accept(RobotContainer.operator.leftTriggerValue.getAsDouble());
+                        RobotContainer.shooterSubsystem.spinBottom
+                                        .accept(RobotContainer.operator.rightTriggerValue.getAsDouble());
+                };
+                public static final Command shooterDriveCommand = Commands.run(shooterDrive,
+                                RobotContainer.shooterSubsystem);
         }
 
         public static final Supplier<Command> createPickupCommand = () -> {
@@ -103,48 +119,34 @@ public class CommandCreator implements Sendable {
                 return command;
         };
 
-        // public static final Supplier<Command> createFenderShootCommand = () -> {
-        // Command shootCommand = Commands.deadline(
-        // RobotContainer.shooterTiltSubsystem.createTurnTiltCommand
-        // .apply(Constants.Shoot.Fender.tiltAngle)
-        // .until(() -> MathUtil.isNear(
-        // Constants.Shoot.Fender.tiltAngle.get()
-        // .in(Degrees),
-        // RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
-        // Constants.Shoot.Fender.angleTolerance
-        // .get()
-        // .in(Degrees))),
-        // RobotContainer.shooterSubsystem.createSpinShootersCommand
-        // .apply(Constants.Shoot.Fender.topShooterSpeed)
-        // .apply(Constants.Shoot.Fender.bottomShooterSpeed))
-        // .andThen(Commands.deadline(
-        // RobotContainer.shooterSubsystem.createSpinShootersCommand
-        // .apply(Constants.Shoot.Fender.topShooterSpeed)
-        // .apply(Constants.Shoot.Fender.bottomShooterSpeed)
-        // .until(() -> MathUtil.isNear(
-        // Constants.Shoot.Fender.topShooterSpeed
-        // .getAsDouble(),
-        // RobotContainer.shooterSubsystem.topVelocity
-        // .in(
-        // Value),
-        // Constants.Shoot.Fender.speedTolerance)),
-        // RobotContainer.shooterTiltSubsystem.createHoldCommand.get()))
-        // .andThen(Commands.waitSeconds(Constants.Shoot.shutOffTime)
-        // .deadlineWith(
-        // RobotContainer.shooterTiltSubsystem.createHoldCommand
-        // .get(),
-        // RobotContainer.pickupSubsystem.createPickupControlCommand
-        // .apply(Constants.Shoot.Fender.outerSpeed)
-        // .apply(Constants.Shoot.Fender.innerSpeed)
-        // .apply(Constants.Shoot.Fender.transportSpeed)
-        // .apply(Constants.Shoot.Fender.singulatorSpeed),
-        // RobotContainer.shooterSubsystem.createSpinShootersCommand
-        // .apply(Constants.Shoot.Fender.topShooterSpeed)
-        // .apply(Constants.Shoot.Fender.bottomShooterSpeed)));
+        public static final Supplier<Command> createFenderShootCommand = () -> {
+                Runnable spinShooters = () -> {
+                        RobotContainer.shooterSubsystem.spinTop.accept(Constants.Shoot.Fender.topShooterSpeed);
+                        RobotContainer.shooterSubsystem.spinBottom.accept(Constants.Shoot.Fender.bottomShooterSpeed);
+                };
+                Command spinShootersCommandWaitUntil = Commands.run(spinShooters, RobotContainer.shooterSubsystem);
+                Command spinShootersCommandFire = Commands.run(spinShooters, RobotContainer.shooterSubsystem);
 
-        // shootCommand.setName("Fender Shoot");
-        // return shootCommand;
-        // };
+                Runnable loadShooter = () -> {
+                        RobotContainer.pickupSubsystem.spinTransport.accept(Constants.Shoot.Fender.transportSpeed);
+                        RobotContainer.pickupSubsystem.spinSingulator.accept(Constants.Shoot.Fender.singulatorSpeed);
+                };
+                Command loadShooterCommand = Commands.run(loadShooter, RobotContainer.pickupSubsystem);
+
+                Command loadAndShootCommand = Commands.parallel(spinShootersCommandFire, loadShooterCommand);
+
+                Command command = Commands
+                                .sequence(spinShootersCommandWaitUntil)
+                                .until(() -> MathUtil.isNear(
+                                                RobotContainer.shooterSubsystem.topVelocity.in(Value),
+                                                Constants.Shoot.Fender.topShooterSpeed,
+                                                0.01))
+                                .andThen(loadAndShootCommand)
+                                .withTimeout(Constants.Shoot.shutOffTime);
+                command.setName("Fender Shoot Command");
+                return command;
+
+        };
 
         public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Supplier<Command>>>>> createPathFindToPoseCommand = (
                         targetPose) -> (constraints) -> (goalEndVelocityMPS) -> (rotationDelayDistance) -> {
@@ -196,6 +198,17 @@ public class CommandCreator implements Sendable {
         // }
         // };
         // };
+
+        static {
+                new CommandCreator();
+                ManualCommands.elevatorDriveCommand.setName("Manual Elevator");
+                ManualCommands.shooterDriveCommand.setName("Manual Shooter");
+                ManualCommands.tiltDriveCommand.setName("Manual Tilt");
+        }
+
+        private CommandCreator() {
+                SmartDashboard.putData("CommandCreator", this);
+        }
 
         @Override
         public void initSendable(SendableBuilder builder) {

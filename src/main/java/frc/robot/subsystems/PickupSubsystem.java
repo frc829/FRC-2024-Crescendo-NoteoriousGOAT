@@ -87,8 +87,6 @@ public class PickupSubsystem extends SubsystemBase {
   public final Consumer<Double> spinSingulator;
   public final Runnable update;
 
-  public final Command stopCommand;
-
   private PickupSubsystem(
       Measure<Voltage> outerVoltage,
       Measure<Voltage> innerVoltage,
@@ -120,10 +118,9 @@ public class PickupSubsystem extends SubsystemBase {
     this.spinSingulator = spinSingulator;
     this.update = update;
 
-    stopCommand = run(stop);
-    stopCommand.setName("STOP");
-
-    this.setDefaultCommand(stopCommand);
+    Command defaultCommand = run(stop);
+    defaultCommand.setName("STOP");
+    this.setDefaultCommand(defaultCommand);
 
   }
 

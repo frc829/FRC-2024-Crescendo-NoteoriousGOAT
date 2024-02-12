@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Percent;
-import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Consumer;
@@ -22,7 +21,6 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 
 public class ShooterTiltSubsystem extends SubsystemBase {
 
@@ -50,8 +48,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Consumer<Double> drive;
   public final Runnable update;
 
-  public final Command holdCommand;
-  public final Command manualDriveCommand;
 
   private ShooterTiltSubsystem(
       Measure<Voltage> voltage,
@@ -73,13 +69,9 @@ public class ShooterTiltSubsystem extends SubsystemBase {
 
     resetRelEncoderFromAbsolute.run();
 
-    holdCommand = run(hold);
-    holdCommand.setName("HOLD");
-
-    manualDriveCommand = run(() -> drive.accept(RobotContainer.operator.rightYValue.getAsDouble()));
-    manualDriveCommand.setName("Manual Drive");
-
-    this.setDefaultCommand(holdCommand);
+    Command defaultCommand = run(hold);
+    defaultCommand.setName("HOLD");
+    this.setDefaultCommand(defaultCommand);
   }
 
   @Override

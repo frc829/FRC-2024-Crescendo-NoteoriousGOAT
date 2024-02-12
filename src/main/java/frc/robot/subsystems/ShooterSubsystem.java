@@ -51,8 +51,6 @@ public class ShooterSubsystem extends SubsystemBase {
   public final Consumer<Double> spinBottom;
   public final Runnable update;
 
-  public final Command stopCommand;
-  public final Command manualShootCommand;
 
   private ShooterSubsystem(
       Measure<Voltage> topVoltage,
@@ -71,17 +69,9 @@ public class ShooterSubsystem extends SubsystemBase {
     this.spinBottom = spinBottom;
     this.update = update;
 
-    stopCommand = run(stop);
-    stopCommand.setName("STOP");
-
-    Runnable spin = () -> {
-      spinTop.accept(RobotContainer.operator.leftTriggerValue.getAsDouble());
-      spinBottom.accept(RobotContainer.operator.rightTriggerValue.getAsDouble());
-    };
-    manualShootCommand = run(spin);
-    manualShootCommand.setName("Shooter Control");
-
-    this.setDefaultCommand(stopCommand);
+    Command defaultCommand = run(stop);
+    defaultCommand.setName("STOP");
+    this.setDefaultCommand(defaultCommand);
 
   }
 
