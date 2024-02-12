@@ -1,9 +1,13 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Millimeters;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Value;
 
@@ -19,16 +23,34 @@ import java.util.function.Function;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+
+//pickup, manual and detected
+//baby bird
+//transfer note to shooter
+//shoot the note
+//once loaded go to zero degrees, loaded boolean box.  
+//amp mode, elevator, tilt, sepate drop mode button, and then reset
+//Fender shot, tilt speed, fire
+//Ranged shot, just the magic
+//climb, elevator up, tilt a little, elevator pull up.  
+//trap shot, possible shooter button
+//spin up button
+//reset pose button
+//limelight pose setter
 
 public class CommandCreator implements Sendable {
 
@@ -54,12 +76,14 @@ public class CommandCreator implements Sendable {
 
                 private static final class Shoot {
                         private static final Measure<Distance> bottomOfSpeaker = Meters.of(2.0);
+                        private static final Measure<Distance> middleOfSpeaker = Meters.of(2.065);
                         private static final Measure<Distance> topOfSpeaker = Meters.of(2.13);
                         private static final Measure<Distance> shooterWheelRadius = Inches.of(2.0);
-                        private static final Measure<Distance> shooterTiltX = Inches.of(0.0); // TODO:
+                        private static final Measure<Distance> shooterTiltX = Centimeters.of(20.0); // TODO:
                         private static final Measure<Distance> shooterTiltY = Inches.of(0.0); // TODO:
-                        private static final Measure<Distance> shooterRadius = Inches.of(0.0); // TODO:
+                        private static final Measure<Distance> shooterRadius = Centimeters.of(22.0); // TODO:
                         private static final Measure<Time> shutOffTime = Seconds.of(2);
+                        private static final double efficiency = 1.0; // TODO:
 
                         private static final class Fender {
                                 private static final double outerSpeed = 0.0;
@@ -214,6 +238,37 @@ public class CommandCreator implements Sendable {
                         return command;
                 };
 
+                public static final Supplier<Command> createBabyBirdCommand = () -> {
+                        Runnable spinShooters = () -> {
+                                RobotContainer.shooterSubsystem.spinTop.accept(-Constants.Shoot.Fender.topShooterSpeed);
+                                RobotContainer.shooterSubsystem.spinBottom
+                                                .accept(-Constants.Shoot.Fender.bottomShooterSpeed);
+                        };
+                        Runnable spinPickup = () -> {
+                                RobotContainer.pickupSubsystem.spinOuter.accept(0.0);
+                                RobotContainer.pickupSubsystem.spinInner.accept(0.0);
+                                RobotContainer.pickupSubsystem.spinTransport.accept(0.0);
+                                RobotContainer.pickupSubsystem.spinSingulator.accept(-Constants.Pickup.singulatorSpeed);
+                        };
+
+                        Command spinPickupCommand = Commands.run(spinPickup, RobotContainer.pickupSubsystem);
+                        Command spinShooterCommandNoHasNote = Commands.run(spinShooters,
+                                        RobotContainer.shooterSubsystem);
+
+                        BooleanSupplier hasNote = () -> {
+                                if (RobotBase.isSimulation()) {
+                                        return false;
+                                } else {
+                                        return RobotContainer.pickupSubsystem.hasNote.getAsBoolean();
+
+                                }
+                        };
+                        Command command = Commands.parallel(spinPickupCommand,
+                                        spinShooterCommandNoHasNote).until(hasNote);
+                        command.setName("Baby Bird");
+                        return command;
+                };
+
                 public static final Supplier<Command> createFenderShootCommand = () -> {
                         Runnable spinShooters = () -> {
                                 RobotContainer.shooterSubsystem.spinTop.accept(Constants.Shoot.Fender.topShooterSpeed);
@@ -247,15 +302,78 @@ public class CommandCreator implements Sendable {
 
                 };
 
-                public static final DoubleSupplier robotDistanceToSpeaker = () -> {
-
-                        return 0.0;
+                public static final Supplier<Translation2d> robotTranslationToSpeaker = () -> {
+                        Pose2d robotPose = new Pose2d(); // TODO: once driveSubsystem is back up
+                        var alliance = DriverStation.getAlliance();
+                        if (alliance.isPresent()) {
+                                if (alliance.get() == Alliance.Blue) {
+                                        return Constants.speakerBlue.minus(robotPose.getTranslation());
+                                } else {
+                                        return Constants.speakerRed.minus(robotPose.getTranslation());
+                                }
+                        } else {
+                                return robotPose.getTranslation();
+                        }
                 };
 
-                public static Function<Double, Double> getAngleFromDistance = (distance) -> {
-
-                        return 0.0;
+                public static final Function<Translation2d, Measure<Angle>> getAngleFromRobotDistanceTranslation = (
+                                translation) -> {
+                        double robotCenterToSpeakerDistance = translation.getNorm();
+                        return Radians.of(Math.atan(2 * Constants.Shoot.middleOfSpeaker.in(Meters))
+                                        / robotCenterToSpeakerDistance);
                 };
+
+                public static final Function<Translation2d, Measure<Velocity<Distance>>> getVelocityFromRobotDistanceTranslation = (
+                                translation) -> {
+                        double robotCenterToSpeakerDistance = translation.getNorm();
+                        var vSquaredValue = (9.8 * (Math.pow(robotCenterToSpeakerDistance, 2)
+                                        + 4 * Math.pow(Constants.Shoot.middleOfSpeaker.in(Meters), 2)))
+                                        / Constants.Shoot.middleOfSpeaker.in(Meters);
+                        var vValue = Math.sqrt(vSquaredValue);
+                        return MetersPerSecond.of(vValue);
+                };
+
+                public static final Function<Measure<Velocity<Distance>>, Measure<Velocity<Angle>>> getShooterSpeedFromSpeed = (
+                                speed) -> {
+                        var omegaRadiansPerSecond = speed.in(MetersPerSecond)
+                                        / Constants.Shoot.shooterRadius.in(Meters);
+                        return RadiansPerSecond.of(omegaRadiansPerSecond);
+                };
+
+                public static final Function<Measure<Velocity<Angle>>, Double> getShooterSpeedPercent = (speed) -> {
+                        return speed.in(RadiansPerSecond) / DCMotor.getNeoVortex(1).freeSpeedRadPerSec;
+                };
+
+                public static final Supplier<Command> createKeepShootersAtSpeedCommand = () -> {
+                        Runnable spinShooters = () -> {
+                                var translationFromSpeaker = robotTranslationToSpeaker.get();
+                                var velocity = getVelocityFromRobotDistanceTranslation
+                                                .andThen(getShooterSpeedFromSpeed)
+                                                .andThen(getShooterSpeedPercent)
+                                                .apply(translationFromSpeaker);
+
+                                RobotContainer.shooterSubsystem.spinTop
+                                                .accept(velocity);
+                                RobotContainer.shooterSubsystem.spinBottom
+                                                .accept(velocity);
+                        };
+                        Command spinShootersCommand = Commands.run(
+                                        spinShooters,
+                                        RobotContainer.shooterSubsystem);
+                        Command elevatorDown = Commands.run(
+                                        () -> RobotContainer.elevatorSubsystem.move.accept(Meters.of(0)),
+                                        RobotContainer.elevatorSubsystem);
+                        Command tiltLevel = Commands.run(
+                                        () -> RobotContainer.shooterTiltSubsystem.turn.accept(Degrees.of(0)),
+                                        RobotContainer.shooterTiltSubsystem);
+                        Command command = Commands.parallel(
+                                        spinShootersCommand,
+                                        elevatorDown,
+                                        tiltLevel);
+                        command.setName("Keep Shooter At Speed");
+                        return command;
+                };
+
         }
 
         public static final Function<Pose2d, Function<PathConstraints, Function<Double, Function<Double, Supplier<Command>>>>> createPathFindToPoseCommand = (

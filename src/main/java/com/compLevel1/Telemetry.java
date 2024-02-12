@@ -1,7 +1,10 @@
 package com.compLevel1;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +28,15 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Telemetry {
+
+        private static final class Constants {
+                private static final Measure<Distance> positionErrorTolerance = Centimeters.of(5);
+        }
 
         public final Field2d field2d;
         public final Measure<Velocity<Velocity<Distance>>> accelerationMag;
@@ -134,6 +142,36 @@ public class Telemetry {
                                         swerveDrivePoseEstimator.update(
                                                         Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
                                                         wheelPositions.get().positions);
+
+                                        for (var fieldDetector : fieldDetectors) {
+                                                var pose = fieldDetector.fieldPosition.get();
+                                                var latency = fieldDetector.latency.get();
+                                                if (pose.isPresent() && latency.isPresent()) {
+                                                        Translation2d poseEstimateTranslation = swerveDrivePoseEstimator
+                                                                        .getEstimatedPosition().getTranslation();
+                                                        Translation2d detectedPoseTranslation = pose.get()
+                                                                        .getTranslation();
+                                                        Translation2d difference = poseEstimateTranslation
+                                                                        .minus(detectedPoseTranslation);
+                                                        double differenceValue = difference.getNorm();
+                                                        if (differenceValue <= Constants.positionErrorTolerance
+                                                                        .in(Meters)) {
+                                                                swerveDrivePoseEstimator.addVisionMeasurement(
+                                                                                pose.get(),
+                                                                                Timer.getFPGATimestamp()
+                                                                                                - latency.get().in(
+                                                                                                                Seconds));
+                                                        } else {
+                                                                swerveDrivePoseEstimator.resetPosition(
+                                                                                Rotation2d.fromDegrees(gyroscope.yaw
+                                                                                                .in(Degrees)),
+                                                                                wheelPositions.get().positions,
+                                                                                pose.get());
+                                                        }
+
+                                                }
+
+                                        }
                                 };
 
                                 return new Telemetry(
