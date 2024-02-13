@@ -104,17 +104,6 @@ public class Telemetry {
                                                 objectDetector.update.run();
                                         }
                                         field2d.setRobotPose(poseEstimate.get());
-                                        for (var fieldDetectorOptPosition : fieldDetectorOptPositions) {
-                                                String name = fieldDetectorOptPosition.getFirst();
-                                                Optional<Pose2d> position = fieldDetectorOptPosition
-                                                                .getSecond().get();
-                                                if (position.isPresent()) {
-                                                        field2d.getObject(name + "-Pose").setPose(position.get());
-                                                } else {
-                                                        field2d.getObject(name + "-Pose").setPose(new Pose2d(Double.NaN,
-                                                                        Double.NaN, Rotation2d.fromDegrees(0)));
-                                                }
-                                        }
                                         for (var objectDetectorOptPosition : objectDetectorOptPositions) {
                                                 String name = objectDetectorOptPosition.getFirst();
                                                 Optional<Pose2d> position = objectDetectorOptPosition

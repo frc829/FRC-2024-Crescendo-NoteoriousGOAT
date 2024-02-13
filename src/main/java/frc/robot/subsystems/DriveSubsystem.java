@@ -280,7 +280,7 @@ public class DriveSubsystem extends SubsystemBase {
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
                                         if (RobotBase.isSimulation()) {
-                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.06);
                                         } else {
                                                 chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
                                         }

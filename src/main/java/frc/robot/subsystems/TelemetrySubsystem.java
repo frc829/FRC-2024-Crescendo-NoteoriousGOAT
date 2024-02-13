@@ -13,7 +13,9 @@ import com.compLevel1.Telemetry;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,7 +28,14 @@ public class TelemetrySubsystem extends SubsystemBase {
     private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
         new Pair<>(
             "limelightFront",
-            new Pose3d()));
+            new Pose3d(
+                Units.inchesToMeters(-13),
+                Units.inchesToMeters(-13),
+                Units.inchesToMeters(6),
+                new Rotation3d(
+                    0,
+                    0,
+                    Math.toRadians(180)))));
   }
 
   public final Field2d field2d;

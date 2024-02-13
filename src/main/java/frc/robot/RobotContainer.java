@@ -4,14 +4,8 @@
 
 package frc.robot;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.function.Supplier;
-
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -74,6 +68,8 @@ public class RobotContainer {
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
+                ComplexTriggers.fieldCentricOriginDriveTrigger
+                                .whileTrue(ManualCommands.Drive.FieldCentric.command);
 
                 Runnable playOrchestra = () -> {
                         orchestra.play();
