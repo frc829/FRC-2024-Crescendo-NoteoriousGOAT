@@ -4,38 +4,18 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Second;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.compLevel0.FieldDetector;
-import com.compLevel0.Gyroscope;
 import com.compLevel0.Motor;
-import com.compLevel0.ObjectDetector;
 import com.compLevel1.SwerveModule;
-import com.compLevel1.Telemetry;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -44,26 +24,20 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 
 public class DriveSubsystem extends SubsystemBase {
 
-        private static final class Constants {
-                private static final DCMotor driveDCMotor = DCMotor.getNEO(1);
+        public static final class Constants {
+                private static final DCMotor driveDCMotor = DCMotor.getKrakenX60Foc(1);
                 private static final List<Integer> steerDeviceIds = Arrays.asList(10, 11, 12, 13);
                 private static final List<Double> steerGearings = Collections.nCopies(4, -150.0 / 7.0);
                 private static final List<Integer> wheelDeviceIds = Arrays.asList(20, 21, 22, 23);
@@ -85,212 +59,59 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final List<Double> wheelFOCkFs = Collections.nCopies(4, 0.0);
                 private static final Measure<Distance> moduleX = Inches.of(13);
                 private static final Measure<Distance> moduleY = Inches.of(13);
-                private static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+                public static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
                                 new Translation2d(moduleX, moduleY),
                                 new Translation2d(moduleX, moduleY.negate()),
                                 new Translation2d(moduleX.negate(), moduleY),
                                 new Translation2d(moduleX.negate(), moduleY.negate()));
-                private static final Measure<Distance> driveRadius = Inches
+                public static final Measure<Distance> driveRadius = Inches
                                 .of(Math.hypot(moduleX.in(Inches), moduleY.in(Inches)));
-                private static final Measure<Velocity<Distance>> maxLinearVelocity = MetersPerSecond.of(
+                public static final Measure<Velocity<Distance>> maxLinearVelocity = MetersPerSecond.of(
                                 driveDCMotor.freeSpeedRadPerSec * wheelRadii.get(0).in(Meters) / wheelGearings.get(0));
-                private static final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(
+                public static final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(
                                 maxLinearVelocity.in(MetersPerSecond) / driveRadius.in(Meters));
 
-                private static final class CentersOfRotation {
-                        private static final Translation2d origin = new Translation2d();
-                        private static final Translation2d frontLeft = new Translation2d(Inches.of(13), Inches.of(13));
-                        private static final Translation2d frontRight = new Translation2d(Inches.of(13),
-                                        Inches.of(-13));
-                }
-
-                private static final class ModuleStates {
-                        private static final SwerveDriveWheelStates zeroing = new SwerveDriveWheelStates(
-                                        new SwerveModuleState[] {
-                                                        new SwerveModuleState(),
-                                                        new SwerveModuleState(),
-                                                        new SwerveModuleState(),
-                                                        new SwerveModuleState(),
-                                        });
-                }
-
-                private static final class PathPlannerConfigs {
-                        private static final PIDConstants translationConstants = new PIDConstants(8, 0, 0);
-                        private static final PIDConstants rotationConstants = new PIDConstants(
-                                        8, 0, 0);
-                        private static final ReplanningConfig replanningConfig = new ReplanningConfig(
-                                        true,
-                                        true,
-                                        0.5,
-                                        0.5);
-                        private static final BooleanSupplier shouldFlipPath = () -> {
-                                var alliance = DriverStation.getAlliance();
-                                if (alliance.isPresent()) {
-                                        return alliance.get() == DriverStation.Alliance.Red;
-                                }
-                                return false;
-                        };
-
-                        private static final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
-                                        translationConstants,
-                                        rotationConstants,
-                                        maxLinearVelocity.in(MetersPerSecond),
-                                        driveRadius.in(Meters),
-                                        replanningConfig,
-                                        0.020);
-                }
-
-                private static final class RotateInPlace {
-                        private static final double kP = 1.0;
-                        private static final PIDController pidController = new PIDController(kP, 0, 0);
-                }
-
         }
 
-        static {
-                Constants.RotateInPlace.pidController.enableContinuousInput(-0.5, 0.5);
-                Constants.RotateInPlace.pidController.setTolerance(0.01);
-        }
-
-        public final Field2d field2d;
-        public final Supplier<Pose2d> fieldPose;
         public final List<Measure<Voltage>> steerVoltages;
         public final List<Measure<Voltage>> wheelVoltages;
         public final List<Measure<Voltage>> angleSensorVoltages;
         public final List<Measure<Angle>> sensorAngles;
+        public final Supplier<SwerveDriveWheelPositions> swerveDriveWheelPositions;
         public final Supplier<ChassisSpeeds> robotSpeeds;
-        public final Supplier<ChassisSpeeds> fieldSpeeds;
-        public final Measure<Velocity<Velocity<Distance>>> linearAcceleration;
-        public final Measure<Velocity<Velocity<Angle>>> angularAcceleration;
-        public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions;
+        public final Consumer<SwerveDriveWheelStates> controlModules;
+        public final Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds;
         public final Runnable resetSteerEncodersFromAbsolutes;
         public final Runnable stop;
         public final Runnable update;
 
-        public final Supplier<Command> createStopCommand;
-        public final Command resetSteerEncodersCommand;
-        public final Command zeroModulesCommand;
-        public final Command robotCentricOriginCommand;
-        public final Command fieldCentricOriginCommand;
-
-        public final Function<Translation2d, Command> createPointToLocationCommand;
-
         private DriveSubsystem(
-                        Field2d field2d,
                         List<Measure<Voltage>> steerVoltages,
                         List<Measure<Voltage>> wheelVoltages,
                         List<Measure<Voltage>> angleSensorVoltages,
                         List<Measure<Angle>> sensorAngles,
-                        Supplier<Pose2d> fieldPose,
-                        Supplier<ChassisSpeeds> fieldSpeeds,
+                        Supplier<SwerveDriveWheelPositions> swerveDriveWheelPositions,
                         Supplier<ChassisSpeeds> robotSpeeds,
-                        Measure<Velocity<Velocity<Distance>>> linearAcceleration,
-                        Measure<Velocity<Velocity<Angle>>> angularAcceleration,
-                        Consumer<Pose2d> resetPose,
                         Consumer<SwerveDriveWheelStates> controlModules,
                         Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds,
-                        Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds,
-                        List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions,
                         Runnable resetSteerEncodersFromAbsolutes,
                         Runnable stop,
                         Runnable update) {
-                this.field2d = field2d;
-                this.fieldPose = fieldPose;
                 this.steerVoltages = steerVoltages;
                 this.wheelVoltages = wheelVoltages;
                 this.angleSensorVoltages = angleSensorVoltages;
                 this.sensorAngles = sensorAngles;
+                this.swerveDriveWheelPositions = swerveDriveWheelPositions;
                 this.robotSpeeds = robotSpeeds;
-                this.fieldSpeeds = fieldSpeeds;
-                this.linearAcceleration = linearAcceleration;
-                this.angularAcceleration = angularAcceleration;
-                this.objectPositions = objectPositions;
+                this.controlModules = controlModules;
+                this.controlRobotChassisSpeeds = controlRobotChassisSpeeds;
                 this.resetSteerEncodersFromAbsolutes = resetSteerEncodersFromAbsolutes;
                 this.stop = stop;
                 this.update = update;
 
-                createStopCommand = () -> {
-                        Command stopCommand = run(stop);
-                        stopCommand.setName("STOP");
-                        return stopCommand;
-                };
-
-                resetSteerEncodersCommand = runOnce(resetSteerEncodersFromAbsolutes);
-                resetSteerEncodersCommand.setName("Reset Steer Encoders");
-
-                Runnable control = () -> controlModules.accept(Constants.ModuleStates.zeroing);
-                zeroModulesCommand = run(control);
-                zeroModulesCommand.setName("Zero Module");
-
-                ChassisSpeeds setChassisSpeeds = new ChassisSpeeds();
-                Runnable setRobotChassisSpeeds = () -> {
-                        setChassisSpeeds.vxMetersPerSecond = RobotContainer.driver.rightYValue
-                                        .getAsDouble()
-                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
-                        setChassisSpeeds.vyMetersPerSecond = RobotContainer.driver.rightXValue
-                                        .getAsDouble()
-                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
-                        setChassisSpeeds.omegaRadiansPerSecond = RobotContainer.driver.fullTriggerValue
-                                        .getAsDouble()
-                                        * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                        controlRobotChassisSpeeds.apply(Constants.CentersOfRotation.origin)
-                                        .accept(setChassisSpeeds);
-                };
-                robotCentricOriginCommand = run(setRobotChassisSpeeds);
-                robotCentricOriginCommand.setName("Manual Origin Robot Chassis Speeds");
-
-                Runnable setFieldChassisSpeeds = () -> {
-                        setChassisSpeeds.vxMetersPerSecond = RobotContainer.driver.leftYValue.getAsDouble()
-                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
-                        setChassisSpeeds.vyMetersPerSecond = RobotContainer.driver.leftXValue.getAsDouble()
-                                        * Constants.maxLinearVelocity.in(MetersPerSecond);
-                        setChassisSpeeds.omegaRadiansPerSecond = RobotContainer.driver.fullTriggerValue
-                                        .getAsDouble()
-                                        * Constants.maxAngularVelocity.in(RadiansPerSecond);
-                        controlFieldChassisSpeeds.apply(Constants.CentersOfRotation.origin)
-                                        .accept(setChassisSpeeds);
-                };
-                fieldCentricOriginCommand = run(setFieldChassisSpeeds);
-                fieldCentricOriginCommand.setName("Manual Field Chassis Speeds");
-
-                createPointToLocationCommand = (location) -> {
-                        Runnable rotateInPlace = () -> {
-                                Rotation2d currentRotation = fieldPose.get().getRotation();
-                                Translation2d pointingVector = location.minus(fieldPose.get().getTranslation());
-                                Rotation2d desiredRotation = pointingVector.getAngle();
-                                double rotationsPerSecond = Constants.RotateInPlace.pidController.calculate(
-                                                currentRotation.getRotations(), desiredRotation.getRotations());
-                                double omegaRadiansPerSecond = Units.rotationsToRadians(rotationsPerSecond);
-                                omegaRadiansPerSecond = MathUtil.clamp(omegaRadiansPerSecond,
-                                                -Constants.maxAngularVelocity.in(RadiansPerSecond),
-                                                Constants.maxAngularVelocity.in(RadiansPerSecond));
-                                if (Constants.RotateInPlace.pidController.atSetpoint()) {
-                                        omegaRadiansPerSecond = 0;
-                                }
-                                controlFieldChassisSpeeds.apply(new Translation2d())
-                                                .accept(new ChassisSpeeds(
-                                                                RobotContainer.driver.leftYValue.getAsDouble(),
-                                                                RobotContainer.driver.leftXValue.getAsDouble(),
-                                                                omegaRadiansPerSecond));
-                                SmartDashboard.putNumber("Rotate In Place radPerSec", omegaRadiansPerSecond);
-
-                        };
-                        Command rotateInPlaceCommand = run(rotateInPlace);
-                        rotateInPlaceCommand.setName("RotateInPlace");
-                        return rotateInPlaceCommand;
-                };
-
-                setDefaultCommand(createStopCommand.get());
-
-                AutoBuilder.configureHolonomic(
-                                fieldPose,
-                                resetPose,
-                                robotSpeeds,
-                                controlRobotChassisSpeeds.apply(new Translation2d()),
-                                Constants.PathPlannerConfigs.config,
-                                Constants.PathPlannerConfigs.shouldFlipPath,
-                                this);
-
+                Command defaultCommand = run(stop);
+                defaultCommand.setName("STOP");
+                this.setDefaultCommand(defaultCommand);
         }
 
         @Override
@@ -311,18 +132,18 @@ public class DriveSubsystem extends SubsystemBase {
                                 () -> Constants.maxAngularVelocity.in(RadiansPerSecond),
                                 null);
                 builder.addDoubleProperty(
-                                "Field Forward Velocity (mps)",
-                                () -> fieldSpeeds.get().vxMetersPerSecond,
+                                "Robot Forward Velocity (mps)",
+                                () -> robotSpeeds.get().vxMetersPerSecond,
                                 null);
 
                 builder.addDoubleProperty(
-                                "Field Strafe Velocity (mps)",
-                                () -> fieldSpeeds.get().vyMetersPerSecond,
+                                "Robot Strafe Velocity (mps)",
+                                () -> robotSpeeds.get().vyMetersPerSecond,
                                 null);
 
                 builder.addDoubleProperty(
-                                "Field Rotational Velocity (dps)",
-                                () -> Math.toDegrees(fieldSpeeds.get().omegaRadiansPerSecond),
+                                "Robot Rotational Velocity (dps)",
+                                () -> Math.toDegrees(robotSpeeds.get().omegaRadiansPerSecond),
                                 null);
         }
 
@@ -422,9 +243,6 @@ public class DriveSubsystem extends SubsystemBase {
                 List<Measure<Angle>> sensorAngles = Arrays.asList(0, 1, 2, 3).stream()
                                 .map((i) -> modules.get(i).angleFromSensor).toList();
 
-                MutableMeasure<Velocity<Velocity<Angle>>> angularAcceleration = MutableMeasure
-                                .zero(RadiansPerSecond.per(Second));
-
                 Supplier<SwerveDriveWheelPositions> currentWheelPositions = () -> {
                         var modulePositions = Arrays.asList(0, 1, 2, 3).stream().map(
                                         (i) -> {
@@ -462,7 +280,7 @@ public class DriveSubsystem extends SubsystemBase {
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
                                         if (RobotBase.isSimulation()) {
-                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.06);
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
                                         } else {
                                                 chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
                                         }
@@ -498,67 +316,23 @@ public class DriveSubsystem extends SubsystemBase {
                                         (i) -> modules.get(i).stopAndHold.run());
                 };
 
-                Telemetry telemetry = (Gyroscope.KauaiLabs.createNavxXMP)
-                                .andThen(Telemetry.create)
-                                .apply(robotSpeeds)
-                                .apply(Constants.kinematics)
-                                .apply(currentWheelPositions);
-
-                Telemetry.addFieldDetectorToTelemetry
-                                .apply(FieldDetector.Limelight.createLimelight
-                                                .apply("limelightFront")
-                                                .apply(telemetry.fieldPoseEstimate))
-                                .apply(telemetry);
-
-                Telemetry.addFieldDetectorToTelemetry
-                                .apply(FieldDetector.Limelight.createLimelight
-                                                .apply("limelightPickup")
-                                                .apply(telemetry.fieldPoseEstimate))
-                                .apply(telemetry);
-
-                Pose3d cameraPosition = new Pose3d(
-                                Units.inchesToMeters(-13),
-                                Units.inchesToMeters(13),
-                                Units.inchesToMeters(4),
-                                new Rotation3d(
-                                                0,
-                                                0,
-                                                Math.toRadians(180)));
-
-                Telemetry.addObjectDetectorToTelemetry
-                                .apply(ObjectDetector.Limelight.createLimelight
-                                                .apply("limelightPickup")
-                                                .apply(cameraPosition))
-                                .apply(telemetry);
-
-                Function<Translation2d, Consumer<ChassisSpeeds>> controlFieldChassisSpeeds = (
-                                centerOfRotation) -> (chassisSpeeds) -> {
-                                        chassisSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds,
-                                                        telemetry.fieldPoseEstimate.get().getRotation());
-                                        controlRobotChassisSpeeds.apply(centerOfRotation).accept(chassisSpeeds);
-
-                                };
-
-                Supplier<ChassisSpeeds> fieldSpeeds = () -> {
-                        return ChassisSpeeds.fromRobotRelativeSpeeds(robotSpeeds.get(),
-                                        telemetry.fieldPoseEstimate.get().getRotation());
-                };
-
                 Runnable update = () -> {
                         Arrays.asList(0, 1, 2, 3).stream().forEachOrdered((i) -> {
                                 modules.get(i).update.run();
                         });
-
-                        telemetry.update.run();
-                        angularAcceleration.mut_setMagnitude(
-                                        telemetry.accelerationMag.in(MetersPerSecondPerSecond)
-                                                        / Constants.driveRadius.in(Meters));
                 };
 
-                return new DriveSubsystem(telemetry.field2d, steerVoltages, wheelVoltages, angleSensorVoltages,
-                                sensorAngles, telemetry.fieldPoseEstimate, fieldSpeeds, robotSpeeds,
-                                telemetry.accelerationMag, angularAcceleration, telemetry.resetFieldPosition,
-                                controlModuleStates, controlRobotChassisSpeeds, controlFieldChassisSpeeds,
-                                telemetry.objectDetectorOptPositions, resetSteerEncodersFromAbsolutes, stop, update);
+                return new DriveSubsystem(
+                                steerVoltages,
+                                wheelVoltages,
+                                angleSensorVoltages,
+                                sensorAngles,
+                                currentWheelPositions,
+                                robotSpeeds,
+                                controlModuleStates,
+                                controlRobotChassisSpeeds,
+                                resetSteerEncodersFromAbsolutes,
+                                stop,
+                                update);
         };
 }

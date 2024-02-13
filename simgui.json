@@ -67,12 +67,21 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Bottom Shooter": "Subsystem",
       "/SmartDashboard/Drive": "Subsystem",
       "/SmartDashboard/Elevator": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Inner Intake": "Subsystem",
+      "/SmartDashboard/NoteLoaded": "Subsystem",
+      "/SmartDashboard/Outer Intake": "Subsystem",
+      "/SmartDashboard/OuterIntake": "Subsystem",
       "/SmartDashboard/Pickup": "Subsystem",
       "/SmartDashboard/Shooter": "Subsystem",
-      "/SmartDashboard/Shooter Tilt": "Subsystem"
+      "/SmartDashboard/Shooter Tilt": "Subsystem",
+      "/SmartDashboard/Singulator": "Subsystem",
+      "/SmartDashboard/Telemetry": "Subsystem",
+      "/SmartDashboard/Top Shooter": "Subsystem",
+      "/SmartDashboard/Transport": "Subsystem"
     },
     "windows": {
       "/SmartDashboard/Auto Chooser": {

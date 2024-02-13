@@ -20,19 +20,19 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class ObjectDetector {
 
     public final String name;
-    public final Supplier<Optional<Translation2d>> objectTranslationRobotSpace;
+    public final Supplier<Optional<Translation2d>> robotSpaceObjectTranslation;
     public final Supplier<Optional<Measure<Time>>> latency;
     public final Runnable enable;
     public final Runnable update;
 
     private ObjectDetector(
             String name,
-            Supplier<Optional<Translation2d>> objectTranslationRobotSpace,
+            Supplier<Optional<Translation2d>> robotSpaceObjectTranslation,
             Supplier<Optional<Measure<Time>>> latency,
             Runnable enable,
             Runnable update) {
         this.name = name;
-        this.objectTranslationRobotSpace = objectTranslationRobotSpace;
+        this.robotSpaceObjectTranslation = robotSpaceObjectTranslation;
         this.latency = latency;
         this.enable = enable;
         this.update = update;
@@ -70,7 +70,7 @@ public class ObjectDetector {
                     MutableMeasure<Time> latencyMeasure = MutableMeasure.zero(Milliseconds);
                     Translation2d cameraTranslationRobotSpace = new Translation2d(cameraPosition.getX(),
                             cameraPosition.getY());
-                    Supplier<Optional<Translation2d>> objectTranslationRobotSpace = () -> {
+                    Supplier<Optional<Translation2d>> robotSpaceObjectTranslation = () -> {
                         double txDegrees = txDegreesSupplier.get();
                         double tyDegrees = tyDegreesSupplier.get();
                         double tv = RobotBase.isSimulation() ? 1.0 : validTargetSupplier.getDouble(0.0);
@@ -111,7 +111,7 @@ public class ObjectDetector {
 
                     return new ObjectDetector(
                             name,
-                            objectTranslationRobotSpace,
+                            robotSpaceObjectTranslation,
                             latency,
                             enable,
                             update);
