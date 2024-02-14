@@ -70,6 +70,8 @@ public class RobotContainer {
                 SmartDashboard.putData("Elevator", elevatorSubsystem);
                 SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
+                operator.leftY.whileTrue(ManualCommands.Elevator.drive);
+                operator.rightY.whileTrue(ManualCommands.Tilt.drive);
                 operator.a.whileTrue(ManualCommands.Pickup.barf);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);

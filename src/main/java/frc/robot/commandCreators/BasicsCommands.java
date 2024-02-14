@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -19,13 +18,7 @@ import frc.robot.RobotContainer;
 public class BasicsCommands {
 
     private static final class Constants {
-        private static final Translation2d speakerBlue = new Translation2d(
-                null,
-                null);
 
-        private static final Translation2d speakerRed = new Translation2d(
-                null,
-                null);
     }
 
     public static final class HoldandStop {
@@ -56,6 +49,17 @@ public class BasicsCommands {
             };
         }
 
+        public static final class ElevatorDrive {
+            public static final Function<DoubleSupplier, Command> create = (speed) -> {
+                Command command = Commands
+                        .run(() -> RobotContainer.elevatorSubsystem.drive.accept(speed.getAsDouble()),
+                                RobotContainer.elevatorSubsystem);
+                String name = String.format("Drive Elevator");
+                command.setName(name);
+                return command;
+            };
+        }
+
         public static final class TiltAngle {
             public static final Measure<Angle> tolerance = Degrees.of(0.5);
             public static final Function<Measure<Angle>, Command> create = (angle) -> {
@@ -73,11 +77,22 @@ public class BasicsCommands {
             };
         }
 
+        public static final class TiltDrive {
+            public static final Function<DoubleSupplier, Command> create = (speed) -> {
+                Command command = Commands
+                        .run(() -> RobotContainer.shooterTiltSubsystem.drive.accept(speed.getAsDouble()),
+                                RobotContainer.shooterTiltSubsystem);
+                String name = String.format("Drive Tilt");
+                command.setName(name);
+                return command;
+            };
+        }
+
         public static final class TopShooter {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.topShooterSubsystem.spin.accept(speed.getAsDouble()),
-                        RobotContainer.topShooterSubsystem);
+                                RobotContainer.topShooterSubsystem);
                 String name = String.format("Accelerate Top Shooter");
                 command.setName(name);
                 return command;
@@ -88,7 +103,7 @@ public class BasicsCommands {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.bottomShooterSubsystem.spin.accept(speed.getAsDouble()),
-                        RobotContainer.bottomShooterSubsystem);
+                                RobotContainer.bottomShooterSubsystem);
                 String name = String.format("Accelerate Bottom Shooter");
                 command.setName(name);
                 return command;
@@ -99,7 +114,7 @@ public class BasicsCommands {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.outerIntakeSubsystem.spin.accept(speed),
-                        RobotContainer.outerIntakeSubsystem);
+                                RobotContainer.outerIntakeSubsystem);
                 String name = String.format("Run Outer Intake");
                 command.setName(name);
                 return command;
@@ -110,7 +125,7 @@ public class BasicsCommands {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.innerIntakeSubsystem.spin.accept(speed),
-                        RobotContainer.innerIntakeSubsystem);
+                                RobotContainer.innerIntakeSubsystem);
                 String name = String.format("Run Inner Intake");
                 command.setName(name);
                 return command;
@@ -121,7 +136,7 @@ public class BasicsCommands {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.transportSubsystem.spin.accept(speed),
-                        RobotContainer.transportSubsystem);
+                                RobotContainer.transportSubsystem);
                 String name = String.format("Run Transport");
                 command.setName(name);
                 return command;
@@ -132,7 +147,7 @@ public class BasicsCommands {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.singulatorSubsystem.spin.accept(speed),
-                        RobotContainer.singulatorSubsystem);
+                                RobotContainer.singulatorSubsystem);
                 String name = String.format("Run Singulator");
                 command.setName(name);
                 return command;
@@ -142,7 +157,5 @@ public class BasicsCommands {
 
     public BasicsCommands() {
     }
-
-
 
 }

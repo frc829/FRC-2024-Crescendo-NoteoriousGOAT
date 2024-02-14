@@ -10,22 +10,19 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelState
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import frc.robot.commandCreators.BasicsCommands;
 import frc.robot.commandCreators.PickupCommands;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ManualCommands {
         public static final class Elevator {
-                private static final Runnable drive = () -> RobotContainer.elevatorSubsystem.drive
-                                .accept(RobotContainer.operator.leftYValue.getAsDouble());
-                public static final Command command = Commands.run(drive,
-                                RobotContainer.elevatorSubsystem);
+                public static final Command drive = BasicsCommands.Set.ElevatorDrive.create
+                                .apply(RobotContainer.operator.leftYValue);
         }
 
         public static final class Tilt {
-                public static final Runnable drive = () -> RobotContainer.shooterTiltSubsystem.drive
-                                .accept(RobotContainer.operator.rightYValue.getAsDouble());
-                public static final Command command = Commands.run(drive,
-                                RobotContainer.shooterTiltSubsystem);
+                public static final Command drive = BasicsCommands.Set.TiltDrive.create
+                                .apply(RobotContainer.operator.rightYValue);
         }
 
         public static final class Shooter {
@@ -93,13 +90,13 @@ public class ManualCommands {
                 }
         }
 
-        public static final class Pickup{
+        public static final class Pickup {
                 public static final Command barf = PickupCommands.createBarf.get();
         }
 
         static {
-                Elevator.command.setName("Manual Elevator");
-                Tilt.command.setName("Manual Tilt");
+                Elevator.drive.setName("Manual Elevator");
+                Tilt.drive.setName("Manual Tilt");
                 Shooter.command.setName("Manual Shooter");
                 Drive.FieldCentric.command.setName("Manual Field Centric");
                 Drive.RobotCentric.command.setName("Manual Robot Centric");
