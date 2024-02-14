@@ -92,6 +92,7 @@ public class ManualCommands {
 
         public static final class Pickup {
                 public static final Command barf = PickupCommands.createBarf.get();
+                public static final Command groundPickup = PickupCommands.createGround.get();
         }
 
         static {

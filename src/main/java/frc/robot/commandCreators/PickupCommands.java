@@ -22,11 +22,11 @@ public class PickupCommands implements Sendable {
         private static final class Ground {
             private static final Measure<Angle> tiltAngle = Degrees.of(75);
             private static final Measure<Distance> elevatorPosition = Meters.of(0.0);
-            private static final double topShooterPercent = 0.0;
-            private static final double bottomShooterPercent = 0.0;
-            private static final double transportPercent = 0.0;
-            private static final double innerIntakePercent = 0.0;
-            private static final double outerIntakePercent = 0.0;
+            private static final double topShooterPercent = 0.5;
+            private static final double bottomShooterPercent = 0.5;
+            private static final double transportPercent = 0.5;
+            private static final double innerIntakePercent = 0.5;
+            private static final double outerIntakePercent = 0.5;
         }
 
         private static final class BabyBird {
@@ -44,30 +44,41 @@ public class PickupCommands implements Sendable {
     }
 
     public static final Supplier<Command> createGround = () -> {
-        Command elevatorCommand = BasicCommands.Set.ElevatorPosition.create.apply(Constants.Ground.elevatorPosition);
-        Command tiltCommand = BasicCommands.Set.TiltAngle.create.apply(Constants.Ground.tiltAngle);
-
-        BooleanSupplier elevatorTiltEndCondition = () -> {
-            boolean elevatorAtPosition = MathUtil.isNear(
+        BooleanSupplier elevatorAtPosition = () -> {
+            return MathUtil.isNear(
                     Constants.Ground.elevatorPosition.in(Meters),
                     RobotContainer.elevatorSubsystem.position.in(Meters),
                     BasicCommands.Set.ElevatorPosition.tolerance.in(Meters));
-            boolean tiltAtPosition = MathUtil.isNear(
+        };
+
+        BooleanSupplier tiltAtPosition = () -> {
+            return MathUtil.isNear(
                     Constants.Ground.tiltAngle.in(Degrees),
                     RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
                     BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
-            return elevatorAtPosition && tiltAtPosition;
+        };
+
+        Command elevatorCommand = BasicCommands.Set.ElevatorPosition.create.apply(Constants.Ground.elevatorPosition)
+                .until(elevatorAtPosition).andThen(BasicCommands.HoldandStop.createForElevator.get());
+        Command tiltCommand = BasicCommands.Set.TiltAngle.create.apply(Constants.Ground.tiltAngle).until(tiltAtPosition)
+                .andThen(BasicCommands.HoldandStop.createForTilt.get());
+
+        BooleanSupplier elevatorTiltEndCondition = () -> {
+            return elevatorAtPosition.getAsBoolean() && tiltAtPosition.getAsBoolean();
         };
         Command elevatorTiltSetCommand = Commands.parallel(elevatorCommand, tiltCommand)
                 .until(elevatorTiltEndCondition);
 
+        Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+        Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
         Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Ground.transportPercent);
         Command innerIntakeCommand = BasicCommands.Set.InnerIntake.create.apply(Constants.Ground.innerIntakePercent);
         Command outerIntakeCommand = BasicCommands.Set.OuterIntake.create.apply(Constants.Ground.outerIntakePercent);
 
-        Command groundPickupCommand = Commands.parallel(transportCommand, innerIntakeCommand, outerIntakeCommand)
+        Command groundPickupCommand = Commands.parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, innerIntakeCommand, outerIntakeCommand)
                 .until(RobotContainer.notedLoadedSubsystem.hasNote);
-        Command command = Commands.sequence(elevatorTiltSetCommand, groundPickupCommand);
+        Command command = Commands.sequence(elevatorTiltSetCommand,
+                groundPickupCommand);
         command.setName("Ground Pickup");
         return command;
     };

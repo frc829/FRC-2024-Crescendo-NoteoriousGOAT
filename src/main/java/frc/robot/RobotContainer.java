@@ -74,6 +74,7 @@ public class RobotContainer {
                 operator.leftY.whileTrue(ManualCommands.Elevator.drive);
                 operator.rightY.whileTrue(ManualCommands.Tilt.drive);
                 operator.a.whileTrue(ManualCommands.Pickup.barf);
+                operator.b.whileTrue(ManualCommands.Pickup.groundPickup);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger

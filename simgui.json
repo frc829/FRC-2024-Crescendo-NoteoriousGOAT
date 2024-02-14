@@ -140,10 +140,10 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
-        "CommandCreator": {
+        "Bottom Shooter": {
           "open": true
         },
-        "Drive": {
+        "CommandCreator": {
           "open": true
         },
         "Elevator": {
@@ -155,8 +155,7 @@
           },
           "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
             "open": true
-          },
-          "open": true
+          }
         },
         "NoteLoaded": {
           "open": true
@@ -171,6 +170,9 @@
           "open": true
         },
         "Shooter Tilt": {
+          "open": true
+        },
+        "Transport": {
           "open": true
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
