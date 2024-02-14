@@ -10,18 +10,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelState
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
-import frc.robot.commandCreators.BasicsCommands;
+import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.PickupCommands;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ManualCommands {
         public static final class Elevator {
-                public static final Command drive = BasicsCommands.Set.ElevatorDrive.create
+                public static final Command drive = BasicCommands.Set.ElevatorDrive.create
                                 .apply(RobotContainer.operator.leftYValue);
         }
 
         public static final class Tilt {
-                public static final Command drive = BasicsCommands.Set.TiltDrive.create
+                public static final Command drive = BasicCommands.Set.TiltDrive.create
                                 .apply(RobotContainer.operator.rightYValue);
         }
 

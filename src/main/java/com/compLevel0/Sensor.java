@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.sim.CANcoderSimState;
@@ -34,19 +35,23 @@ public class Sensor<T extends Unit<T>> {
         this.update = update;
     }
 
+    @SuppressWarnings(value = { "resource" })
     public static final class PWF {
-        public static final Function<Integer, TimeOfFlight> createTimeOfFlight = (deviceId) -> new TimeOfFlight(
-                deviceId);
-
-        public static final Function<TimeOfFlight, Sensor<Distance>> createDistanceSensor = (timeOfFlight) -> {
-            MutableMeasure<Voltage> voltage = MutableMeasure.ofBaseUnits(12, Volts);
-            MutableMeasure<Distance> distance = MutableMeasure.zero(Millimeters);
-            Runnable update = () -> {
-                distance.mut_setMagnitude(timeOfFlight.getRange());
-                SmartDashboard.putString("TOF" + "_Status", timeOfFlight.getStatus().toString());
-            };
-            return new Sensor<>(voltage, distance, update);
-        };
+        public static final Function<Supplier<Measure<Distance>>, Function<Integer, Sensor<Distance>>> createDistanceSensorFromTimeOfFlight = (
+                simDistance) -> (deviceId) -> {
+                    TimeOfFlight timeOfFlight = new TimeOfFlight(deviceId);
+                    MutableMeasure<Voltage> voltage = MutableMeasure.ofBaseUnits(12, Volts);
+                    MutableMeasure<Distance> distance = MutableMeasure.zero(Millimeters);
+                    Runnable update = () -> {
+                        if (RobotBase.isSimulation()) {
+                            distance.mut_setMagnitude(simDistance.get().in(Millimeters));
+                        } else {
+                            distance.mut_setMagnitude(timeOfFlight.getRange());
+                            SmartDashboard.putString("TOF" + "_Status", timeOfFlight.getStatus().toString());
+                        }
+                    };
+                    return new Sensor<>(voltage, distance, update);
+                };
     }
 
     public static final class CTRE {

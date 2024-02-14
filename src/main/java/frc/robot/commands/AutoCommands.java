@@ -1,10 +1,5 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import frc.robot.RobotContainer;
-
 public class AutoCommands {
 
     private static final class Constants{

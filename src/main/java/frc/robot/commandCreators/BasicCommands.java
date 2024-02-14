@@ -7,7 +7,6 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -15,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
-public class BasicsCommands {
+public class BasicCommands {
 
     private static final class Constants {
 
@@ -37,12 +36,7 @@ public class BasicsCommands {
             public static final Function<Measure<Distance>, Command> create = (position) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.elevatorSubsystem.move.accept(position),
-                                RobotContainer.elevatorSubsystem)
-                        .until(() -> MathUtil.isNear(
-                                position.in(Meters),
-                                RobotContainer.elevatorSubsystem.position.in(Meters),
-                                tolerance.in(Meters)))
-                        .andThen(HoldandStop.createForElevator.get());
+                                RobotContainer.elevatorSubsystem);
                 String name = String.format("Move Elevator to %s m", position.in(Meters));
                 command.setName(name);
                 return command;
@@ -65,12 +59,7 @@ public class BasicsCommands {
             public static final Function<Measure<Angle>, Command> create = (angle) -> {
                 Command command = Commands
                         .run(() -> RobotContainer.shooterTiltSubsystem.turn.accept(angle),
-                                RobotContainer.shooterTiltSubsystem)
-                        .until(() -> MathUtil.isNear(
-                                angle.in(Degrees),
-                                RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
-                                tolerance.in(Degrees)))
-                        .andThen(HoldandStop.createForTilt.get());
+                                RobotContainer.shooterTiltSubsystem);
                 String name = String.format("Move Tilt to %s degrees", angle.in(Degrees));
                 command.setName(name);
                 return command;
@@ -155,7 +144,7 @@ public class BasicsCommands {
         }
     }
 
-    public BasicsCommands() {
+    public BasicCommands() {
     }
 
 }

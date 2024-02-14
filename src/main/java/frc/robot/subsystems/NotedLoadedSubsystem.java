@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Millimeters;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -10,12 +12,13 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class NotedLoadedSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 34;
-    private static final Measure<Distance> minOn = Inches.of(0);
+    private static final Measure<Distance> minOn = Millimeters.of(1);
     private static final Measure<Distance> maxOn = Inches.of(0.5);
   }
 
@@ -45,8 +48,15 @@ public class NotedLoadedSubsystem extends SubsystemBase {
 
   public static final Supplier<NotedLoadedSubsystem> create = () -> {
 
-    PositionSwitch positionSwitch = Sensor.PWF.createTimeOfFlight
-        .andThen(Sensor.PWF.createDistanceSensor)
+    Supplier<Measure<Distance>> simDistance = () -> {
+      if (RobotContainer.test.a.getAsBoolean()) {
+        return Millimeters.of(5);
+      } else {
+        return Millimeters.of(0);
+      }
+    };
+
+    PositionSwitch positionSwitch = Sensor.PWF.createDistanceSensorFromTimeOfFlight.apply(simDistance)
         .andThen(PositionSwitch.create)
         .apply(Constants.deviceId)
         .apply(Constants.minOn)

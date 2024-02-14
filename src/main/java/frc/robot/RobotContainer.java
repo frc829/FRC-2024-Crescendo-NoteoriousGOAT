@@ -6,9 +6,6 @@ package frc.robot;
 
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
-import com.pathplanner.lib.auto.AutoBuilder;
-
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -33,6 +30,7 @@ public class RobotContainer {
                         private static final double deadband = 0.1;
                         private static final int driverPort = 0;
                         private static final int operatorPort = 1;
+                        private static final int testPort = 2;
                 }
         }
 
@@ -42,6 +40,9 @@ public class RobotContainer {
                         .apply(Constants.Controller.deadband);
         public static final Controller operator = Controller.createFromXBox
                         .apply(Constants.Controller.operatorPort)
+                        .apply(Constants.Controller.deadband);
+        public static final Controller test = Controller.createFromXBox
+                        .apply(Constants.Controller.testPort)
                         .apply(Constants.Controller.deadband);
 
         public static final TopShooterSubsystem topShooterSubsystem = TopShooterSubsystem.create.get();
