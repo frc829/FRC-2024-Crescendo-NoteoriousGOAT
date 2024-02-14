@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelState
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import frc.robot.commandCreators.PickupCommands;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ManualCommands {
@@ -90,6 +91,10 @@ public class ManualCommands {
                         };
                         public static final Command command = Commands.run(drive, RobotContainer.driveSubsystem);
                 }
+        }
+
+        public static final class Pickup{
+                public static final Command barf = PickupCommands.createBarf.get();
         }
 
         static {

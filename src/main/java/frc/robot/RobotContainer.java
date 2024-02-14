@@ -6,6 +6,9 @@ package frc.robot;
 
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -52,6 +55,7 @@ public class RobotContainer {
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
+
         // private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
@@ -66,6 +70,7 @@ public class RobotContainer {
                 SmartDashboard.putData("Elevator", elevatorSubsystem);
                 SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
+                operator.a.whileTrue(ManualCommands.Pickup.barf);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -83,10 +88,13 @@ public class RobotContainer {
 
                 driver.y.whileTrue(playOrchestraCommand);
                 driver.y.onFalse(stopOrchestraCommand);
+
+                // autoChooser = AutoBuilder.buildAutoChooser();
+
         }
 
         public Command getAutonomousCommand() {
-                // return autoChooser.getSelected();
                 return Commands.none();
+                // return autoChooser.getSelected();
         }
 }

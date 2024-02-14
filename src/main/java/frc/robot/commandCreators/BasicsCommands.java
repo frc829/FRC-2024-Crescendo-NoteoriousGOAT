@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
-public class SubsystemCommandFactory {
+public class BasicsCommands {
 
     private static final class Constants {
         private static final Translation2d speakerBlue = new Translation2d(
@@ -76,7 +76,8 @@ public class SubsystemCommandFactory {
         public static final class TopShooter {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.topShooterSubsystem.spin.accept(speed.getAsDouble()));
+                        .run(() -> RobotContainer.topShooterSubsystem.spin.accept(speed.getAsDouble()),
+                        RobotContainer.topShooterSubsystem);
                 String name = String.format("Accelerate Top Shooter");
                 command.setName(name);
                 return command;
@@ -86,7 +87,8 @@ public class SubsystemCommandFactory {
         public static final class BottomShooter {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.bottomShooterSubsystem.spin.accept(speed.getAsDouble()));
+                        .run(() -> RobotContainer.bottomShooterSubsystem.spin.accept(speed.getAsDouble()),
+                        RobotContainer.bottomShooterSubsystem);
                 String name = String.format("Accelerate Bottom Shooter");
                 command.setName(name);
                 return command;
@@ -96,7 +98,8 @@ public class SubsystemCommandFactory {
         public static final class OuterIntake {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.outerIntakeSubsystem.spin.accept(speed));
+                        .run(() -> RobotContainer.outerIntakeSubsystem.spin.accept(speed),
+                        RobotContainer.outerIntakeSubsystem);
                 String name = String.format("Run Outer Intake");
                 command.setName(name);
                 return command;
@@ -106,7 +109,8 @@ public class SubsystemCommandFactory {
         public static final class InnerIntake {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.innerIntakeSubsystem.spin.accept(speed));
+                        .run(() -> RobotContainer.innerIntakeSubsystem.spin.accept(speed),
+                        RobotContainer.innerIntakeSubsystem);
                 String name = String.format("Run Inner Intake");
                 command.setName(name);
                 return command;
@@ -116,7 +120,8 @@ public class SubsystemCommandFactory {
         public static final class Transport {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.transportSubsystem.spin.accept(speed));
+                        .run(() -> RobotContainer.transportSubsystem.spin.accept(speed),
+                        RobotContainer.transportSubsystem);
                 String name = String.format("Run Transport");
                 command.setName(name);
                 return command;
@@ -126,7 +131,8 @@ public class SubsystemCommandFactory {
         public static final class Singulator {
             public static final Function<Double, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.singulatorSubsystem.spin.accept(speed));
+                        .run(() -> RobotContainer.singulatorSubsystem.spin.accept(speed),
+                        RobotContainer.singulatorSubsystem);
                 String name = String.format("Run Singulator");
                 command.setName(name);
                 return command;
@@ -134,7 +140,7 @@ public class SubsystemCommandFactory {
         }
     }
 
-    public SubsystemCommandFactory() {
+    public BasicsCommands() {
     }
 
 

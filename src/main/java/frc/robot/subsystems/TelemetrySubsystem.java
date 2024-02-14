@@ -44,7 +44,9 @@ public class TelemetrySubsystem extends SubsystemBase {
   public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions;
   public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions;
   public final Consumer<Pose2d> setPoseEstimator;
-  public final Runnable resetPoseEstimator;
+  public final Runnable resetPoseEstimateFromFieldDetectors;
+  public final List<Runnable> enableFieldDetectors;
+  public final List<Runnable> enableObjectDetectors;
   public final Runnable update;
 
   private TelemetrySubsystem(
@@ -54,7 +56,9 @@ public class TelemetrySubsystem extends SubsystemBase {
       List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions,
       List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions,
       Consumer<Pose2d> setPoseEstimator,
-      Runnable resetPoseEstimator,
+      Runnable resetPoseEstimateFromFieldDetectors,
+      List<Runnable> enableFieldDetectors,
+      List<Runnable> enableObjectDetectors,
       Runnable update) {
     this.field2d = field2d;
     this.fieldSpeeds = fieldSpeeds;
@@ -62,8 +66,13 @@ public class TelemetrySubsystem extends SubsystemBase {
     this.fieldDetectorsPositions = fieldDetectorsPositions;
     this.objectPositions = objectPositions;
     this.setPoseEstimator = setPoseEstimator;
-    this.resetPoseEstimator = resetPoseEstimator;
+    this.resetPoseEstimateFromFieldDetectors = resetPoseEstimateFromFieldDetectors;
+    this.enableFieldDetectors = enableFieldDetectors;
+    this.enableObjectDetectors = enableObjectDetectors;
     this.update = update;
+
+    enableFieldDetectors.stream().forEachOrdered((detector) -> detector.run());
+
   }
 
   @Override
@@ -118,6 +127,8 @@ public class TelemetrySubsystem extends SubsystemBase {
         telemetry.objectDetectorOptPositions,
         telemetry.setPoseEstimate,
         telemetry.resetPoseEstimateFromFieldDetectors,
+        telemetry.enableFieldDetectors,
+        telemetry.enableObjectDetectors,
         update);
   };
 }

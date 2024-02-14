@@ -35,8 +35,10 @@ public class Telemetry {
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions;
         public final Consumer<Pose2d> setPoseEstimate;
-        public final Runnable addDetectedPoseToEstimator;
+        public final Runnable addDetectedPosesToEstimator;
         public final Runnable resetPoseEstimateFromFieldDetectors;
+        public final List<Runnable> enableFieldDetectors;
+        public final List<Runnable> enableObjectDetectors;
         public final Runnable update;
 
         private Telemetry(
@@ -46,8 +48,10 @@ public class Telemetry {
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions,
                         Consumer<Pose2d> setPoseEstimate,
-                        Runnable addDetectedPoseToEstimator,
+                        Runnable addDetectedPosesToEstimator,
                         Runnable resetPoseEstimateFromFieldDetectors,
+                        List<Runnable> enableFieldDetectors,
+                        List<Runnable> enableObjectDetectors,
                         Runnable update) {
                 this.field2d = field2d;
                 this.accelerationMag = accelerationMag;
@@ -55,8 +59,10 @@ public class Telemetry {
                 this.fieldDetectorOptPositions = fieldDetectorOptPositions;
                 this.objectDetectorOptPositions = objectDetectorOptPositions;
                 this.setPoseEstimate = setPoseEstimate;
-                this.addDetectedPoseToEstimator = addDetectedPoseToEstimator;
+                this.addDetectedPosesToEstimator = addDetectedPosesToEstimator;
                 this.resetPoseEstimateFromFieldDetectors = resetPoseEstimateFromFieldDetectors;
+                this.enableFieldDetectors = enableFieldDetectors;
+                this.enableObjectDetectors = enableObjectDetectors;
                 this.update = update;
                 SmartDashboard.putData(field2d);
         }
@@ -95,6 +101,9 @@ public class Telemetry {
                                         // TODO:
                                 };
 
+                                List<Runnable> enableFieldDetectors = new ArrayList<>();
+                                List<Runnable> enableObjectDetectors = new ArrayList<>();
+
                                 Runnable update = () -> {
                                         gyroscope.update.run();
                                         for (var fieldDetector : fieldDetectors) {
@@ -130,9 +139,16 @@ public class Telemetry {
 
                                 };
 
-                                return new Telemetry(field2d, accelerationMag, poseEstimate, fieldDetectorOptPositions,
-                                                objectDetectorOptPositions, setPoseEstimate,
-                                                addDetectedPoseToEstimator, resetPoseEstimateFromFieldDetectors,
+                                return new Telemetry(field2d,
+                                                accelerationMag,
+                                                poseEstimate,
+                                                fieldDetectorOptPositions,
+                                                objectDetectorOptPositions,
+                                                setPoseEstimate,
+                                                addDetectedPoseToEstimator,
+                                                resetPoseEstimateFromFieldDetectors,
+                                                enableFieldDetectors,
+                                                enableObjectDetectors,
                                                 update);
                         };
 
@@ -141,6 +157,8 @@ public class Telemetry {
                                 telemetry.fieldDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(fieldDetector.name,
                                                                 fieldDetector.fieldPosition));
+                                telemetry.enableFieldDetectors.add(fieldDetector.enable);
+
                                 return telemetry;
                         };
 
@@ -178,6 +196,7 @@ public class Telemetry {
                                 telemetry.objectDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(objectDetector.name,
                                                                 objectDetectorOptPose));
+                                telemetry.enableObjectDetectors.add(objectDetector.enable);
                                 return telemetry;
                         };
 }
