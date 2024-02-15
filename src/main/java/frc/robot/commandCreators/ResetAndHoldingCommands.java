@@ -27,8 +27,8 @@ import frc.robot.RobotContainer;
 public class ResetAndHoldingCommands {
 
     private static final class Constants {
-        private static final Translation2d speakerBlueVector = new Translation2d(); // TODO:
-        private static final Translation2d spearkRedVector = new Translation2d(); // TODO:
+        private static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
+        private static final Translation2d speakerRedVector = new Translation2d(0, 8.211 - 5.44638);
         private static final Measure<Distance> speakerHeight = Meters.of(2.065);
         private static final Measure<Distance> shooterWheelRadius = Inches.of(2);
         private static final double shooterSpeedTransferEfficiency = 0.90;
@@ -81,7 +81,18 @@ public class ResetAndHoldingCommands {
             Optional<Alliance> alliance = DriverStation.getAlliance();
 
             if (alliance.get() == Alliance.Red) {
-
+                Translation2d targetVector = Constants.speakerRedVector.minus(fieldPosition.getTranslation());
+                double distanceMeters = targetVector.getNorm();
+                double velocity = 9.8
+                        * (distanceMeters * distanceMeters
+                                + 4 * Constants.speakerHeight.in(Meters) * Constants.speakerHeight.in(Meters))
+                        / Constants.speakerHeight.in(Meters);
+                velocity = Math.sqrt(velocity);
+                double shooterOmega = velocity / Constants.shooterWheelRadius.in(Meters);
+                shooterOmega /= Constants.shooterSpeedTransferEfficiency;
+                double shooterPercent = shooterOmega / Constants.maxShooterSpeed.in(RadiansPerSecond);
+                RobotContainer.topShooterSubsystem.spin.accept(shooterPercent);
+                RobotContainer.bottomShooterSubsystem.spin.accept(shooterPercent);
             } else {
                 Translation2d targetVector = Constants.speakerBlueVector.minus(fieldPosition.getTranslation());
                 double distanceMeters = targetVector.getNorm();

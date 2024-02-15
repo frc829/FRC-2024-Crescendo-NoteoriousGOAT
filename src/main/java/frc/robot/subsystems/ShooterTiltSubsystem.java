@@ -36,8 +36,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     private static final double slot1kI = 0.0;
     private static final double slot1kD = 0.0;
     private static final double slot1kF = 0.0;
-    private static final Measure<Angle> absoluteEncoderOffset = Degrees.of(0); // TODO:
-    private static final double absoluteAngleScaleFactor = 1.0; // TODO:
   }
 
   public final Measure<Voltage> voltage;
@@ -116,9 +114,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkD.apply(1).apply(Constants.slot1kD))
         .andThen(Motor.REV.setkF.apply(1).apply(Constants.slot1kF))
         .andThen(Motor.REV.setAngleWrapping.apply(Constants.gearing))
-        .andThen(Motor.REV.setAbsolutEencoderScaleFactor.apply(Constants.absoluteAngleScaleFactor))
         .andThen(Motor.REV.setInvertAbsoluteEncoder)
-        .andThen(Motor.REV.setAbsoluteEncoderOffset.apply(Constants.absoluteEncoderOffset))
         .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.invert)
         .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))

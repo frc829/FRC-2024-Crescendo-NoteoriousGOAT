@@ -16,10 +16,6 @@ import frc.robot.RobotContainer;
 
 public class BasicCommands {
 
-    private static final class Constants {
-
-    }
-
     public static final class HoldandStop {
         public static final Supplier<Command> createForElevator = () -> Commands.run(
                 RobotContainer.elevatorSubsystem.hold,

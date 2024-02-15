@@ -5,8 +5,6 @@ import static edu.wpi.first.units.Units.Meters;
 
 import java.util.function.Supplier;
 
-import com.compLevel1.Telemetry;
-
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -22,8 +20,6 @@ public class PickupCommands implements Sendable {
                 private static final class Ground {
                         private static final Measure<Angle> tiltAngle = Degrees.of(75);
                         private static final Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static final double topShooterPercent = 0.5;
-                        private static final double bottomShooterPercent = 0.5;
                         private static final double transportPercent = 0.5;
                         private static final double innerIntakePercent = 0.5;
                         private static final double outerIntakePercent = 0.5;

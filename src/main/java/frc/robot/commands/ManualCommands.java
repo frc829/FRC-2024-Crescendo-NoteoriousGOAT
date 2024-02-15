@@ -11,6 +11,7 @@ import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commandCreators.PickupCommands;
 import frc.robot.commandCreators.ResetAndHoldingCommands;
+import frc.robot.commandCreators.ScoringCommands;
 
 public class ManualCommands {
         public static final class Elevator {
@@ -79,6 +80,13 @@ public class ManualCommands {
                                 .apply(Degrees.of(0));
                 public static final Command noteDetectPickup = PickupCommands.createNoteDetect.get();
                 public static final Command noteDetectReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0))
+                                .apply(Degrees.of(0));
+        }
+
+        public static final class Scoring {
+                public static final Command ampScore = ScoringCommands.createAmp.get();
+                public static final Command ampReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
         }

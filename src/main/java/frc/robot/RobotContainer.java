@@ -18,10 +18,10 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commands.ManualCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
@@ -93,7 +93,7 @@ public class RobotContainer {
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
 
-        // private final SendableChooser<Command> autoChooser;
+        private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
                 AutoBuilder.configureHolonomic(
@@ -122,6 +122,8 @@ public class RobotContainer {
                 operator.b.whileFalse(ManualCommands.Pickup.groundPickupReset);
                 operator.x.whileTrue(ManualCommands.Pickup.babyBirdPickup);
                 operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
+                operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
+                operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
                 driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
                 driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
                 driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
@@ -158,12 +160,11 @@ public class RobotContainer {
                 driver.y.whileTrue(playOrchestraCommand);
                 driver.y.onFalse(stopOrchestraCommand);
 
-                // autoChooser = AutoBuilder.buildAutoChooser();
+                autoChooser = AutoBuilder.buildAutoChooser();
 
         }
 
         public Command getAutonomousCommand() {
-                return Commands.none();
-                // return autoChooser.getSelected();
+                return autoChooser.getSelected();
         }
 }

@@ -35,10 +35,15 @@ public class DriveCommands {
                 }
 
                 private static final class Source {
-                        private static final Pose2d source = new Pose2d(
+                        private static final Pose2d blueSource = new Pose2d(
                                         15.438237,
                                         0.962824,
                                         Rotation2d.fromDegrees(-60.0));
+
+                        private static final Pose2d redSource = new Pose2d(
+                                        15.438237,
+                                        8.211 - 0.962824,
+                                        Rotation2d.fromDegrees(60.0));
                 }
         }
 
@@ -204,11 +209,20 @@ public class DriveCommands {
         };
 
         public static final Supplier<Command> createGoToSource = () -> {
-                return AutoBuilder.pathfindToPose(
-                                Constants.Source.source,
-                                Constants.NoteDetection.pathConstraints,
-                                Constants.NoteDetection.goalEndVelocityMPS,
-                                Constants.NoteDetection.rotationDelayDistance);
+                if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+                        return AutoBuilder.pathfindToPose(
+                                        Constants.Source.redSource,
+                                        Constants.NoteDetection.pathConstraints,
+                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                        Constants.NoteDetection.rotationDelayDistance);
+                } else {
+                        return AutoBuilder.pathfindToPose(
+                                        Constants.Source.blueSource,
+                                        Constants.NoteDetection.pathConstraints,
+                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                        Constants.NoteDetection.rotationDelayDistance);
+                }
+
         };
 
         public DriveCommands() {
