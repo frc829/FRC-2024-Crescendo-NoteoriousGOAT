@@ -6,15 +6,26 @@ import frc.robot.RobotContainer;
 /** Add your docs here. */
 public class ComplexTriggers {
 
-    private ComplexTriggers() {
-    }
+        private ComplexTriggers() {
+        }
 
-    public static final Trigger fieldCentricOriginDriveTrigger = new Trigger(RobotContainer.driver.leftX)
-            .or(RobotContainer.driver.leftY);
+        public static final Trigger fieldCentricOriginDriveTrigger = new Trigger(RobotContainer.driver.leftX)
+                        .or(RobotContainer.driver.leftY);
 
-    public static final Trigger robotCentricOriginDriveTrigger = fieldCentricOriginDriveTrigger.negate().and(
-            RobotContainer.driver.rightX.or(RobotContainer.driver.rightY).or(RobotContainer.driver.fullTrigger));
+        public static final Trigger fieldCentricFLDriveTrigger = fieldCentricOriginDriveTrigger
+                        .and(RobotContainer.driver.x);
+        public static final Trigger fieldCentricFRDriveTrigger = fieldCentricOriginDriveTrigger
+                        .and(RobotContainer.driver.b);
 
-    // public static final Trigger templateTrigger = new Trigger(null);
+        public static final Trigger robotCentricOriginDriveTrigger = fieldCentricOriginDriveTrigger.negate().and(
+                        RobotContainer.driver.rightX.or(RobotContainer.driver.rightY)
+                                        .or(RobotContainer.driver.fullTrigger));
+
+        public static final Trigger robotCentricFLDriveTrigger = robotCentricOriginDriveTrigger
+                        .and(RobotContainer.driver.x);
+        public static final Trigger robotCentricFRDriveTrigger = robotCentricOriginDriveTrigger
+                        .and(RobotContainer.driver.b);
+
+        // public static final Trigger templateTrigger = new Trigger(null);
 
 }

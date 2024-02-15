@@ -29,13 +29,13 @@ public class TelemetrySubsystem extends SubsystemBase {
         new Pair<>(
             "limelightFront",
             new Pose3d(
-                Units.inchesToMeters(-13),
-                Units.inchesToMeters(-13),
+                Units.inchesToMeters(0),
+                Units.inchesToMeters(0),
                 Units.inchesToMeters(6),
                 new Rotation3d(
                     0,
                     0,
-                    Math.toRadians(180)))));
+                    Math.toRadians(0)))));
   }
 
   public final Field2d field2d;

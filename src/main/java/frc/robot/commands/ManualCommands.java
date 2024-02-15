@@ -2,20 +2,15 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.commandCreators.BasicCommands;
+import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commandCreators.PickupCommands;
-import frc.robot.commandCreators.ElevatorTiltCommand;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.commandCreators.ResetAndHoldingCommands;
 
 public class ManualCommands {
         public static final class Elevator {
@@ -54,50 +49,43 @@ public class ManualCommands {
                         public static final Command command = Commands.run(zero, RobotContainer.driveSubsystem);
                 }
 
-                public static final class RobotCentric {
-                        private static final ChassisSpeeds speeds = new ChassisSpeeds();
-                        private static final Translation2d cor = new Translation2d();
-                        private static final Runnable drive = () -> {
-                                speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                                .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
-                                speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                                .in(MetersPerSecond) * RobotContainer.driver.rightXValue.getAsDouble();
-                                speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                                .in(RadiansPerSecond)
-                                                * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                                RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                                .apply(cor)
-                                                .accept(speeds);
-                        };
-                        public static final Command command = Commands.run(drive, RobotContainer.driveSubsystem);
+                public static final class FieldCentric {
+                        public static final Command command = DriveCommands.createFieldCentricCommand.get();
+                        public static final Command frontLeft = DriveCommands.createFieldCentricFLCommand.get();
+                        public static final Command frontRight = DriveCommands.createFieldCentricFRCommand.get();
+
                 }
 
-                public static final class FieldCentric {
-                        private static ChassisSpeeds speeds = new ChassisSpeeds();
-                        private static final Translation2d cor = new Translation2d();
-                        private static final Runnable drive = () -> {
-                                speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                                .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
-                                speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                                .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
-                                speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                                .in(RadiansPerSecond)
-                                                * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                                speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-                                                RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
-                                RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                                .apply(cor)
-                                                .accept(speeds);
-                        };
-                        public static final Command command = Commands.run(drive, RobotContainer.driveSubsystem);
+                public static final class RobotCentric {
+                        public static final Command command = DriveCommands.createRobotCentricCommand.get();
+                        public static final Command frontLeftRC = DriveCommands.createRobotCentricFLCommand.get();
+                        public static final Command frontRightRC = DriveCommands.createRobotCentricFRCommand.get();
+                }
+
+                public static final class Positions {
+                        public static final Command source = DriveCommands.createGoToSource.get();
                 }
         }
 
         public static final class Pickup {
                 public static final Command barf = PickupCommands.createBarf.get();
                 public static final Command groundPickup = PickupCommands.createGround.get();
-                public static final Command groundPickupTravel = ElevatorTiltCommand.setUntil.apply(Meters.of(0))
+                public static final Command groundPickupReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
+                public static final Command babyBirdPickup = PickupCommands.createGround.get();
+                public static final Command babyBirdPickupReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0))
+                                .apply(Degrees.of(0));
+                public static final Command noteDetectPickup = PickupCommands.createNoteDetect.get();
+                public static final Command noteDetectReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0))
+                                .apply(Degrees.of(0));
+        }
+
+        public static final class ResetAndHolding {
+                public static final Command shooterAdjust = ResetAndHoldingCommands.distanceBasedShooterAdjust.get();
+
         }
 
         static {
@@ -105,7 +93,6 @@ public class ManualCommands {
                 Tilt.drive.setName("Manual Tilt");
                 Shooter.command.setName("Manual Shooter");
                 Drive.FieldCentric.command.setName("Manual Field Centric");
-                Drive.RobotCentric.command.setName("Manual Robot Centric");
                 Drive.ZeroModules.command.setName("Zero Modules");
         }
 }

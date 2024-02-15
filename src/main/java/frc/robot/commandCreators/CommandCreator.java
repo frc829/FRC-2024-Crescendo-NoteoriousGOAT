@@ -95,12 +95,7 @@ package frc.robot.commandCreators;
 
 //                         private static final class Ranged {
 
-//                         }
-//                 }
-
-//                 private static final class Amp {
-
-//                 }
+//                         
 //         }
 
 //         public static final class ContinuousCommandBuilders {
@@ -317,48 +312,6 @@ package frc.robot.commandCreators;
 //                                 return () -> pathFindToPoseCommand;
 //                         };
 
-//         public static final Command[] pathFindToSuppliedOptPoseCommand = new Command[] { Commands.none() };
-
-//         // public static final Function<Supplier<Optional<Pose2d>>,
-//         // Function<PathConstraints, Function<Double, Function<Double, Function<Boolean,
-//         // Supplier<Command>>>>>> createSetPathFindCommand = (
-//         // targetPoseSupplier) -> (
-//         // constraints) -> (goalEndVelocityMPS) -> (
-//         // rotationDelayDistance) -> (pathFlip) -> {
-//         // return () -> {
-//         // Optional<Pose2d> targetPoseOptional = targetPoseSupplier
-//         // .get();
-//         // if (targetPoseOptional.isPresent()) {
-//         // Pose2d targetPose = targetPoseOptional
-//         // .get();
-//         // if (pathFlip) {
-//         // return AutoBuilder
-//         // .pathfindToPoseFlipped(
-//         // targetPose,
-//         // constraints,
-//         // goalEndVelocityMPS,
-//         // rotationDelayDistance)
-//         // .handleInterrupt(
-//         // RobotContainer.driveSubsystem.stop);
-//         // } else {
-//         // return AutoBuilder
-//         // .pathfindToPose(
-//         // targetPose,
-//         // constraints,
-//         // goalEndVelocityMPS,
-//         // rotationDelayDistance)
-//         // .handleInterrupt(
-//         // RobotContainer.driveSubsystem.stop);
-//         // }
-
-//         // } else {
-//         // return Commands.none();
-//         // }
-//         // };
-//         // };
-
-//         public CommandCreator() {
-//         }
 
 //         @Override
 //         public void initSendable(SendableBuilder builder) {

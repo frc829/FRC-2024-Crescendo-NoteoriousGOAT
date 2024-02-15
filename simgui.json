@@ -26,6 +26,11 @@
           "open": true
         }
       },
+      "SPARK MAX [15]": {
+        "header": {
+          "open": true
+        }
+      },
       "SPARK MAX [20]": {
         "header": {
           "open": true
@@ -155,7 +160,8 @@
           },
           "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
             "open": true
-          }
+          },
+          "open": true
         },
         "NoteLoaded": {
           "open": true

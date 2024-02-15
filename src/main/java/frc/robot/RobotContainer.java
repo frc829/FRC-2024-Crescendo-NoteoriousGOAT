@@ -4,11 +4,25 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import java.util.function.BooleanSupplier;
+
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commandCreators.BasicCommands;
+import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commands.ManualCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -32,6 +46,28 @@ public class RobotContainer {
                         private static final int operatorPort = 1;
                         private static final int testPort = 2;
                 }
+
+                private static final ReplanningConfig replanningConfig = new ReplanningConfig(
+                                true,
+                                true,
+                                0.5,
+                                0.5);
+
+                private static final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
+                                new PIDConstants(5),
+                                new PIDConstants(5),
+                                DriveSubsystem.Constants.maxLinearVelocity.in(MetersPerSecond),
+                                DriveSubsystem.Constants.driveRadius.in(Meters),
+                                replanningConfig,
+                                0.02);
+
+                private static final BooleanSupplier shouldFlipPath = () -> {
+                        var alliance = DriverStation.getAlliance();
+                        if (alliance.isPresent()) {
+                                return alliance.get() == DriverStation.Alliance.Red;
+                        }
+                        return false;
+                };
         }
 
         public static final Orchestra orchestra = new Orchestra();
@@ -60,6 +96,14 @@ public class RobotContainer {
         // private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
+                AutoBuilder.configureHolonomic(
+                                telemetrySubsystem.poseEstimate,
+                                telemetrySubsystem.setPoseEstimator,
+                                driveSubsystem.robotSpeeds,
+                                driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()),
+                                Constants.config,
+                                Constants.shouldFlipPath,
+                                driveSubsystem);
                 SmartDashboard.putData("Outer Intake", outerIntakeSubsystem);
                 SmartDashboard.putData("Inner Intake", innerIntakeSubsystem);
                 SmartDashboard.putData("Transport", transportSubsystem);
@@ -75,12 +119,32 @@ public class RobotContainer {
                 operator.rightY.whileTrue(ManualCommands.Tilt.drive);
                 operator.a.whileTrue(ManualCommands.Pickup.barf);
                 operator.b.whileTrue(ManualCommands.Pickup.groundPickup);
-                operator.b.whileFalse(ManualCommands.Pickup.groundPickupTravel);
+                operator.b.whileFalse(ManualCommands.Pickup.groundPickupReset);
+                operator.x.whileTrue(ManualCommands.Pickup.babyBirdPickup);
+                operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
+                driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
+                driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
+                driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
+                driver.rightBumper.whileFalse(
+                                Commands.sequence(
+                                                Commands.runOnce(telemetrySubsystem.enableFieldDetectors
+                                                                .get(0)::run,
+                                                                telemetrySubsystem),
+                                                ManualCommands.Pickup.noteDetectReset));
+                operator.y.whileTrue(ManualCommands.ResetAndHolding.shooterAdjust);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.FieldCentric.command);
+                ComplexTriggers.fieldCentricFLDriveTrigger.whileTrue(ManualCommands.Drive.FieldCentric.frontLeft);
+                ComplexTriggers.fieldCentricFLDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
+                ComplexTriggers.fieldCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.FieldCentric.frontRight);
+                ComplexTriggers.fieldCentricFRDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
 
+                ComplexTriggers.robotCentricFLDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontLeftRC);
+                ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
+                ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
+                ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
                 Runnable playOrchestra = () -> {
                         orchestra.play();
                 };

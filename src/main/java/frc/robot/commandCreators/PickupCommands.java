@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Meters;
 
 import java.util.function.Supplier;
 
+import com.compLevel1.Telemetry;
+
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -28,7 +30,12 @@ public class PickupCommands implements Sendable {
                 }
 
                 private static final class BabyBird {
-
+                        private static final Measure<Angle> tiltAngle = Degrees.of(75);
+                        private static final Measure<Distance> elevatorPosition = Meters.of(0.5);
+                        private static final double topShooterPercent = 0.5;
+                        private static final double bottomShooterPercent = 0.5;
+                        private static final double transportPercent = 0.0;
+                        private static final double singulatorPercent = 0.5;
                 }
 
                 private static final class Barf {
@@ -42,7 +49,7 @@ public class PickupCommands implements Sendable {
         }
 
         public static final Supplier<Command> createGround = () -> {
-                Command elevatorTiltCommand = ElevatorTiltCommand.setUntil
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Constants.Ground.elevatorPosition)
                                 .apply(Constants.Ground.tiltAngle);
 
@@ -59,7 +66,7 @@ public class PickupCommands implements Sendable {
                                                 outerIntakeCommand)
                                 .until(RobotContainer.notedLoadedSubsystem.hasNote);
 
-                Command elevatorTiltCommand3 = ElevatorTiltCommand.setForever
+                Command elevatorTiltCommand3 = ResetAndHoldingCommands.setElevatorTiltForever
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
 
@@ -79,7 +86,43 @@ public class PickupCommands implements Sendable {
         };
 
         public static final Supplier<Command> createBabyBird = () -> {
-                return null;
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Constants.BabyBird.elevatorPosition)
+                                .apply(Constants.BabyBird.tiltAngle);
+
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command transportCommand = BasicCommands.Set.Transport.create
+                                .apply(Constants.BabyBird.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.BabyBird.singulatorPercent);
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.BabyBird.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.BabyBird.bottomShooterPercent);
+
+                Command babyBirdPickupCommand = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand)
+                                .until(RobotContainer.notedLoadedSubsystem.hasNote);
+
+                Command elevatorTiltCommand3 = ResetAndHoldingCommands.setElevatorTiltForever
+                                .apply(Meters.of(0))
+                                .apply(Degrees.of(0));
+
+                Command hasNoteCommand = Commands.parallel(
+                                elevatorTiltCommand3,
+                                BasicCommands.Set.OuterIntake.create.apply(0.0),
+                                BasicCommands.Set.InnerIntake.create.apply(0.0),
+                                BasicCommands.Set.Transport.create.apply(0.0),
+                                BasicCommands.Set.Singulator.create.apply(0.0),
+                                BasicCommands.Set.TopShooter.create.apply(() -> 0.0),
+                                BasicCommands.Set.BottomShooter.create.apply(() -> 0.0));
+
+                Command command = Commands.sequence(elevatorTiltCommand,
+                                babyBirdPickupCommand, hasNoteCommand);
+                command.setName("Baby Bird Pickup");
+                return command;
         };
 
         public static final Supplier<Command> createBarf = () -> {
@@ -102,6 +145,23 @@ public class PickupCommands implements Sendable {
                                 innerIntakeCommand,
                                 outerIntakeCommand);
                 command.setName("Barf");
+                return command;
+        };
+
+        public static final Supplier<Command> createNoteDetect = () -> {
+                Command setObjectDetectModeCommand = Commands.runOnce(RobotContainer.telemetrySubsystem.enableObjectDetectors.get(0)::run,
+                                RobotContainer.telemetrySubsystem);
+
+                Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier.get());
+
+                Command setFieldDetectModeCommand = Commands.runOnce(RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
+                                RobotContainer.telemetrySubsystem);
+                
+                Command pickupDetectedNote = Commands.parallel(goToNoteCommand, createGround.get());
+
+                Command command = Commands.sequence(setObjectDetectModeCommand, pickupDetectedNote, setFieldDetectModeCommand);
+                
+                command.setName("Note Detect");
                 return command;
         };
 
