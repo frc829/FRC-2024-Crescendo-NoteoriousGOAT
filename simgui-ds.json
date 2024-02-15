@@ -98,7 +98,7 @@
       "useGamepad": true
     },
     {
-      "useGamepad": true
+      "guid": "Keyboard0"
     }
   ]
 }

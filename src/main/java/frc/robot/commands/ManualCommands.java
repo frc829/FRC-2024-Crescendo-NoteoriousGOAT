@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.PickupCommands;
+import frc.robot.commandCreators.ElevatorTiltCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ManualCommands {
@@ -93,6 +96,8 @@ public class ManualCommands {
         public static final class Pickup {
                 public static final Command barf = PickupCommands.createBarf.get();
                 public static final Command groundPickup = PickupCommands.createGround.get();
+                public static final Command groundPickupTravel = ElevatorTiltCommand.setUntil.apply(Meters.of(0))
+                                .apply(Degrees.of(0));
         }
 
         static {
