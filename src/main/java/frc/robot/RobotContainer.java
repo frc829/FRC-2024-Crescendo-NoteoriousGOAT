@@ -161,6 +161,7 @@ public class RobotContainer {
                 driver.y.onFalse(stopOrchestraCommand);
 
                 autoChooser = AutoBuilder.buildAutoChooser();
+                SmartDashboard.putData("Auto Chooser", autoChooser);
 
         }
 

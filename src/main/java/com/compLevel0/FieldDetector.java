@@ -19,9 +19,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class FieldDetector {
 
@@ -52,7 +50,6 @@ public class FieldDetector {
                     NetworkTableEntry validTargetSupplier = table.getEntry("tv");
                     NetworkTableEntry pipelineSupplier = table.getEntry("getpipe");
                     NetworkTableEntry botpose_wpiblueSupplier = table.getEntry("botpose_wpiblue");
-                    NetworkTableEntry botpose_wpiredSupplier = table.getEntry("botpose_wpired");
                     NetworkTableEntry pipelineConsumer = table.getEntry("pipeline");
 
                     MutableMeasure<Distance> fieldX = MutableMeasure.zero(Meters);
@@ -96,29 +93,13 @@ public class FieldDetector {
                     Runnable enable = () -> pipelineConsumer.setNumber(1);
 
                     Runnable update = () -> {
-                        double[] poseArray = new double[7];
-                        Optional<Alliance> allianceOption = DriverStation.getAlliance();
-                        if (allianceOption.isPresent()) {
-                            Alliance alliance = allianceOption.get();
-                            if (alliance == Alliance.Blue) {
-                                poseArray = botpose_wpiblueSupplier.getDoubleArray(new double[7]);
-                            } else if (alliance == Alliance.Red) {
-                                poseArray = botpose_wpiredSupplier.getDoubleArray(new double[7]);
-                            } else {
-                                poseArray = new double[7];
-                            }
-                        }
+                        double[] poseArray = botpose_wpiblueSupplier.getDoubleArray(new double[7]);
                         fieldX.mut_setMagnitude(poseArray[0]);
                         fieldX.mut_setMagnitude(poseArray[1]);
                         latencyMeasure.mut_setMagnitude(poseArray[6]);
                     };
 
-                    return new FieldDetector(
-                            name,
-                            fieldPosition,
-                            latency,
-                            enable,
-                            update);
+                    return new FieldDetector(name, fieldPosition, latency, enable, update);
                 };
     }
 

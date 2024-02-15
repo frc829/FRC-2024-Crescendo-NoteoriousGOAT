@@ -28,7 +28,7 @@ public class ResetAndHoldingCommands {
 
     private static final class Constants {
         private static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
-        private static final Translation2d speakerRedVector = new Translation2d(0, 8.211 - 5.44638);
+        private static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
         private static final Measure<Distance> speakerHeight = Meters.of(2.065);
         private static final Measure<Distance> shooterWheelRadius = Inches.of(2);
         private static final double shooterSpeedTransferEfficiency = 0.90;

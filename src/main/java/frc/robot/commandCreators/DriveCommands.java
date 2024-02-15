@@ -14,8 +14,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -35,15 +33,10 @@ public class DriveCommands {
                 }
 
                 private static final class Source {
-                        private static final Pose2d blueSource = new Pose2d(
+                        private static final Pose2d source = new Pose2d(
                                         15.438237,
                                         0.962824,
                                         Rotation2d.fromDegrees(-60.0));
-
-                        private static final Pose2d redSource = new Pose2d(
-                                        15.438237,
-                                        8.211 - 0.962824,
-                                        Rotation2d.fromDegrees(60.0));
                 }
         }
 
@@ -191,37 +184,25 @@ public class DriveCommands {
 
         public static final Supplier<Supplier<Command>> goToNoteCommandSupplier = () -> {
                 Supplier<Command> commandSupplier = () -> {
-                        Optional<Alliance> alliance = DriverStation.getAlliance();
                         Optional<Pose2d> notePose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond()
                                         .get();
-                        if (alliance.isPresent()) {
-                                return AutoBuilder
-                                                .pathfindToPose(
-                                                                notePose.get(),
-                                                                Constants.NoteDetection.pathConstraints,
-                                                                Constants.NoteDetection.goalEndVelocityMPS,
-                                                                Constants.NoteDetection.rotationDelayDistance);
-                        } else {
-                                return Commands.none();
-                        }
+                        return AutoBuilder
+                                        .pathfindToPose(
+                                                        notePose.get(),
+                                                        Constants.NoteDetection.pathConstraints,
+                                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                                        Constants.NoteDetection.rotationDelayDistance);
+
                 };
                 return commandSupplier;
         };
 
         public static final Supplier<Command> createGoToSource = () -> {
-                if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-                        return AutoBuilder.pathfindToPose(
-                                        Constants.Source.redSource,
-                                        Constants.NoteDetection.pathConstraints,
-                                        Constants.NoteDetection.goalEndVelocityMPS,
-                                        Constants.NoteDetection.rotationDelayDistance);
-                } else {
-                        return AutoBuilder.pathfindToPose(
-                                        Constants.Source.blueSource,
-                                        Constants.NoteDetection.pathConstraints,
-                                        Constants.NoteDetection.goalEndVelocityMPS,
-                                        Constants.NoteDetection.rotationDelayDistance);
-                }
+                return AutoBuilder.pathfindToPoseFlipped(
+                                Constants.Source.source,
+                                Constants.NoteDetection.pathConstraints,
+                                Constants.NoteDetection.goalEndVelocityMPS,
+                                Constants.NoteDetection.rotationDelayDistance);
 
         };
 

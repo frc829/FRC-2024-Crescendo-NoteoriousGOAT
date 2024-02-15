@@ -81,6 +81,7 @@
       "/SmartDashboard/Outer Intake": "Subsystem",
       "/SmartDashboard/OuterIntake": "Subsystem",
       "/SmartDashboard/Pickup": "Subsystem",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Shooter": "Subsystem",
       "/SmartDashboard/Shooter Tilt": "Subsystem",
       "/SmartDashboard/Singulator": "Subsystem",
