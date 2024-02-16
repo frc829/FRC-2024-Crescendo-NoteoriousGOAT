@@ -18,7 +18,6 @@ import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Unit;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Sensor<T extends Unit<T>> {
 
@@ -47,7 +46,6 @@ public class Sensor<T extends Unit<T>> {
                             distance.mut_setMagnitude(simDistance.get().in(Millimeters));
                         } else {
                             distance.mut_setMagnitude(timeOfFlight.getRange());
-                            SmartDashboard.putString("TOF" + "_Status", timeOfFlight.getStatus().toString());
                         }
                     };
                     return new Sensor<>(voltage, distance, update);

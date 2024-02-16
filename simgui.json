@@ -177,19 +177,14 @@
         "Shooter": {
           "open": true
         },
-        "Shooter Tilt": {
-          "open": true
-        },
-        "Singulator": {
-          "open": true
-        },
         "Telemetry": {
           "double[]##v_/SmartDashboard/Telemetry/Object Pose from limelightFront": {
             "open": true
           },
           "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
             "open": true
-          }
+          },
+          "open": true
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
           "open": true

@@ -65,8 +65,8 @@ public class FieldDetector {
                         if (RobotBase.isSimulation()) {
                             Pose2d simPose = simFieldPose.get();
                             Pose2d newPose = new Pose2d(
-                                    randX.nextDouble() * 0.2 - 0.1 + simPose.getX(),
-                                    randY.nextDouble() * 0.2 - 0.1 + simPose.getY(),
+                                    randX.nextDouble() * 0.02 - 0.01 + simPose.getX(),
+                                    randY.nextDouble() * 0.02 - 0.01 + simPose.getY(),
                                     Rotation2d.fromDegrees(
                                             randTheta.nextDouble() * 2 - 1 + simPose.getRotation().getDegrees()));
                             return Optional.of(newPose);
