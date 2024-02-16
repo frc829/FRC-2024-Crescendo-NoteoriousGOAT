@@ -1,6 +1,7 @@
 package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Optional;
@@ -24,10 +25,10 @@ public class DriveCommands {
         private static final class Constants {
                 private static final class NoteDetection {
                         private static final PathConstraints pathConstraints = new PathConstraints(
-                                        2,
-                                        2,
-                                        360,
-                                        360);
+                                        DriveSubsystem.Constants.maxLinearVelocity.in(MetersPerSecond),
+                                        DriveSubsystem.Constants.maxLinearVelocity.in(MetersPerSecond),
+                                        DriveSubsystem.Constants.maxAngularVelocity.in(RadiansPerSecond),
+                                        DriveSubsystem.Constants.maxAngularVelocity.in(RadiansPerSecond));
                         private static final double goalEndVelocityMPS = 0.0;
                         private static final double rotationDelayDistance = 0.0;
                 }

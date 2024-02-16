@@ -1,21 +1,24 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
+import com.pathplanner.lib.auto.NamedCommands;
+
+import frc.robot.commandCreators.PickupCommands;
+import frc.robot.commandCreators.ResetAndHoldingCommands;
+import frc.robot.commandCreators.ScoringCommands;
+
 public class AutoCommands {
 
-    // private static final class Constants{
-
-    // }
-
     public AutoCommands() {
-    //     AutoBuilder.configureHolonomic(
-    //             RobotContainer.telemetrySubsystem.poseEstimate,
-    //             RobotContainer.telemetrySubsystem.setPoseEstimator,
-    //             RobotContainer.driveSubsystem.robotSpeeds,
-    //             RobotContainer.driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()),
-    //             null,
-    //             null,
-    //             RobotContainer.driveSubsystem);
-    // 
-}
+        NamedCommands.registerCommand("RangedShoot", ScoringCommands.createRanged.get());
+        NamedCommands.registerCommand("FenderShoot", ScoringCommands.createFender.get());
+        NamedCommands.registerCommand("Pickup", PickupCommands.createGround.get());
+        NamedCommands.registerCommand("Amp", ScoringCommands.createAmp.get());
+        NamedCommands.registerCommand("GetLow",
+                ResetAndHoldingCommands.setElevatorTiltForever.apply(Meters.of(0.0)).apply(Degrees.of(0)));
+
+    }
 
 }

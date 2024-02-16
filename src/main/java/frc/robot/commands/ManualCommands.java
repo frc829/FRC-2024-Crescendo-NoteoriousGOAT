@@ -94,7 +94,7 @@ public class ManualCommands {
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
                 public static final Command rangedScore = ScoringCommands.createRanged.get();
-                public static final Command rangedReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                public static final Command rangedReset = ResetAndHoldingCommands.setElevatorTiltForever
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
         }

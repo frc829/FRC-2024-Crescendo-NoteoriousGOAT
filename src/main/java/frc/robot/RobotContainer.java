@@ -23,11 +23,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commandCreators.DriveCommands;
+import frc.robot.commands.AutoCommands;
 import frc.robot.commands.ManualCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.InnerIntakeSubsystem;
+import frc.robot.subsystems.MechanismSubsystem;
 import frc.robot.subsystems.NotedLoadedSubsystem;
 import frc.robot.subsystems.OuterIntakeSubsystem;
 import frc.robot.subsystems.TopShooterSubsystem;
@@ -92,6 +94,7 @@ public class RobotContainer {
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
+        public static final MechanismSubsystem mechanismSubsystem = new MechanismSubsystem();
 
         private final SendableChooser<Command> autoChooser;
 
@@ -124,12 +127,16 @@ public class RobotContainer {
                 operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
                 operator.y.whileTrue(ManualCommands.ResetAndHolding.shooterAdjust);
                 driver.a.whileTrue(ManualCommands.Scoring.rangedScore);
-                driver.a.whileFalse(ManualCommands.Scoring.rangedReset);
+                driver.a.onFalse(Commands.parallel(
+                                ManualCommands.Scoring.rangedReset,
+                                DriveCommands.createFieldCentricCommand.get()));
+
                 operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
                 operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
                 operator.rightBumper.whileTrue(ManualCommands.Scoring.fenderScore);
                 operator.rightBumper.whileFalse(ManualCommands.Scoring.fenderReset);
                 driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
+                driver.leftBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
                 driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.rightBumper.whileFalse(
@@ -163,6 +170,7 @@ public class RobotContainer {
 
                 // driver.y.whileTrue(playOrchestraCommand);
                 // driver.y.onFalse(stopOrchestraCommand);
+                new AutoCommands();
 
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);

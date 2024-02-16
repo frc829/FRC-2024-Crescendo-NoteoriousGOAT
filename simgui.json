@@ -21,27 +21,17 @@
           "open": true
         }
       },
-      "SPARK MAX [14]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [15]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [16]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [20]": {
         "header": {
           "open": true
         }
       },
       "SPARK MAX [21]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [26]": {
         "header": {
           "open": true
         }
@@ -82,6 +72,7 @@
       "/SmartDashboard/Elevator": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Inner Intake": "Subsystem",
+      "/SmartDashboard/Mech": "Mechanism2d",
       "/SmartDashboard/NoteLoaded": "Subsystem",
       "/SmartDashboard/Outer Intake": "Subsystem",
       "/SmartDashboard/OuterIntake": "Subsystem",
@@ -101,9 +92,24 @@
         }
       },
       "/SmartDashboard/Field": {
+        "Robot": {
+          "length": 0.6600000262260437,
+          "width": 0.6600000262260437
+        },
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
+        "limelightFront-ObjectPose": {
+          "arrowColor": [
+            0.9607843160629272,
+            0.5431423783302307,
+            0.014129194431006908,
+            255.0
+          ],
+          "arrowSize": 14,
+          "arrowWeight": 1.0,
+          "style": "Track"
+        },
         "limelightFront-Pose": {
           "style": "Hidden"
         },
@@ -145,6 +151,11 @@
         "window": {
           "visible": true
         }
+      },
+      "/SmartDashboard/Mech": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -157,10 +168,10 @@
         "open": true
       },
       "SmartDashboard": {
-        "Bottom Shooter": {
+        "CommandCreator": {
           "open": true
         },
-        "CommandCreator": {
+        "Drive": {
           "open": true
         },
         "Field": {
@@ -183,8 +194,7 @@
           },
           "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
             "open": true
-          },
-          "open": true
+          }
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
           "open": true
