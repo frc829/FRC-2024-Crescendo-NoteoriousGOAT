@@ -2,9 +2,9 @@ package frc.robot.commands;
 
 public class AutoCommands {
 
-    private static final class Constants{
+    // private static final class Constants{
 
-    }
+    // }
 
     public AutoCommands() {
     //     AutoBuilder.configureHolonomic(

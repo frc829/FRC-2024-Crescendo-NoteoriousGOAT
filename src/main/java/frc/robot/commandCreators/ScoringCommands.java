@@ -107,8 +107,8 @@ public class ScoringCommands implements Sendable {
                 return command;
         };
 
+        @SuppressWarnings({ "resource" })
         public static final Supplier<Command> createRanged = () -> {
-
                 MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
                 MutableMeasure<Dimensionless> shooterPercentMeasure = MutableMeasure.zero(Value);
                 PIDController pidController = new PIDController(5, 0, 0);
