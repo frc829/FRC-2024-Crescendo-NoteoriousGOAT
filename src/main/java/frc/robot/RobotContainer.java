@@ -122,6 +122,9 @@ public class RobotContainer {
                 operator.b.whileFalse(ManualCommands.Pickup.groundPickupReset);
                 operator.x.whileTrue(ManualCommands.Pickup.babyBirdPickup);
                 operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
+                operator.y.whileTrue(ManualCommands.ResetAndHolding.shooterAdjust);
+                driver.a.whileTrue(ManualCommands.Scoring.rangedScore);
+                driver.a.whileFalse(ManualCommands.Scoring.rangedReset);
                 operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
                 operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
                 operator.rightBumper.whileTrue(ManualCommands.Scoring.fenderScore);
@@ -135,7 +138,6 @@ public class RobotContainer {
                                                                 .get(0)::run,
                                                                 telemetrySubsystem),
                                                 ManualCommands.Pickup.noteDetectReset));
-                operator.y.whileTrue(ManualCommands.ResetAndHolding.shooterAdjust);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -149,18 +151,18 @@ public class RobotContainer {
                 ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
                 ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
-                Runnable playOrchestra = () -> {
-                        orchestra.play();
-                };
-                Command playOrchestraCommand = Commands.runOnce(playOrchestra);
+                // Runnable playOrchestra = () -> {
+                // orchestra.play();
+                // };
+                // Command playOrchestraCommand = Commands.runOnce(playOrchestra);
 
-                Runnable stopOrchestra = () -> {
-                        orchestra.stop();
-                };
-                Command stopOrchestraCommand = Commands.runOnce(stopOrchestra);
+                // Runnable stopOrchestra = () -> {
+                // orchestra.stop();
+                // };
+                // Command stopOrchestraCommand = Commands.runOnce(stopOrchestra);
 
-                driver.y.whileTrue(playOrchestraCommand);
-                driver.y.onFalse(stopOrchestraCommand);
+                // driver.y.whileTrue(playOrchestraCommand);
+                // driver.y.onFalse(stopOrchestraCommand);
 
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);

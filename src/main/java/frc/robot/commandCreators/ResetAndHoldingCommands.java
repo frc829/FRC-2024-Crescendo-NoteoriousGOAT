@@ -29,13 +29,13 @@ import frc.robot.RobotContainer;
 
 public class ResetAndHoldingCommands implements Sendable {
 
-    private static final class Constants {
-        private static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
-        private static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
-        private static final Measure<Distance> speakerHeight = Meters.of(2.065);
-        private static final Measure<Distance> shooterWheelRadius = Inches.of(2);
-        private static double shooterSpeedTransferEfficiency = 0.90;
-        private static final Measure<Velocity<Angle>> maxShooterSpeed = RadiansPerSecond
+    public static final class Constants {
+        public static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
+        public static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
+        public static final Measure<Distance> speakerHeight = Meters.of(2.065);
+        public static final Measure<Distance> shooterWheelRadius = Inches.of(2);
+        public static double shooterSpeedTransferEfficiency = 0.90;
+        public static final Measure<Velocity<Angle>> maxShooterSpeed = RadiansPerSecond
                 .of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec);
 
     }

@@ -157,6 +157,9 @@
         "open": true
       },
       "SmartDashboard": {
+        "Bottom Shooter": {
+          "open": true
+        },
         "CommandCreator": {
           "open": true
         },
@@ -171,13 +174,13 @@
         "Pickup": {
           "open": true
         },
-        "PickupCommands": {
-          "open": true
-        },
-        "Scoring Commands": {
-          "open": true
-        },
         "Shooter": {
+          "open": true
+        },
+        "Shooter Tilt": {
+          "open": true
+        },
+        "Singulator": {
           "open": true
         },
         "Telemetry": {
