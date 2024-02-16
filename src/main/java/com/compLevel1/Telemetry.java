@@ -2,6 +2,8 @@ package com.compLevel1;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,10 +36,10 @@ public class Telemetry {
         public final Measure<Velocity<Velocity<Distance>>> accelerationMag;
         public final Supplier<Pose2d> poseEstimate;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions;
+        public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions;
         public final Consumer<Pose2d> setPoseEstimate;
-        public final Runnable addDetectedPosesToEstimator;
-        public final Runnable resetPoseEstimateFromFieldDetectors;
+        public final Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator;
         public final List<Runnable> enableFieldDetectors;
         public final List<Runnable> enableObjectDetectors;
         public final Runnable update;
@@ -46,10 +49,10 @@ public class Telemetry {
                         Measure<Velocity<Velocity<Distance>>> accelerationMag,
                         Supplier<Pose2d> poseEstimate,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions,
+                        List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions,
                         Consumer<Pose2d> setPoseEstimate,
-                        Runnable addDetectedPosesToEstimator,
-                        Runnable resetPoseEstimateFromFieldDetectors,
+                        Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator,
                         List<Runnable> enableFieldDetectors,
                         List<Runnable> enableObjectDetectors,
                         Runnable update) {
@@ -57,10 +60,10 @@ public class Telemetry {
                 this.accelerationMag = accelerationMag;
                 this.poseEstimate = poseEstimate;
                 this.fieldDetectorOptPositions = fieldDetectorOptPositions;
+                this.fieldDetectorLatencies = fieldDetectorLatencies;
                 this.objectDetectorOptPositions = objectDetectorOptPositions;
                 this.setPoseEstimate = setPoseEstimate;
                 this.addDetectedPosesToEstimator = addDetectedPosesToEstimator;
-                this.resetPoseEstimateFromFieldDetectors = resetPoseEstimateFromFieldDetectors;
                 this.enableFieldDetectors = enableFieldDetectors;
                 this.enableObjectDetectors = enableObjectDetectors;
                 this.update = update;
@@ -84,6 +87,7 @@ public class Telemetry {
                                 List<ObjectDetector> objectDetectors = new ArrayList<>();
 
                                 List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions = new ArrayList<>();
+                                List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorOptLatencies = new ArrayList<>();
                                 List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions = new ArrayList<>();
 
                                 Consumer<Pose2d> setPoseEstimate = (resetPose) -> {
@@ -92,14 +96,11 @@ public class Telemetry {
                                                         wheelPositions.get().positions, resetPose);
                                 };
 
-                                Runnable addDetectedPoseToEstimator = () -> {
-                                        // TODO:
-
-                                };
-
-                                Runnable resetPoseEstimateFromFieldDetectors = () -> {
-                                        // TODO:
-                                };
+                                Function<Pose2d, Consumer<Measure<Time>>> addDetectedPoseToEstimator = (
+                                                pose) -> (latency) -> {
+                                                        swerveDrivePoseEstimator.addVisionMeasurement(pose,
+                                                                        latency.in(Seconds));
+                                                };
 
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
                                 List<Runnable> enableObjectDetectors = new ArrayList<>();
@@ -143,10 +144,10 @@ public class Telemetry {
                                                 accelerationMag,
                                                 poseEstimate,
                                                 fieldDetectorOptPositions,
+                                                fieldDetectorOptLatencies,
                                                 objectDetectorOptPositions,
                                                 setPoseEstimate,
                                                 addDetectedPoseToEstimator,
-                                                resetPoseEstimateFromFieldDetectors,
                                                 enableFieldDetectors,
                                                 enableObjectDetectors,
                                                 update);
@@ -157,6 +158,9 @@ public class Telemetry {
                                 telemetry.fieldDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(fieldDetector.name,
                                                                 fieldDetector.fieldPosition));
+                                telemetry.fieldDetectorLatencies
+                                                .add(new Pair<String, Supplier<Optional<Measure<Time>>>>(
+                                                                fieldDetector.name, fieldDetector.latency));
                                 telemetry.enableFieldDetectors.add(fieldDetector.enable);
 
                                 return telemetry;

@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -145,9 +147,87 @@ public class DriveSubsystem extends SubsystemBase {
                                 "Robot Rotational Velocity (dps)",
                                 () -> Math.toDegrees(robotSpeeds.get().omegaRadiansPerSecond),
                                 null);
-                //TODO:  add all voltage
-                //TODO:  add sensor angles
-        }
+                builder.addDoubleProperty(
+                                String.format("Steer Voltage [%s]", 0),
+                                () -> steerVoltages.get(0).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Steer Voltage [%s]", 1),
+                                () -> steerVoltages.get(1).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Steer Voltage [%s]", 2),
+                                () -> steerVoltages.get(2).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Steer Voltage [%s]", 3),
+                                () -> steerVoltages.get(3).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Wheel Voltage [%s]", 0),
+                                () -> wheelVoltages.get(0).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Wheel Voltage [%s]", 1),
+                                () -> wheelVoltages.get(1).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Wheel Voltage [%s]", 2),
+                                () -> wheelVoltages.get(2).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Wheel Voltage [%s]", 3),
+                                () -> wheelVoltages.get(3).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 0),
+                                () -> angleSensorVoltages.get(0).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 1),
+                                () -> angleSensorVoltages.get(1).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 2),
+                                () -> angleSensorVoltages.get(2).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 3),
+                                () -> angleSensorVoltages.get(3).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 0),
+                                () -> angleSensorVoltages.get(0).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 1),
+                                () -> angleSensorVoltages.get(1).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 2),
+                                () -> angleSensorVoltages.get(2).in(Volts),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor Voltage [%s]", 3),
+                                () -> angleSensorVoltages.get(3).in(Volts),
+                                null);
+
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor [%s] Degrees", 0),
+                                () -> sensorAngles.get(0).in(Degrees),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor [%s] Degrees", 1),
+                                () -> sensorAngles.get(1).in(Degrees),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor [%s] Degrees", 2),
+                                () -> sensorAngles.get(2).in(Degrees),
+                                null);
+                builder.addDoubleProperty(
+                                String.format("Angle Sensor [%s] Degrees", 3),
+                                () -> sensorAngles.get(3).in(Degrees),
+                                null);        }
 
         public static final Supplier<DriveSubsystem> create = () -> {
 
