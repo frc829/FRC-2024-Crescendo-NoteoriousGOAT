@@ -31,6 +31,11 @@
           "open": true
         }
       },
+      "SPARK MAX [16]": {
+        "header": {
+          "open": true
+        }
+      },
       "SPARK MAX [20]": {
         "header": {
           "open": true
@@ -144,15 +149,15 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
+      "PathPlanner": {
+        "open": true
+      },
       "SmartDashboard": {
-        "Bottom Shooter": {
-          "open": true
-        },
         "CommandCreator": {
-          "open": true
-        },
-        "Elevator": {
           "open": true
         },
         "Field": {
@@ -161,26 +166,27 @@
           },
           "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
             "open": true
-          },
-          "open": true
-        },
-        "NoteLoaded": {
-          "open": true
-        },
-        "Outer Intake": {
-          "open": true
+          }
         },
         "Pickup": {
+          "open": true
+        },
+        "PickupCommands": {
+          "open": true
+        },
+        "Scoring Commands": {
           "open": true
         },
         "Shooter": {
           "open": true
         },
-        "Shooter Tilt": {
-          "open": true
-        },
-        "Transport": {
-          "open": true
+        "Telemetry": {
+          "double[]##v_/SmartDashboard/Telemetry/Object Pose from limelightFront": {
+            "open": true
+          },
+          "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
+            "open": true
+          }
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
           "open": true
@@ -197,6 +203,12 @@
         "double[]##v_/SmartDashboard/objectTranslationRobot": {
           "open": true
         },
+        "open": true
+      },
+      "limelightFront": {
+        "open": true
+      },
+      "limelightRear": {
         "open": true
       }
     }

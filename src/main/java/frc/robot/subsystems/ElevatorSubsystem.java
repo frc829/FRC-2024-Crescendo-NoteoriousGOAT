@@ -26,7 +26,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 28;
-    private static final double gearing = 4.0 * 4.0 * 4.0 * 30.0 / 40.0;
+    private static final double gearing = 4.0 * 4.0 * 4.0 * 40.0 / 30.0;
     private static final Measure<Distance> drumRadius = Inches.of(2.0);
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;

@@ -8,8 +8,10 @@ import java.util.function.Supplier;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -18,29 +20,30 @@ public class PickupCommands implements Sendable {
 
         private static final class Constants {
                 private static final class Ground {
-                        private static final Measure<Angle> tiltAngle = Degrees.of(75);
-                        private static final Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static final double transportPercent = 0.5;
-                        private static final double innerIntakePercent = 0.5;
-                        private static final double outerIntakePercent = 0.5;
+                        private static Measure<Angle> tiltAngle = Degrees.of(75);
+                        private static Measure<Distance> elevatorPosition = Meters.of(0.0);
+                        private static double transportPercent = 0.5;
+                        private static double innerIntakePercent = 0.5;
+                        private static double outerIntakePercent = 0.5;
                 }
 
                 private static final class BabyBird {
-                        private static final Measure<Angle> tiltAngle = Degrees.of(75);
-                        private static final Measure<Distance> elevatorPosition = Meters.of(0.5);
-                        private static final double topShooterPercent = 0.5;
-                        private static final double bottomShooterPercent = 0.5;
-                        private static final double transportPercent = 0.0;
-                        private static final double singulatorPercent = 0.5;
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.5,
+                                        Meters);
+                        private static double topShooterPercent = 0.5;
+                        private static double bottomShooterPercent = 0.5;
+                        private static double transportPercent = 0.0;
+                        private static double singulatorPercent = 0.5;
                 }
 
                 private static final class Barf {
-                        private static final double topShooterPercent = 0.0;
-                        private static final double bottomShooterPercent = 0.0;
-                        private static final double singulatorPercent = 0.0;
-                        private static final double transportPercent = 0.0;
-                        private static final double innerIntakePercent = 0.0;
-                        private static final double outerIntakePercent = 0.0;
+                        private static double topShooterPercent = 0.5;
+                        private static double bottomShooterPercent = 0.5;
+                        private static double singulatorPercent = 0.5;
+                        private static double transportPercent = 0.5;
+                        private static double innerIntakePercent = 0.5;
+                        private static double outerIntakePercent = 0.5;
                 }
         }
 
@@ -145,27 +148,69 @@ public class PickupCommands implements Sendable {
         };
 
         public static final Supplier<Command> createNoteDetect = () -> {
-                Command setObjectDetectModeCommand = Commands.runOnce(RobotContainer.telemetrySubsystem.enableObjectDetectors.get(0)::run,
+                Command setObjectDetectModeCommand = Commands.runOnce(
+                                RobotContainer.telemetrySubsystem.enableObjectDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
 
                 Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier.get());
 
-                Command setFieldDetectModeCommand = Commands.runOnce(RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
+                Command setFieldDetectModeCommand = Commands.runOnce(
+                                RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
-                
+
                 Command pickupDetectedNote = Commands.parallel(goToNoteCommand, createGround.get());
 
-                Command command = Commands.sequence(setObjectDetectModeCommand, pickupDetectedNote, setFieldDetectModeCommand);
-                
+                Command command = Commands.sequence(setObjectDetectModeCommand, pickupDetectedNote,
+                                setFieldDetectModeCommand);
+
                 command.setName("Note Detect");
                 return command;
         };
+
+        static {
+                SmartDashboard.putData("PickupCommands", new PickupCommands());
+        }
 
         public PickupCommands() {
         }
 
         @Override
         public void initSendable(SendableBuilder builder) {
+                builder.addDoubleProperty(
+                                "Ground Transport Percent",
+                                () -> Constants.Ground.transportPercent,
+                                (percent) -> Constants.Ground.transportPercent = percent);
+                builder.addDoubleProperty(
+                                "Ground Inner Percent",
+                                () -> Constants.Ground.innerIntakePercent,
+                                (percent) -> Constants.Ground.innerIntakePercent = percent);
+                builder.addDoubleProperty(
+                                "Ground Outer Percent",
+                                () -> Constants.Ground.outerIntakePercent,
+                                (percent) -> Constants.Ground.outerIntakePercent = percent);
 
+                builder.addDoubleProperty(
+                                "Baby Bird Transport Percent",
+                                () -> Constants.BabyBird.transportPercent,
+                                (percent) -> Constants.BabyBird.transportPercent = percent);
+                builder.addDoubleProperty(
+                                "Baby Bird Singulator Percent",
+                                () -> Constants.BabyBird.singulatorPercent,
+                                (percent) -> Constants.BabyBird.singulatorPercent = percent);
+                builder.addDoubleProperty(
+                                "Baby Bird Shooter Percent",
+                                () -> Constants.BabyBird.topShooterPercent,
+                                (percent) -> {
+                                        Constants.BabyBird.topShooterPercent = percent;
+                                        Constants.BabyBird.bottomShooterPercent = percent;
+                                });
+                builder.addDoubleProperty(
+                                "Baby Bird Elevator Position",
+                                () -> Constants.BabyBird.elevatorPosition.in(Meters),
+                                (meters) -> Constants.BabyBird.elevatorPosition.mut_setMagnitude(meters));
+                builder.addDoubleProperty(
+                                "Baby Bird Tilt Angle",
+                                () -> Constants.BabyBird.tiltAngle.in(Degrees),
+                                (degrees) -> Constants.BabyBird.tiltAngle.mut_setMagnitude(degrees));
         }
 }

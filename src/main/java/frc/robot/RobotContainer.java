@@ -124,6 +124,8 @@ public class RobotContainer {
                 operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
                 operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
                 operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
+                operator.rightBumper.whileTrue(ManualCommands.Scoring.fenderScore);
+                operator.rightBumper.whileFalse(ManualCommands.Scoring.fenderReset);
                 driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
                 driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
                 driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());

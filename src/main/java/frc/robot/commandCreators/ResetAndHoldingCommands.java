@@ -18,20 +18,23 @@ import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
-public class ResetAndHoldingCommands {
+public class ResetAndHoldingCommands implements Sendable {
 
     private static final class Constants {
         private static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
         private static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
         private static final Measure<Distance> speakerHeight = Meters.of(2.065);
         private static final Measure<Distance> shooterWheelRadius = Inches.of(2);
-        private static final double shooterSpeedTransferEfficiency = 0.90;
+        private static double shooterSpeedTransferEfficiency = 0.90;
         private static final Measure<Velocity<Angle>> maxShooterSpeed = RadiansPerSecond
                 .of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec);
 
@@ -114,6 +117,18 @@ public class ResetAndHoldingCommands {
         return command;
     };
 
+    static {
+        SmartDashboard.putData("Reset and Holding Commands", new ResetAndHoldingCommands());
+    }
+
     public ResetAndHoldingCommands() {
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty(
+            "Shooting Efficiency", 
+            () -> Constants.shooterSpeedTransferEfficiency, 
+            (efficiency) -> Constants.shooterSpeedTransferEfficiency = efficiency);
     }
 }

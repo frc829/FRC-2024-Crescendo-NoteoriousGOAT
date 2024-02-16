@@ -89,6 +89,10 @@ public class ManualCommands {
                 public static final Command ampReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
+                public static final Command fenderScore = ScoringCommands.createFender.get();
+                public static final Command fenderReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0))
+                                .apply(Degrees.of(0));
         }
 
         public static final class ResetAndHolding {

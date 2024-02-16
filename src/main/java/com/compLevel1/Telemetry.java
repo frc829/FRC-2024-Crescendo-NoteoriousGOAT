@@ -171,14 +171,8 @@ public class Telemetry {
                                         if (objectDetectorTranslation.isPresent()) {
                                                 Translation2d objectTranslation = objectDetectorTranslation.get();
                                                 Pose2d currentFieldPosition = telemetry.poseEstimate.get();
-                                                SmartDashboard.putNumberArray("objectTranslation", new double[] {
-                                                                objectTranslation.getX(), objectTranslation.getY() });
                                                 objectTranslation = objectTranslation.rotateBy(
                                                                 currentFieldPosition.getRotation());
-                                                SmartDashboard.putNumberArray("objectTranslationAfterRot",
-                                                                new double[] {
-                                                                                objectTranslation.getX(),
-                                                                                objectTranslation.getY() });
 
                                                 objectTranslation = currentFieldPosition.getTranslation()
                                                                 .plus(objectTranslation);

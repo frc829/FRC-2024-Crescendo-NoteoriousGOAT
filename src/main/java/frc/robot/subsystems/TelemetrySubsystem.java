@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -16,6 +18,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.Distance;
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,6 +43,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                     Math.toRadians(0)))));
   }
 
+  public final Measure<Velocity<Velocity<Distance>>> accelerationMag;
   public final Field2d field2d;
   public final Supplier<ChassisSpeeds> fieldSpeeds;
   public final Supplier<Pose2d> poseEstimate;
@@ -50,6 +56,7 @@ public class TelemetrySubsystem extends SubsystemBase {
   public final Runnable update;
 
   private TelemetrySubsystem(
+      Measure<Velocity<Velocity<Distance>>> accelerationMag,
       Field2d field2d,
       Supplier<ChassisSpeeds> fieldSpeeds,
       Supplier<Pose2d> poseEstimate,
@@ -60,6 +67,7 @@ public class TelemetrySubsystem extends SubsystemBase {
       List<Runnable> enableFieldDetectors,
       List<Runnable> enableObjectDetectors,
       Runnable update) {
+    this.accelerationMag = accelerationMag;
     this.field2d = field2d;
     this.fieldSpeeds = fieldSpeeds;
     this.poseEstimate = poseEstimate;
@@ -83,6 +91,77 @@ public class TelemetrySubsystem extends SubsystemBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
+    builder.addDoubleProperty(
+        "Linear Acceleration Mag",
+        () -> accelerationMag.in(MetersPerSecondPerSecond),
+        null);
+
+    builder.addDoubleProperty(
+        "Field Forward Velocity (mps)",
+        () -> fieldSpeeds.get().vxMetersPerSecond,
+        null);
+
+    builder.addDoubleProperty(
+        "Field Strafe Velocity (mps)",
+        () -> fieldSpeeds.get().vyMetersPerSecond,
+        null);
+
+    builder.addDoubleProperty(
+        "Field Rotational Velocity (dps)",
+        () -> Math.toDegrees(fieldSpeeds.get().omegaRadiansPerSecond),
+        null);
+
+    builder.addDoubleArrayProperty(
+        "Pose Estimate",
+        () -> new double[] {
+            poseEstimate.get().getX(),
+            poseEstimate.get().getY(),
+            poseEstimate.get().getRotation().getDegrees()
+        },
+        null);
+    for (var fieldDetectorPosition : fieldDetectorsPositions) {
+      builder.addDoubleArrayProperty(
+          "Field Pose from " + fieldDetectorPosition.getFirst(),
+          () -> {
+            Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
+            if (pose.isPresent()) {
+              return new double[] {
+                  poseEstimate.get().getX(),
+                  poseEstimate.get().getY(),
+                  poseEstimate.get().getRotation().getDegrees()
+              };
+            } else {
+              return new double[] {
+                  Double.NaN,
+                  Double.NaN,
+                  Double.NaN
+              };
+            }
+          },
+          null);
+    }
+
+    for (var objectDetectorPosition : objectPositions) {
+      builder.addDoubleArrayProperty(
+          "Object Pose from " + objectDetectorPosition.getFirst(),
+          () -> {
+            Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
+            if (pose.isPresent()) {
+              return new double[] {
+                  poseEstimate.get().getX(),
+                  poseEstimate.get().getY(),
+                  poseEstimate.get().getRotation().getDegrees()
+              };
+            } else {
+              return new double[] {
+                  Double.NaN,
+                  Double.NaN,
+                  Double.NaN
+              };
+            }
+          },
+          null);
+    }
 
   }
 
@@ -120,6 +199,7 @@ public class TelemetrySubsystem extends SubsystemBase {
     };
 
     return new TelemetrySubsystem(
+        telemetry.accelerationMag,
         telemetry.field2d,
         fieldSpeeds,
         telemetry.poseEstimate,

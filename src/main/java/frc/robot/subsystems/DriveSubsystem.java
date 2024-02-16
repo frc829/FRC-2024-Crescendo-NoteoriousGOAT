@@ -145,6 +145,8 @@ public class DriveSubsystem extends SubsystemBase {
                                 "Robot Rotational Velocity (dps)",
                                 () -> Math.toDegrees(robotSpeeds.get().omegaRadiansPerSecond),
                                 null);
+                //TODO:  add all voltage
+                //TODO:  add sensor angles
         }
 
         public static final Supplier<DriveSubsystem> create = () -> {
