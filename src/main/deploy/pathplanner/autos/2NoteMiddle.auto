@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "2NoteMidStart"
+          }
+        },
+        {
           "type": "race",
           "data": {
             "commands": [

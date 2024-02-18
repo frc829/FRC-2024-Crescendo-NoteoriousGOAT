@@ -21,7 +21,7 @@ public class ManualCommands {
 
         public static final class Tilt {
                 public static final Command drive = BasicCommands.Set.TiltDrive.create
-                                .apply(RobotContainer.operator.rightYValue);
+                                .apply(() -> RobotContainer.operator.rightYValue.getAsDouble() * 0.5);
         }
 
         public static final class Shooter {

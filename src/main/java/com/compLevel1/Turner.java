@@ -25,6 +25,7 @@ public class Turner {
     public final Runnable resetRelEncoderFromAbsolute;
     public final Runnable hold;
     public final Runnable update;
+    public final Runnable stop;
 
     private Turner(
             Measure<Voltage> voltage,
@@ -35,7 +36,8 @@ public class Turner {
             Consumer<Double> drive,
             Runnable resetRelEncoderFromAbsolute,
             Runnable hold,
-            Runnable update) {
+            Runnable update,
+            Runnable stop) {
         this.voltage = voltage;
         this.angle = angle;
         this.absoluteAngle = absoluteAngle;
@@ -45,10 +47,12 @@ public class Turner {
         this.resetRelEncoderFromAbsolute = resetRelEncoderFromAbsolute;
         this.hold = hold;
         this.update = update;
+        this.stop = stop;
     }
 
     public static final Function<Double, Function<Motor, Turner>> create = (gearing) -> (motor) -> {
         MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
+        MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
         MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
 
         MutableMeasure<Angle> turnSetpoint = MutableMeasure.zero(Rotations);
@@ -64,12 +68,16 @@ public class Turner {
             turnSetpoint.mut_setMagnitude(motor.angle.in(Rotations));
             motor.spin.accept(driveSetpoint);
         };
-        Runnable resetRelEncoderFromAbsolute = () -> motor.setRelativeEncoderAngle
-                .accept(motor.absoluteAngle.times(gearing));
+        Runnable resetRelEncoderFromAbsolute = () -> {
+            motor.setRelativeEncoderAngle
+                    .accept(motor.absoluteAngle.times(5 * 4 * 3));
+        };
         Runnable hold = () -> motor.turn.accept(turnSetpoint);
+        Runnable stop = () -> motor.stop.run();
         Runnable update = () -> {
             motor.update.run();
             angle.mut_setMagnitude(motor.angle.in(Rotations) / gearing);
+            absoluteAngle.mut_setMagnitude(motor.absoluteAngle.in(Rotations) * 18.0 / 56.0);
             velocity.mut_setMagnitude(motor.angularVelocity.in(RPM));
             velocity.mut_divide(motor.maxAngularVelocity.in(RPM));
         };
@@ -77,13 +85,14 @@ public class Turner {
         return new Turner(
                 motor.voltage,
                 angle,
-                motor.absoluteAngle,
+                absoluteAngle,
                 velocity,
                 turn,
                 drive,
                 resetRelEncoderFromAbsolute,
                 hold,
-                update);
+                update,
+                stop);
     };
 
 }

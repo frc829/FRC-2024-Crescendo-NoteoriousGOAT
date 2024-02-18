@@ -44,7 +44,9 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Measure<Dimensionless> velocity;
   public final Consumer<Measure<Angle>> turn;
   public final Consumer<Double> drive;
+  public final Runnable resetEncoder;
   public final Runnable hold;
+  public final Runnable stop; 
   public final Runnable update;
 
 
@@ -57,20 +59,23 @@ public class ShooterTiltSubsystem extends SubsystemBase {
       Consumer<Double> drive,
       Runnable resetRelEncoderFromAbsolute,
       Runnable hold,
+      Runnable stop,
       Runnable update) {
     this.voltage = voltage;
     this.angle = angle;
     this.absoluteAngle = absoluteAngle;
     this.velocity = velocity;
     this.turn = turn;
+    this.resetEncoder = resetRelEncoderFromAbsolute;
     this.drive = drive;
     this.hold = hold;
     this.update = update;
+    this.stop = stop;
 
     resetRelEncoderFromAbsolute.run();
 
-    Command defaultCommand = run(hold);
-    defaultCommand.setName("HOLD");
+    Command defaultCommand = run(stop);
+    defaultCommand.setName("STOP");
     this.setDefaultCommand(defaultCommand);
   }
 
@@ -114,7 +119,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkD.apply(1).apply(Constants.slot1kD))
         .andThen(Motor.REV.setkF.apply(1).apply(Constants.slot1kF))
         .andThen(Motor.REV.setAngleWrapping.apply(Constants.gearing))
-        .andThen(Motor.REV.setInvertAbsoluteEncoder)
         .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.invert)
         .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))
@@ -138,6 +142,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         turner.drive,
         turner.resetRelEncoderFromAbsolute,
         turner.hold,
+        turner.stop,
         turner.update);
   };
 }

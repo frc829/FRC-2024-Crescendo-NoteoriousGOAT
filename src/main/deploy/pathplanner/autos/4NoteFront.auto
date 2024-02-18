@@ -2,15 +2,21 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.68,
-      "y": 4.5
+      "x": 0.83,
+      "y": 6.49
     },
-    "rotation": -58.5
+    "rotation": 58.5
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "2NoteTopStart"
+          }
+        },
         {
           "type": "race",
           "data": {

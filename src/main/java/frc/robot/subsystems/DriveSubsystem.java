@@ -17,6 +17,10 @@ import java.util.function.Supplier;
 import com.compLevel0.Motor;
 import com.compLevel1.SwerveModule;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.utility.GoatMath;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -41,23 +45,23 @@ public class DriveSubsystem extends SubsystemBase {
         public static final class Constants {
                 private static final DCMotor driveDCMotor = DCMotor.getKrakenX60Foc(1);
                 private static final List<Integer> steerDeviceIds = Arrays.asList(10, 11, 12, 13);
-                private static final List<Double> steerGearings = Collections.nCopies(4, -150.0 / 7.0);
+                private static final List<Double> steerGearings = Collections.nCopies(4, 150.0 / 7.0);
                 private static final List<Integer> wheelDeviceIds = Arrays.asList(20, 21, 22, 23);
-                private static final List<Double> wheelGearings = Collections.nCopies(4, 6.75);
+                private static final List<Double> wheelGearings = Collections.nCopies(4, -5.90);
                 private static final List<Measure<Distance>> wheelRadii = Collections.nCopies(4, Inches.of(2));
                 private static final List<Integer> angleSensorIds = Arrays.asList(30, 31, 32, 33);
-                private static final String angleSensorCanbus = "rio";
+                private static final String angleSensorCanbus = "CANIVORE";
                 private static final List<Double> steerkPs = Collections.nCopies(4, 2.0);
                 private static final List<Double> steerkIs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkDs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkFs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkPs = Collections.nCopies(4, 0.11);
-                private static final List<Double> wheelkIs = Collections.nCopies(4, 0.5);
-                private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0001);
+                private static final List<Double> wheelkPs = Collections.nCopies(4, 0.0);
+                private static final List<Double> wheelkIs = Collections.nCopies(4, 0.0);
+                private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0000);
                 private static final List<Double> wheelkFs = Collections.nCopies(4, 0.12);
                 private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 5.0);
-                private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.1);
-                private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.001);
+                private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.00);
+                private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.000);
                 private static final List<Double> wheelFOCkFs = Collections.nCopies(4, 0.0);
                 private static final Measure<Distance> moduleX = Inches.of(13);
                 private static final Measure<Distance> moduleY = Inches.of(13);
@@ -69,7 +73,7 @@ public class DriveSubsystem extends SubsystemBase {
                 public static final Measure<Distance> driveRadius = Inches
                                 .of(Math.hypot(moduleX.in(Inches), moduleY.in(Inches)));
                 public static final Measure<Velocity<Distance>> maxLinearVelocity = MetersPerSecond.of(
-                                driveDCMotor.freeSpeedRadPerSec * wheelRadii.get(0).in(Meters) / wheelGearings.get(0));
+                                driveDCMotor.freeSpeedRadPerSec * wheelRadii.get(0).in(Meters) / Math.abs(wheelGearings.get(0)));
                 public static final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(
                                 maxLinearVelocity.in(MetersPerSecond) / driveRadius.in(Meters));
 
@@ -126,114 +130,131 @@ public class DriveSubsystem extends SubsystemBase {
                 super.initSendable(builder);
                 builder.addDoubleProperty(
                                 "Max Linear Velocity (mps)",
-                                () -> Constants.maxLinearVelocity.in(MetersPerSecond),
+                                () -> GoatMath.round(Constants.maxLinearVelocity.in(MetersPerSecond), 3),
                                 null);
 
                 builder.addDoubleProperty(
                                 "Max Angular Velocity (mps)",
-                                () -> Constants.maxAngularVelocity.in(RadiansPerSecond),
+                                () -> GoatMath.round(Constants.maxAngularVelocity.in(RadiansPerSecond), 3),
                                 null);
                 builder.addDoubleProperty(
                                 "Robot Forward Velocity (mps)",
-                                () -> robotSpeeds.get().vxMetersPerSecond,
+                                () -> GoatMath.round(robotSpeeds.get().vxMetersPerSecond, 3),
                                 null);
 
                 builder.addDoubleProperty(
                                 "Robot Strafe Velocity (mps)",
-                                () -> robotSpeeds.get().vyMetersPerSecond,
+                                () -> GoatMath.round(robotSpeeds.get().vyMetersPerSecond, 3),
                                 null);
 
                 builder.addDoubleProperty(
                                 "Robot Rotational Velocity (dps)",
-                                () -> Math.toDegrees(robotSpeeds.get().omegaRadiansPerSecond),
+                                () -> GoatMath.round(Math.toDegrees(robotSpeeds.get().omegaRadiansPerSecond), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Steer Voltage [%s]", 0),
-                                () -> steerVoltages.get(0).in(Volts),
+                                () -> GoatMath.round(steerVoltages.get(0).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Steer Voltage [%s]", 1),
-                                () -> steerVoltages.get(1).in(Volts),
+                                () -> GoatMath.round(steerVoltages.get(1).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Steer Voltage [%s]", 2),
-                                () -> steerVoltages.get(2).in(Volts),
+                                () -> GoatMath.round(steerVoltages.get(2).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Steer Voltage [%s]", 3),
-                                () -> steerVoltages.get(3).in(Volts),
+                                () -> GoatMath.round(steerVoltages.get(3).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Wheel Voltage [%s]", 0),
-                                () -> wheelVoltages.get(0).in(Volts),
+                                () -> GoatMath.round(wheelVoltages.get(0).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Wheel Voltage [%s]", 1),
-                                () -> wheelVoltages.get(1).in(Volts),
+                                () -> GoatMath.round(wheelVoltages.get(1).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Wheel Voltage [%s]", 2),
-                                () -> wheelVoltages.get(2).in(Volts),
+                                () -> GoatMath.round(wheelVoltages.get(2).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Wheel Voltage [%s]", 3),
-                                () -> wheelVoltages.get(3).in(Volts),
+                                () -> GoatMath.round(wheelVoltages.get(3).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 0),
-                                () -> angleSensorVoltages.get(0).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(0).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 1),
-                                () -> angleSensorVoltages.get(1).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(1).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 2),
-                                () -> angleSensorVoltages.get(2).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(2).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 3),
-                                () -> angleSensorVoltages.get(3).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(3).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 0),
-                                () -> angleSensorVoltages.get(0).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(0).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 1),
-                                () -> angleSensorVoltages.get(1).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(1).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 2),
-                                () -> angleSensorVoltages.get(2).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(2).in(Volts), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor Voltage [%s]", 3),
-                                () -> angleSensorVoltages.get(3).in(Volts),
+                                () -> GoatMath.round(angleSensorVoltages.get(3).in(Volts), 3),
                                 null);
 
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor [%s] Degrees", 0),
-                                () -> sensorAngles.get(0).in(Degrees),
+                                () -> GoatMath.round(sensorAngles.get(0).in(Degrees), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor [%s] Degrees", 1),
-                                () -> sensorAngles.get(1).in(Degrees),
+                                () -> GoatMath.round(sensorAngles.get(1).in(Degrees), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor [%s] Degrees", 2),
-                                () -> sensorAngles.get(2).in(Degrees),
+                                () -> GoatMath.round(sensorAngles.get(2).in(Degrees), 3),
                                 null);
                 builder.addDoubleProperty(
                                 String.format("Angle Sensor [%s] Degrees", 3),
-                                () -> sensorAngles.get(3).in(Degrees),
-                                null);        }
+                                () -> GoatMath.round(sensorAngles.get(3).in(Degrees), 3),
+                                null);
+        }
 
         public static final Supplier<DriveSubsystem> create = () -> {
 
                 List<SwerveModule> modules = Arrays.asList(0, 1, 2, 3).stream().map(
                                 (i) -> {
                                         TalonFXConfiguration config = new TalonFXConfiguration();
+                                        config.Voltage.PeakForwardVoltage = 12.0;
+                                        config.Voltage.PeakReverseVoltage = -12.0;
+                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
+                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
+                                        config.Slot0.kP = Constants.wheelkPs.get(i);
+                                        config.Slot0.kI = Constants.wheelkIs.get(i);
+                                        config.Slot0.kD = Constants.wheelkDs.get(i);
+                                        config.Slot0.kV = Constants.wheelkFs.get(i);
+                                        config.Slot1.kP = Constants.wheelFOCkPs.get(i);
+                                        config.Slot1.kI = Constants.wheelFOCkIs.get(i);
+                                        config.Slot1.kD = Constants.wheelFOCkDs.get(i);
+                                        config.Slot1.kV = Constants.wheelFOCkFs.get(i);
+                                        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+                                        TalonFX wheelTalonFX = Motor.CTRE.createTalonFX.apply("CANIVORE")
+                                                        .apply(Constants.wheelDeviceIds.get(i));
+                                        wheelTalonFX.getConfigurator().apply(config);
                                         return SwerveModule.create
                                                         .apply(Motor.REV.createCANSparkBaseNEO
                                                                         .andThen(Motor.REV.setkP.apply(1).apply(
@@ -269,43 +290,9 @@ public class DriveSubsystem extends SubsystemBase {
                                                                                         .apply(Constants.steerGearings
                                                                                                         .get(i)))
                                                                         .apply(Constants.steerDeviceIds.get(i)))
-                                                        .apply(Motor.CTRE.createTalonFX.apply("rio")
-                                                                        .andThen(Motor.CTRE.setkP.apply(0)
-                                                                                        .apply(Constants.wheelkPs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkI.apply(0)
-                                                                                        .apply(Constants.wheelkIs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkD.apply(0)
-                                                                                        .apply(Constants.wheelkDs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkV.apply(0)
-                                                                                        .apply(Constants.wheelkFs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkP.apply(2)
-                                                                                        .apply(Constants.wheelFOCkPs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkI.apply(2)
-                                                                                        .apply(Constants.wheelFOCkIs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkD.apply(2)
-                                                                                        .apply(Constants.wheelFOCkDs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setkV.apply(2)
-                                                                                        .apply(Constants.wheelFOCkFs
-                                                                                                        .get(i))
-                                                                                        .apply(config))
-                                                                        .andThen(Motor.CTRE.setBrake.apply(config))
-                                                                        .andThen(Motor.CTRE.createMotorFromTalonFX)
+                                                        .apply(Motor.CTRE.createMotorFromTalonFX
                                                                         .andThen(Motor.CTRE.setKrakenX60FOCMaxVelocity)
-                                                                        .apply(Constants.wheelDeviceIds.get(i)))
+                                                                        .apply(wheelTalonFX))
                                                         .apply(Constants.steerGearings.get(i))
                                                         .apply(Constants.wheelGearings.get(i))
                                                         .apply(Constants.wheelRadii.get(i))

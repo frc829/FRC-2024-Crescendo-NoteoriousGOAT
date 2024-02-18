@@ -1,15 +1,11 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 
 public class MechanismSubsystem extends SubsystemBase {
 
@@ -36,7 +32,7 @@ public class MechanismSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    elevatorShaft.setLength(RobotContainer.elevatorSubsystem.position.in(Meters));
-    shooter.setAngle(RobotContainer.shooterTiltSubsystem.angle.in(Degrees) - 75);
+    // elevatorShaft.setLength(RobotContainer.elevatorSubsystem.position.in(Meters));
+    // shooter.setAngle(RobotContainer.shooterTiltSubsystem.angle.in(Degrees) - 75);
   }
 }

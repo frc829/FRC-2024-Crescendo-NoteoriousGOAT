@@ -34,6 +34,7 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.RobotContainer;
 
 public class Motor {
@@ -192,11 +193,23 @@ public class Motor {
                                         MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                                         MutableMeasure<Velocity<Angle>> angularVelocity = MutableMeasure.zero(RPM);
                                         MutableMeasure<Velocity<Angle>> maxAngularVelocity = MutableMeasure.zero(RPM);
-                                        Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> canSparkBase
-                                                        .getEncoder()
-                                                        .setPosition(setpoint.in(Rotations));
-                                        Consumer<Measure<Angle>> turn = (setpoint) -> canSparkBase.getPIDController()
-                                                        .setReference(setpoint.in(Rotations), ControlType.kPosition, 1);
+                                        Consumer<Measure<Angle>> setRelativeEncoderAngle = (setpoint) -> {
+                                                canSparkBase
+                                                                .getEncoder()
+                                                                .setPosition(setpoint.in(Rotations) * gearing);
+                                        };
+                                        Consumer<Measure<Angle>> turn = (setpoint) -> {
+                                                if (canSparkBase.getDeviceId() == 10) {
+                                                        canSparkBase.getPIDController()
+                                                                        .setReference(setpoint.in(Rotations),
+                                                                                        ControlType.kPosition, 1);
+                                                } else {
+                                                        canSparkBase.getPIDController()
+                                                                        .setReference(setpoint.in(Rotations),
+                                                                                        ControlType.kPosition, 1);
+                                                }
+
+                                        };
                                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> canSparkBase
                                                         .getPIDController()
                                                         .setReference(setpoint.in(RPM), ControlType.kVelocity, 0);
@@ -207,6 +220,16 @@ public class Motor {
                                         Runnable stop = () -> canSparkBase.getPIDController()
                                                         .setReference(0.0, ControlType.kVelocity);
                                         Runnable update = () -> {
+                                                if (canSparkBase.getDeviceId() == 10
+                                                                || canSparkBase.getDeviceId() == 11) {
+                                                        double rots = canSparkBase.getEncoder().getPosition();
+                                                        double ughAngle = rots / gearing;
+                                                        ughAngle *= 360;
+                                                        SmartDashboard.putNumber(
+                                                                        "EncoderPoseRots" + canSparkBase.getDeviceId(),
+                                                                        ughAngle);
+
+                                                }
                                                 voltage.mut_setMagnitude(
                                                                 canSparkBase.getAppliedOutput()
                                                                                 * canSparkBase.getBusVoltage());
@@ -226,7 +249,7 @@ public class Motor {
 
                                         return new Motor(voltage, angle, absoluteAngle, angularVelocity,
                                                         maxAngularVelocity,
-                                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
+                                                        setRelativeEncoderAngle, turn, spin, setVoltage, stop, update);
                                 };
                 // #endregion
 
@@ -421,6 +444,8 @@ public class Motor {
                                                 talonFXConfiguration.Slot1.kV = gain;
                                         } else if (slotID == 2) {
                                                 talonFXConfiguration.Slot2.kV = gain;
+                                                talonFXConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 40;
+                                                talonFXConfiguration.TorqueCurrent.PeakReverseTorqueCurrent = -40;
                                         }
                                         talonFX.getConfigurator().apply(talonFXConfiguration);
                                         return talonFX;
@@ -457,7 +482,7 @@ public class Motor {
 
                         TalonFXSimState talonFXSimState = talonFX.getSimState();
                         DCMotorSim dcMotorSim = new DCMotorSim(
-                                        DCMotor.getKrakenX60Foc(1),
+                                        DCMotor.getKrakenX60(1),
                                         1,
                                         0.001);
 
@@ -491,8 +516,8 @@ public class Motor {
                                         0,
                                         0,
                                         0,
-                                        2,
-                                        false,
+                                        1,
+                                        true,
                                         false,
                                         false);
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
@@ -500,8 +525,19 @@ public class Motor {
                                         velocityDutyCycle.withVelocity(setpoint.in(RotationsPerSecond));
                                         talonFX.setControl(velocityDutyCycle);
                                 } else {
-                                        velocityTorqueCurrentFOC.withVelocity(setpoint.in(RotationsPerSecond));
-                                        talonFX.setControl(velocityTorqueCurrentFOC);
+                                        if (setpoint.in(RotationsPerSecond) > 0) {
+                                                talonFX.setControl(velocityTorqueCurrentFOC
+                                                                .withVelocity(setpoint.in(RotationsPerSecond))
+                                                                .withFeedForward(1));
+                                        } else if (setpoint.in(RotationsPerSecond) < 0) {
+                                                talonFX.setControl(velocityTorqueCurrentFOC
+                                                                .withVelocity(setpoint.in(RotationsPerSecond))
+                                                                .withFeedForward(-1));
+                                        } else {
+                                                talonFX.setControl(velocityTorqueCurrentFOC
+                                                                .withVelocity(setpoint.in(RotationsPerSecond))
+                                                                .withFeedForward(0));
+                                        }
                                 }
                         };
                         Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
@@ -520,6 +556,7 @@ public class Motor {
                                         double deltaTime = currentTime.in(Seconds)
                                                         - lastTime.in(Seconds);
                                         dcMotorSim.setInputVoltage(talonFXSimState.getMotorVoltage());
+                                        System.out.println(talonFXSimState.getSupplyCurrent());
                                         dcMotorSim.update(deltaTime);
                                         talonFXSimState.setRawRotorPosition(
                                                         dcMotorSim.getAngularPositionRotations());

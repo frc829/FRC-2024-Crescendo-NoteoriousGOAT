@@ -43,12 +43,12 @@ public class ScoringCommands implements Sendable {
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = 0.5;
-                        private static double bottomShooterPercent = 0.5;
-                        private static double transportPercent = 0.5;
-                        private static double singulatorPercent = 0.5;
+                        private static double topShooterPercent = -0.9;
+                        private static double bottomShooterPercent = 0.9;
+                        private static double transportPercent = 0.9;
+                        private static double singulatorPercent = -0.9;
                 }
 
                 private static final class Ranged {

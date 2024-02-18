@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commandCreators.DriveCommands;
+import frc.robot.commandCreators.TelemetryCommands;
 import frc.robot.commands.AutoCommands;
 import frc.robot.commands.ManualCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
@@ -46,7 +47,7 @@ public class RobotContainer {
                         private static final double deadband = 0.1;
                         private static final int driverPort = 0;
                         private static final int operatorPort = 1;
-                        private static final int testPort = 2;
+                        // private static final int testPort = 2;
                 }
 
                 private static final ReplanningConfig replanningConfig = new ReplanningConfig(
@@ -79,9 +80,9 @@ public class RobotContainer {
         public static final Controller operator = Controller.createFromXBox
                         .apply(Constants.Controller.operatorPort)
                         .apply(Constants.Controller.deadband);
-        public static final Controller test = Controller.createFromXBox
-                        .apply(Constants.Controller.testPort)
-                        .apply(Constants.Controller.deadband);
+        // public static final Controller test = Controller.createFromXBox
+        // .apply(Constants.Controller.testPort)
+        // .apply(Constants.Controller.deadband);
 
         public static final TopShooterSubsystem topShooterSubsystem = TopShooterSubsystem.create.get();
         public static final BottomShooterSubsystem bottomShooterSubsystem = BottomShooterSubsystem.create.get();
@@ -120,6 +121,7 @@ public class RobotContainer {
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
                 operator.leftY.whileTrue(ManualCommands.Elevator.drive);
                 operator.rightY.whileTrue(ManualCommands.Tilt.drive);
+                operator.fullTrigger.whileTrue(ManualCommands.Shooter.command);
                 operator.a.whileTrue(ManualCommands.Pickup.barf);
                 operator.b.whileTrue(ManualCommands.Pickup.groundPickup);
                 operator.b.whileFalse(ManualCommands.Pickup.groundPickupReset);
@@ -130,21 +132,27 @@ public class RobotContainer {
                 driver.a.onFalse(Commands.parallel(
                                 ManualCommands.Scoring.rangedReset,
                                 DriveCommands.createFieldCentricCommand.get()));
-
+                // driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
+                //                 .apply(TelemetryCommands.Constants.TwoNoteTopStart));
+                driver.start.onTrue(DriveCommands.createResetEncodersCommand.get());
                 operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
                 operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
                 operator.rightBumper.whileTrue(ManualCommands.Scoring.fenderScore);
                 operator.rightBumper.whileFalse(ManualCommands.Scoring.fenderReset);
+                driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
                 driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
                 driver.leftBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
                 driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
+                driver.padDown.whileTrue(DriveCommands.createTestFieldCentricCommand.get());
                 driver.rightBumper.whileFalse(
                                 Commands.sequence(
                                                 Commands.runOnce(telemetrySubsystem.enableFieldDetectors
                                                                 .get(0)::run,
                                                                 telemetrySubsystem),
                                                 ManualCommands.Pickup.noteDetectReset));
+                operator.start.onTrue(Commands.runOnce(shooterTiltSubsystem.resetEncoder, shooterTiltSubsystem));
+
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -158,18 +166,40 @@ public class RobotContainer {
                 ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
                 ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
+                // Runnable loadRhapsody = () -> orchestra.loadMusic("rhapsody.chrp");
+                // Runnable loadGiveYouUp = () ->
+                // orchestra.loadMusic("Never-Gonna-Give-You-Up-1.chrp");
+                // Runnable loadHogan = () -> orchestra.loadMusic("HogansHeroes.chrp");
+                // Runnable loadEastBound = () -> orchestra.loadMusic("EastBoundAndDown.chrp");
+
                 // Runnable playOrchestra = () -> {
                 // orchestra.play();
                 // };
-                // Command playOrchestraCommand = Commands.runOnce(playOrchestra);
+                // Command playRhapsodyCommand =
+                // Commands.runOnce(loadRhapsody).andThen(Commands.runOnce(playOrchestra));
+                // Command playGiveYouUp =
+                // Commands.runOnce(loadGiveYouUp).andThen(Commands.runOnce(playOrchestra));
+                // Command playHogan =
+                // Commands.runOnce(loadHogan).andThen(Commands.runOnce(playOrchestra));
+                // Command playEastBound =
+                // Commands.runOnce(loadEastBound).andThen(Commands.runOnce(playOrchestra));
 
                 // Runnable stopOrchestra = () -> {
                 // orchestra.stop();
                 // };
-                // Command stopOrchestraCommand = Commands.runOnce(stopOrchestra);
+                // Command stopRhapsody = Commands.runOnce(stopOrchestra);
+                // Command stopGiveYouUp = Commands.runOnce(stopOrchestra);
+                // Command stopHogan = Commands.runOnce(stopOrchestra);
+                // Command stopEastBound = Commands.runOnce(stopOrchestra);
 
-                // driver.y.whileTrue(playOrchestraCommand);
-                // driver.y.onFalse(stopOrchestraCommand);
+                // driver.a.whileTrue(playRhapsodyCommand);
+                // driver.a.onFalse(stopRhapsody);
+                // driver.b.whileTrue(playGiveYouUp);
+                // driver.b.onFalse(stopGiveYouUp);
+                // driver.x.whileTrue(playHogan);
+                // driver.x.onFalse(stopHogan);
+                // driver.y.whileTrue(playEastBound);
+                // driver.y.onFalse(stopEastBound);
                 new AutoCommands();
 
                 autoChooser = AutoBuilder.buildAutoChooser();

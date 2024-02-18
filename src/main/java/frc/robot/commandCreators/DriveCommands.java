@@ -1,7 +1,6 @@
 package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Optional;
@@ -14,6 +13,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -40,6 +41,47 @@ public class DriveCommands {
                                         Rotation2d.fromDegrees(-60.0));
                 }
         }
+
+        public static final Supplier<Command> createResetEncodersCommand = () -> {
+                Runnable reset = () -> RobotContainer.driveSubsystem.resetSteerEncodersFromAbsolutes.run();
+
+                Command command = Commands.runOnce(reset, RobotContainer.driveSubsystem);
+                command.setName("Reset Modules");
+                return command;
+        };
+
+        public static final Supplier<Command> createZeroModulesCommand = () -> {
+                SwerveDriveWheelStates zeroStates = new SwerveDriveWheelStates(
+                                new SwerveModuleState[] {
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState(),
+                                                new SwerveModuleState()
+                                });
+                Runnable zero = () -> RobotContainer.driveSubsystem.controlModules.accept(zeroStates);
+
+                Command command = Commands.run(zero, RobotContainer.driveSubsystem);
+                command.setName("Zero Modules");
+                return command;
+        };
+
+        public static final Supplier<Command> createTestFieldCentricCommand = () -> {
+                Translation2d cor = new Translation2d();
+                Runnable drive = () -> {
+                        ChassisSpeeds speeds = new ChassisSpeeds(1, 0, 0);
+                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+                                        RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
+                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
+                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
+                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
+                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
+                                        .apply(cor)
+                                        .accept(speeds);
+                };
+                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
+                command.setName("Test Field Centric");
+                return command;
+        };
 
         public static final Supplier<Command> createRobotCentricCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();

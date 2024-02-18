@@ -11,6 +11,7 @@ import com.compLevel0.FieldDetector;
 import com.compLevel0.Gyroscope;
 import com.compLevel0.ObjectDetector;
 import com.compLevel1.Telemetry;
+import com.utility.GoatMath;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,7 +33,7 @@ public class TelemetrySubsystem extends SubsystemBase {
     private static final class Constants {
         private static final double poseTranslationToleranceMeters = 0.05;
         private static final double poseRotationToleranceDegrees = 1;
-        private static final List<String> fieldDetectorNames = List.of("limelightFront", "limelightRear");
+        private static final List<String> fieldDetectorNames = List.of("limelightFront", "limelight-rear");
         private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                 new Pair<>(
                         "limelightFront",
@@ -96,40 +97,40 @@ public class TelemetrySubsystem extends SubsystemBase {
         super.initSendable(builder);
         builder.addDoubleProperty(
                 "Linear Acceleration Mag",
-                () -> accelerationMag.in(MetersPerSecondPerSecond),
+                () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond),3),
                 null);
 
         builder.addDoubleProperty(
                 "Angular Acceleration Mag",
-                () -> accelerationMag.in(MetersPerSecondPerSecond) / DriveSubsystem.Constants.driveRadius.in(Meters),
+                () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond) / DriveSubsystem.Constants.driveRadius.in(Meters),3),
                 null);
 
         builder.addDoubleProperty(
                 "Field Forward Velocity (mps)",
-                () -> fieldSpeeds.get().vxMetersPerSecond,
+                () -> GoatMath.round(fieldSpeeds.get().vxMetersPerSecond,3),
                 null);
 
         builder.addDoubleProperty(
                 "Field Strafe Velocity (mps)",
-                () -> fieldSpeeds.get().vyMetersPerSecond,
+                () -> GoatMath.round(fieldSpeeds.get().vyMetersPerSecond,3),
                 null);
 
         builder.addDoubleProperty(
                 "Field Rotational Velocity (dps)",
-                () -> Math.toDegrees(fieldSpeeds.get().omegaRadiansPerSecond),
+                () -> GoatMath.round(Math.toDegrees(fieldSpeeds.get().omegaRadiansPerSecond),3),
                 null);
 
         builder.addDoubleProperty(
                 "Pose Estimate X",
-                () -> poseEstimate.get().getX(),
+                () -> GoatMath.round(poseEstimate.get().getX(),3),
                 null);
         builder.addDoubleProperty(
                 "Pose Estimate Y",
-                () -> poseEstimate.get().getY(),
+                () -> GoatMath.round(poseEstimate.get().getY(),3),
                 null);
         builder.addDoubleProperty(
                 "Pose Estimate Theta",
-                () -> poseEstimate.get().getRotation().getDegrees(),
+                () -> GoatMath.round(poseEstimate.get().getRotation().getDegrees(),3),
                 null);
 
         for (var fieldDetectorPosition : fieldDetectorsPositions) {
@@ -137,15 +138,15 @@ public class TelemetrySubsystem extends SubsystemBase {
             if (pose.isPresent()) {
                 builder.addDoubleProperty(
                         "Field X from " + fieldDetectorPosition.getFirst(),
-                        () -> pose.get().getX(),
+                        () -> GoatMath.round(pose.get().getX(),3),
                         null);
                 builder.addDoubleProperty(
                         "Field Y from " + fieldDetectorPosition.getFirst(),
-                        () -> pose.get().getY(),
+                        () -> GoatMath.round(pose.get().getY(),3),
                         null);
                 builder.addDoubleProperty(
                         "Field Theta from " + fieldDetectorPosition.getFirst(),
-                        () -> pose.get().getRotation().getDegrees(),
+                        () -> GoatMath.round(pose.get().getRotation().getDegrees(),3),
                         null);
             } else {
                 builder.addDoubleProperty(
@@ -168,15 +169,15 @@ public class TelemetrySubsystem extends SubsystemBase {
             if (pose.isPresent()) {
                 builder.addDoubleProperty(
                         "Object X from " + objectDetectorPosition.getFirst(),
-                        () -> pose.get().getX(),
+                        () -> GoatMath.round(pose.get().getX(),3),
                         null);
                 builder.addDoubleProperty(
                         "Object Y from " + objectDetectorPosition.getFirst(),
-                        () -> pose.get().getY(),
+                        () -> GoatMath.round(pose.get().getY(),3),
                         null);
                 builder.addDoubleProperty(
                         "Object Theta from " + objectDetectorPosition.getFirst(),
-                        () -> pose.get().getRotation().getDegrees(),
+                        () -> GoatMath.round(pose.get().getRotation().getDegrees(),3),
                         null);
             } else {
                 builder.addDoubleProperty(
