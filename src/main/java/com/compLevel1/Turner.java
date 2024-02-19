@@ -70,7 +70,11 @@ public class Turner {
                     motor.spin.accept(driveSetpoint);
                 };
                 Runnable resetRelEncoderFromAbsolute = () -> {
-                    turnSetpoint.mut_setMagnitude(motor.absoluteAngle.in(Rotations) * (absGearingUp));
+                    double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
+                    if(absoluteAngleValue > 0.25 * absGearingDown){
+                        absoluteAngleValue -= 1.0;
+                    }
+                    turnSetpoint.mut_setMagnitude(absoluteAngleValue * (absGearingUp));
                     motor.setRelativeEncoderAngle
                             .accept(turnSetpoint);
                 };
@@ -79,7 +83,11 @@ public class Turner {
                 Runnable update = () -> {
                     motor.update.run();
                     angle.mut_setMagnitude(motor.angle.in(Rotations) / gearing);
-                    absoluteAngle.mut_setMagnitude(motor.absoluteAngle.in(Rotations) / absGearingDown);
+                    double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
+                    if(absoluteAngleValue > 0.25 * absGearingDown){
+                        absoluteAngleValue -= 1;
+                    }
+                    absoluteAngle.mut_setMagnitude(absoluteAngleValue / absGearingDown);
                     velocity.mut_setMagnitude(motor.angularVelocity.in(RPM));
                     velocity.mut_divide(motor.maxAngularVelocity.in(RPM));
                 };

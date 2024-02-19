@@ -221,9 +221,6 @@ public class Motor {
 
                                 double absoluteAngleValue = canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
                                                 .getPosition();
-                                if (absoluteAngleValue >= 0.5) {
-                                        absoluteAngleValue -= 1;
-                                }
                                 absoluteAngle.mut_setMagnitude(absoluteAngleValue);
 
                         };
