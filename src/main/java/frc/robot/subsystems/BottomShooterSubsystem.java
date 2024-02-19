@@ -80,7 +80,7 @@ public class BottomShooterSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
         .andThen(Motor.REV.enableCoast)
-        .andThen(Motor.REV.createMotorFromCANSparkBase.apply(1.0))
+        .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOVortexMaxVelocity)
         .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)

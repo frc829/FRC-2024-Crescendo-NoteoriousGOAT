@@ -104,7 +104,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkD.apply(1).apply(Constants.slot1kD))
         .andThen(Motor.REV.setkF.apply(1).apply(Constants.slot1kF))
         .andThen(Motor.REV.enableBrake)
-        .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))
+        .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setTurnSim
             .apply(Constants.slot1kP)

@@ -132,8 +132,8 @@ public class RobotContainer {
                 driver.a.onFalse(Commands.parallel(
                                 ManualCommands.Scoring.rangedReset,
                                 DriveCommands.createFieldCentricCommand.get()));
-                // driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
-                //                 .apply(TelemetryCommands.Constants.TwoNoteTopStart));
+                driver.b.onTrue(TelemetryCommands.createSetStartPoseCommand
+                                .apply(TelemetryCommands.Constants.TwoNoteTopStart));
                 driver.start.onTrue(DriveCommands.createResetEncodersCommand.get());
                 operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
                 operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);

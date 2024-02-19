@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Angle;
@@ -34,7 +33,7 @@ public class ScoringCommands implements Sendable {
         private static final class Constants {
                 private static final class Amp {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
-                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.5,
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.0,
                                         Meters);
                         private static double topShooterPercent = 0.5;
                         private static double bottomShooterPercent = 0.5;
@@ -43,12 +42,12 @@ public class ScoringCommands implements Sendable {
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = -0.9;
-                        private static double bottomShooterPercent = 0.9;
-                        private static double transportPercent = 0.9;
-                        private static double singulatorPercent = -0.9;
+                        private static double topShooterPercent = 0.5;
+                        private static double bottomShooterPercent = 0.5;
+                        private static double transportPercent = 0.5;
+                        private static double singulatorPercent = 0.5;
                 }
 
                 private static final class Ranged {
@@ -123,7 +122,7 @@ public class ScoringCommands implements Sendable {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
                                                 .minus(fieldPosition.getTranslation());
                                 pidController.reset();
-                                pidController.setSetpoint(targetVector.getAngle().minus(Rotation2d.fromDegrees(180)).getDegrees());
+                                pidController.setSetpoint(targetVector.getAngle().getDegrees());
                                 double distanceMeters = targetVector.getNorm();
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters
@@ -148,7 +147,7 @@ public class ScoringCommands implements Sendable {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
                                                 .minus(fieldPosition.getTranslation());
                                 pidController.reset();
-                                pidController.setSetpoint(targetVector.getAngle().minus(Rotation2d.fromDegrees(180)).getDegrees());
+                                pidController.setSetpoint(targetVector.getAngle().getDegrees());
                                 double distanceMeters = targetVector.getNorm();
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters

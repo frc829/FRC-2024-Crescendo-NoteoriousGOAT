@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -58,7 +59,7 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final List<Double> wheelkPs = Collections.nCopies(4, 0.0);
                 private static final List<Double> wheelkIs = Collections.nCopies(4, 0.0);
                 private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0000);
-                private static final List<Double> wheelkFs = Collections.nCopies(4, 0.12);
+                private static final List<Double> wheelkFs = Collections.nCopies(4, 1.0 / Units.radiansToRotations(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec));
                 private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 5.0);
                 private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.00);
                 private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.000);
@@ -73,7 +74,8 @@ public class DriveSubsystem extends SubsystemBase {
                 public static final Measure<Distance> driveRadius = Inches
                                 .of(Math.hypot(moduleX.in(Inches), moduleY.in(Inches)));
                 public static final Measure<Velocity<Distance>> maxLinearVelocity = MetersPerSecond.of(
-                                driveDCMotor.freeSpeedRadPerSec * wheelRadii.get(0).in(Meters) / Math.abs(wheelGearings.get(0)));
+                                driveDCMotor.freeSpeedRadPerSec * wheelRadii.get(0).in(Meters)
+                                                / Math.abs(wheelGearings.get(0)));
                 public static final Measure<Velocity<Angle>> maxAngularVelocity = RadiansPerSecond.of(
                                 maxLinearVelocity.in(MetersPerSecond) / driveRadius.in(Meters));
 
@@ -275,9 +277,7 @@ public class DriveSubsystem extends SubsystemBase {
                                                                                                                         .get(i)))
                                                                         .andThen(Motor.REV.enableBrake)
                                                                         .andThen(
-                                                                                        Motor.REV.createMotorFromCANSparkBase
-                                                                                                        .apply(Constants.steerGearings
-                                                                                                                        .get(i)))
+                                                                                        Motor.REV.createMotorFromCANSparkBase)
                                                                         .andThen(Motor.REV.setNEOMaxVelocity)
                                                                         .andThen(Motor.REV.setTurnSim
                                                                                         .apply(Constants.steerkPs
@@ -349,7 +349,7 @@ public class DriveSubsystem extends SubsystemBase {
                 Function<Translation2d, Consumer<ChassisSpeeds>> controlRobotChassisSpeeds = (
                                 centerOfRotation) -> (chassisSpeeds) -> {
                                         if (RobotBase.isSimulation()) {
-                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.06);
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.1);
                                         } else {
                                                 chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
                                         }

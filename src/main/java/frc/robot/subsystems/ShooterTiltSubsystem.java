@@ -27,6 +27,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   private static final class Constants {
     private static final int deviceId = 18;
     private static final double gearing = 5.0 * 4.0 * 3.0 * 56.0 / 18.0;
+    private static final double absoluteGearingUp = 5 * 4 * 3.0;
+    private static final double absoluteGearingDown = 56.0 / 18.0;
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
     private static final double slot0kD = 0.0;
@@ -74,8 +76,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
 
     resetRelEncoderFromAbsolute.run();
 
-    Command defaultCommand = run(stop);
-    defaultCommand.setName("STOP");
+    Command defaultCommand = run(hold);
+    defaultCommand.setName("HOLD");
     this.setDefaultCommand(defaultCommand);
   }
 
@@ -121,7 +123,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setAngleWrapping.apply(Constants.gearing))
         .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.invert)
-        .andThen(Motor.REV.createMotorFromCANSparkBase.apply(Constants.gearing))
+        .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setTurnSim
             .apply(Constants.slot1kP)
@@ -130,7 +132,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
             .apply(true)
             .apply(Constants.gearing))
         .andThen(Motor.REV.setSpinSim)
-        .andThen(Turner.create.apply(Constants.gearing))
+        .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp).apply(Constants.absoluteGearingDown))
         .apply(Constants.deviceId);
 
     return new ShooterTiltSubsystem(

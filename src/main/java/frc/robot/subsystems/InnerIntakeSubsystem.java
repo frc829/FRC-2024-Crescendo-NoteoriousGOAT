@@ -80,7 +80,7 @@ public class InnerIntakeSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
         .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
         .andThen(Motor.REV.enableBrake)
-        .andThen(Motor.REV.createMotorFromCANSparkBase.apply(1.0))
+        .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
         .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
