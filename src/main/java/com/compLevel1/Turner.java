@@ -1,5 +1,6 @@
 package com.compLevel1;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Value;
@@ -14,6 +15,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turner {
     public final Measure<Voltage> voltage;
@@ -71,12 +73,13 @@ public class Turner {
                 };
                 Runnable resetRelEncoderFromAbsolute = () -> {
                     double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
-                    if(absoluteAngleValue > 0.25 * absGearingDown){
+                    if (absoluteAngleValue > 0.25 * absGearingDown) {
                         absoluteAngleValue -= 1.0;
                     }
                     turnSetpoint.mut_setMagnitude(absoluteAngleValue * (absGearingUp));
                     motor.setRelativeEncoderAngle
                             .accept(turnSetpoint);
+
                 };
                 Runnable hold = () -> motor.turn.accept(turnSetpoint);
                 Runnable stop = () -> motor.stop.run();
@@ -84,12 +87,13 @@ public class Turner {
                     motor.update.run();
                     angle.mut_setMagnitude(motor.angle.in(Rotations) / gearing);
                     double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
-                    if(absoluteAngleValue > 0.25 * absGearingDown){
+                    if (absoluteAngleValue > 0.25 * absGearingDown) {
                         absoluteAngleValue -= 1;
                     }
                     absoluteAngle.mut_setMagnitude(absoluteAngleValue / absGearingDown);
                     velocity.mut_setMagnitude(motor.angularVelocity.in(RPM));
                     velocity.mut_divide(motor.maxAngularVelocity.in(RPM));
+                    SmartDashboard.putNumber("Turn Setpiont", turnSetpoint.in(Degrees) / gearing);
                 };
 
                 return new Turner(

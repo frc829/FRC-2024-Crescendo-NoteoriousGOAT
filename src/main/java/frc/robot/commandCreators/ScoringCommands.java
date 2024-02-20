@@ -19,52 +19,94 @@ import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotContainer;
+import static frc.robot.RobotContainer.*;
 
-public class ScoringCommands implements Sendable {
+public class ScoringCommands {
 
         private static final class Constants {
                 private static final class Amp {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
-                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.0,
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.30,
                                         Meters);
-                        private static double topShooterPercent = 0.5;
-                        private static double bottomShooterPercent = 0.5;
-                        private static double transportPercent = 0.5;
-                        private static double singulatorPercent = 0.5;
+                        private static double topShooterPercent = -0.6;
+                        private static double bottomShooterPercent = -0.6;
+                        private static double transportPercent = 0.9;
+                        private static double singulatorPercent = -0.9;
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = 0.5;
-                        private static double bottomShooterPercent = 0.5;
-                        private static double transportPercent = 0.5;
-                        private static double singulatorPercent = 0.5;
+                        private static double topShooterPercent = -0.6;
+                        private static double bottomShooterPercent = 0.6;
+                        private static double transportPercent = 0.9;
+                        private static double singulatorPercent = -0.9;
+                        private static final double shooterTolerancePercent = 0.10;
+
                 }
 
                 private static final class Ranged {
 
-                        private static double singulatorPercent = 0.0;
-                        private static double transportPercent = 0.0;
+                        private static final double singulatorPercent = 0.0;
+                        private static final double transportPercent = 0.0;
                         private static final double shooterTolerancePercent = 0.01;
+                }
+
+                private static final class SpinUp {
+                        private static final double topShooterPercent = Constants.Fender.topShooterPercent * 0.75;
+                        private static final double bottomShooterPercent = Constants.Fender.bottomShooterPercent * 0.75;
+                }
+
+                private static final class Climb {
+                        private static final Measure<Distance> elevatorHeightStart = Meters.of(0.36);
+                        private static final Measure<Distance> elevatorHeightEnd = Meters.of(0.10);
+
+                        private static final Measure<Angle> tiltAngle = Degrees.of(0.0);
                 }
         }
 
-        public static final Supplier<Command> createAmp = () -> {
-                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
+        public static final Supplier<Command> createClimbPrep = () -> {
+                Command command = ResetAndHoldingCommands.setElevatorTiltForever
+                                .apply(Constants.Climb.elevatorHeightStart)
+                                .apply(Constants.Climb.tiltAngle);
+                command.setName("Climb Prep");
+                return command;
+        };
+
+        public static final Supplier<Command> createClimbEnd = () -> {
+                Command command = ResetAndHoldingCommands.setElevatorTiltForever
+                                .apply(Constants.Climb.elevatorHeightEnd)
+                                .apply(Constants.Climb.tiltAngle);
+                command.setName("Climb End");
+                return command;
+        };
+
+        public static final Supplier<Command> createSpinUp = () -> {
+                Runnable spinUp = () -> {
+                        topShooterSubsystem.spin.accept(Constants.SpinUp.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.SpinUp.bottomShooterPercent);
+                };
+                Command spinUpCommand = Commands.run(spinUp, topShooterSubsystem,
+                                bottomShooterSubsystem);
+                spinUpCommand.setName("Spin Up");
+                return spinUpCommand;
+        };
+
+        public static final Supplier<Command> createAmpPosition = () -> {
+                Command command = ResetAndHoldingCommands.setElevatorTiltForever
                                 .apply(Constants.Amp.elevatorPosition)
                                 .apply(Constants.Amp.tiltAngle);
 
-                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
-                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                command.setName("Amp Position");
+                return command;
+        };
+
+        public static final Supplier<Command> createAmpDrop = () -> {
+
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Amp.transportPercent);
                 Command singulatorCommand = BasicCommands.Set.Singulator.create.apply(Constants.Amp.singulatorPercent);
                 Command topShooterCommand = BasicCommands.Set.TopShooter.create
@@ -72,13 +114,10 @@ public class ScoringCommands implements Sendable {
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Amp.bottomShooterPercent);
 
-                Command ampCommands = Commands
-                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
+                Command command = Commands
+                                .parallel(transportCommand, singulatorCommand,
                                                 topShooterCommand, bottomShooterCommand);
-
-                Command command = Commands.sequence(elevatorTiltCommand,
-                                ampCommands);
-                command.setName("Amp Score");
+                command.setName("Amp Drop");
                 return command;
         };
 
@@ -87,8 +126,35 @@ public class ScoringCommands implements Sendable {
                                 .apply(Constants.Fender.elevatorPosition)
                                 .apply(Constants.Fender.tiltAngle);
 
+                Runnable speedUpShooters = () -> {
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
+                };
+
+                Command speedUpShootersCommand1 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                Command elevatorTiltShootersCommand = Commands.race(speedUpShootersCommand1, elevatorTiltCommand);
+
+                Command speedUpShootersCommand2 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        return MathUtil.isNear(
+                                        Constants.Fender.topShooterPercent,
+                                        topShooterSubsystem.velocity.in(Value),
+                                        Constants.Fender.shooterTolerancePercent);
+                };
                 Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
+
                 Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
+
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
                 Command singulatorCommand = BasicCommands.Set.Singulator.create
                                 .apply(Constants.Fender.singulatorPercent);
@@ -97,11 +163,15 @@ public class ScoringCommands implements Sendable {
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Fender.bottomShooterPercent);
 
+                Command continueUpToSpeed = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
+                                .until(shootersAtSpeed);
+
                 Command shootCommands = Commands
-                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
+                                .parallel(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
                                                 topShooterCommand, bottomShooterCommand);
 
-                Command command = Commands.sequence(elevatorTiltCommand,
+                Command command = Commands.sequence(elevatorTiltShootersCommand, continueUpToSpeed,
                                 shootCommands);
                 command.setName("Fender Score");
                 return command;
@@ -116,7 +186,7 @@ public class ScoringCommands implements Sendable {
                 pidController.setTolerance(0.5);
 
                 Runnable setValues = () -> {
-                        Pose2d fieldPosition = RobotContainer.telemetrySubsystem.poseEstimate.get();
+                        Pose2d fieldPosition = telemetrySubsystem.poseEstimate.get();
                         Optional<Alliance> alliance = DriverStation.getAlliance();
                         if (alliance.get() == Alliance.Red) {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
@@ -172,16 +242,16 @@ public class ScoringCommands implements Sendable {
                 };
 
                 Runnable tilt = () -> {
-                        RobotContainer.shooterTiltSubsystem.turn.accept(tiltAngle);
+                        shooterTiltSubsystem.turn.accept(tiltAngle);
                 };
 
                 Runnable speedUpShooters = () -> {
-                        RobotContainer.topShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
-                        RobotContainer.bottomShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
+                        topShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
+                        bottomShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
                 };
 
                 Runnable rotateInPlace = () -> {
-                        double currentAngleDegrees = RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation()
+                        double currentAngleDegrees = telemetrySubsystem.poseEstimate.get().getRotation()
                                         .getDegrees();
                         currentAngleDegrees %= 360;
                         currentAngleDegrees = currentAngleDegrees >= 180 ? currentAngleDegrees - 360
@@ -191,29 +261,29 @@ public class ScoringCommands implements Sendable {
                         double degreesPerSecond = pidController.calculate(currentAngleDegrees);
                         double radiansPerSecond = Math.toRadians(degreesPerSecond);
                         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, radiansPerSecond);
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d())
+                        driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d())
                                         .accept(chassisSpeeds);
                 };
 
                 Command setValuesCommand = Commands.runOnce(setValues);
-                Command tiltCommand = Commands.run(tilt, RobotContainer.shooterTiltSubsystem);
+                Command tiltCommand = Commands.run(tilt, shooterTiltSubsystem);
                 Command speedUpShootersCommand = Commands.run(
                                 speedUpShooters,
-                                RobotContainer.topShooterSubsystem,
-                                RobotContainer.bottomShooterSubsystem);
-                Command rotateInPlaceCommand = Commands.run(rotateInPlace, RobotContainer.driveSubsystem);
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+                Command rotateInPlaceCommand = Commands.run(rotateInPlace, driveSubsystem);
 
                 BooleanSupplier shootersAtSpeed = () -> {
                         return MathUtil.isNear(
                                         shooterPercentMeasure.in(Value),
-                                        RobotContainer.topShooterSubsystem.velocity.in(Value),
+                                        topShooterSubsystem.velocity.in(Value),
                                         Constants.Ranged.shooterTolerancePercent);
                 };
 
                 BooleanSupplier tiltAtPosition = () -> {
                         return MathUtil.isNear(
                                         tiltAngle.in(Degrees),
-                                        RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
+                                        shooterTiltSubsystem.angle.in(Degrees),
                                         BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
                 };
 
@@ -226,7 +296,8 @@ public class ScoringCommands implements Sendable {
                                 .until(shooterTiltDriveAtSetpoint);
 
                 Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
-                Command driveStopCommand = Commands.run(RobotContainer.driveSubsystem.stop, RobotContainer.driveSubsystem);
+                Command driveStopCommand = Commands.run(driveSubsystem.stop,
+                                driveSubsystem);
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
                 Command singulatorCommand = BasicCommands.Set.Singulator.create
                                 .apply(Constants.Fender.singulatorPercent);
@@ -239,70 +310,6 @@ public class ScoringCommands implements Sendable {
                 return command;
         };
 
-        static {
-                SmartDashboard.putData("Scoring Commands", new ScoringCommands());
-        }
-
         public ScoringCommands() {
         }
-
-        @Override
-        public void initSendable(SendableBuilder builder) {
-                builder.addDoubleProperty(
-                                "Amp Transport Percent",
-                                () -> Constants.Amp.transportPercent,
-                                (percent) -> Constants.Amp.transportPercent = percent);
-                builder.addDoubleProperty(
-                                "Amp Singulator Percent",
-                                () -> Constants.Amp.singulatorPercent,
-                                (percent) -> Constants.Amp.singulatorPercent = percent);
-                builder.addDoubleProperty(
-                                "Amp Shooter Percent",
-                                () -> Constants.Amp.topShooterPercent,
-                                (percent) -> {
-                                        Constants.Amp.topShooterPercent = percent;
-                                        Constants.Amp.bottomShooterPercent = percent;
-                                });
-                builder.addDoubleProperty(
-                                "Amp Elevator Position",
-                                () -> Constants.Amp.elevatorPosition.in(Meters),
-                                (meters) -> Constants.Amp.elevatorPosition.mut_setMagnitude(meters));
-                builder.addDoubleProperty(
-                                "Amp Tilt Angle",
-                                () -> Constants.Amp.tiltAngle.in(Degrees),
-                                (degrees) -> Constants.Amp.tiltAngle.mut_setMagnitude(degrees));
-
-                builder.addDoubleProperty(
-                                "Fender Transport Percent",
-                                () -> Constants.Fender.transportPercent,
-                                (percent) -> Constants.Fender.transportPercent = percent);
-                builder.addDoubleProperty(
-                                "Fender Singulator Percent",
-                                () -> Constants.Fender.singulatorPercent,
-                                (percent) -> Constants.Fender.singulatorPercent = percent);
-                builder.addDoubleProperty(
-                                "Fender Shooter Percent",
-                                () -> Constants.Fender.topShooterPercent,
-                                (percent) -> {
-                                        Constants.Fender.topShooterPercent = percent;
-                                        Constants.Fender.bottomShooterPercent = percent;
-                                });
-                builder.addDoubleProperty(
-                                "Fender Tilt Angle",
-                                () -> {
-                                        var thiny = Constants.Amp.tiltAngle;
-                                        return thiny.in(Degrees);
-                                },
-                                (degrees) -> Constants.Amp.tiltAngle.mut_setMagnitude(degrees));
-
-                builder.addDoubleProperty(
-                                "Ranged Transport Percent",
-                                () -> Constants.Ranged.transportPercent,
-                                (percent) -> Constants.Ranged.transportPercent = percent);
-                builder.addDoubleProperty(
-                                "Ranged Singulator Percent",
-                                () -> Constants.Ranged.singulatorPercent,
-                                (percent) -> Constants.Ranged.singulatorPercent = percent);
-        }
-
 }

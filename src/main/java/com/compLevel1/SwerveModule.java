@@ -97,7 +97,12 @@ public class SwerveModule {
                                                                                 .zero(Rotations);
                                                                 Runnable resetSteerEncoderFromAbsolute = () -> {
                                                                         steerMotor.setRelativeEncoderAngle
-                                                                                        .accept(Rotations.of(angleSensor.measure.in(Rotations) * steerGearing));
+                                                                                        .accept(Rotations.of(
+                                                                                                        angleSensor.measure
+                                                                                                                        .in(Rotations)
+                                                                                                                        * steerGearing));
+
+
                                                                 };
 
                                                                 Runnable stopAndHold = () -> {

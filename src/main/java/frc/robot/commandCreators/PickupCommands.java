@@ -20,30 +20,30 @@ public class PickupCommands implements Sendable {
 
         private static final class Constants {
                 private static final class Ground {
-                        private static Measure<Angle> tiltAngle = Degrees.of(68);
-                        private static Measure<Distance> elevatorPosition = Meters.of(0.0);
+                        private static Measure<Angle> tiltAngle = Degrees.of(58);
+                        private static Measure<Distance> elevatorPosition = Meters.of(0);
                         private static double transportPercent = 0.9;
                         private static double innerIntakePercent = 0.9;
                         private static double outerIntakePercent = 0.9;
                 }
 
                 private static final class BabyBird {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(75, Degrees);
-                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.5,
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.0,
                                         Meters);
-                        private static double topShooterPercent = 0.5;
-                        private static double bottomShooterPercent = 0.5;
+                        private static double topShooterPercent = 0.3;
+                        private static double bottomShooterPercent = -0.3;
                         private static double transportPercent = 0.0;
-                        private static double singulatorPercent = 0.5;
+                        private static double singulatorPercent = 0.9;
                 }
 
                 private static final class Barf {
-                        private static double topShooterPercent = 0.9;
+                        private static double topShooterPercent = -0.9;
                         private static double bottomShooterPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static double transportPercent = 0.9;
-                        private static double innerIntakePercent = 0.9;
-                        private static double outerIntakePercent = 0.9;
+                        private static double innerIntakePercent = -0.9;
+                        private static double outerIntakePercent = -0.9;
                 }
         }
 

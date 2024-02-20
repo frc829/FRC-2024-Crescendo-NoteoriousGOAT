@@ -42,8 +42,20 @@ public class BasicCommands {
         public static final class ElevatorDrive {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
-                        .run(() -> RobotContainer.elevatorSubsystem.drive.accept(speed.getAsDouble()),
+                        .run(() -> {
+                            if (RobotContainer.elevatorSubsystem.position.in(Meters) >= 0.37
+                                    && speed.getAsDouble() > 0) {
+                                RobotContainer.elevatorSubsystem.drive.accept(0.0);
+
+                            } else if (RobotContainer.elevatorSubsystem.position.in(Meters) <= 0.0
+                                    && speed.getAsDouble() < 0) {
+                                RobotContainer.elevatorSubsystem.drive.accept(0.0);
+                            } else {
+                                RobotContainer.elevatorSubsystem.drive.accept(speed.getAsDouble());
+                            }
+                        },
                                 RobotContainer.elevatorSubsystem);
+
                 String name = String.format("Drive Elevator");
                 command.setName(name);
                 return command;
@@ -138,6 +150,7 @@ public class BasicCommands {
                 return command;
             };
         }
+
     }
 
     public BasicCommands() {

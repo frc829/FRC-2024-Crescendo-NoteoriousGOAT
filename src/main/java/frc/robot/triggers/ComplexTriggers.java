@@ -13,18 +13,18 @@ public class ComplexTriggers {
                         .or(RobotContainer.driver.leftY);
 
         public static final Trigger fieldCentricFLDriveTrigger = fieldCentricOriginDriveTrigger
-                        .and(RobotContainer.driver.x);
+                        .and(RobotContainer.driver.padLeft);
         public static final Trigger fieldCentricFRDriveTrigger = fieldCentricOriginDriveTrigger
-                        .and(RobotContainer.driver.b);
+                        .and(RobotContainer.driver.padRight);
 
         public static final Trigger robotCentricOriginDriveTrigger = fieldCentricOriginDriveTrigger.negate().and(
                         RobotContainer.driver.rightX.or(RobotContainer.driver.rightY)
                                         .or(RobotContainer.driver.fullTrigger));
 
         public static final Trigger robotCentricFLDriveTrigger = robotCentricOriginDriveTrigger
-                        .and(RobotContainer.driver.x);
+                        .and(RobotContainer.driver.padLeft);
         public static final Trigger robotCentricFRDriveTrigger = robotCentricOriginDriveTrigger
-                        .and(RobotContainer.driver.b);
+                        .and(RobotContainer.driver.padRight);
 
         // public static final Trigger templateTrigger = new Trigger(null);
 

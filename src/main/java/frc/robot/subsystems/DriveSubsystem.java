@@ -351,7 +351,7 @@ public class DriveSubsystem extends SubsystemBase {
                                         if (RobotBase.isSimulation()) {
                                                 chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.1);
                                         } else {
-                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+                                                chassisSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.1);
                                         }
                                         SwerveDriveWheelStates wheelSpeeds = new SwerveDriveWheelStates(
                                                         Constants.kinematics.toSwerveModuleStates(

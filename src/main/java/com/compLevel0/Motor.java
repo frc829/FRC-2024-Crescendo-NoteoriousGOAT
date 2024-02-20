@@ -219,9 +219,13 @@ public class Motor {
                                 angularVelocity.mut_setMagnitude(
                                                 canSparkBase.getEncoder().getVelocity());
 
-                                double absoluteAngleValue = canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
-                                                .getPosition();
-                                absoluteAngle.mut_setMagnitude(absoluteAngleValue);
+                                if (RobotBase.isSimulation()) {
+                                        absoluteAngle.mut_setMagnitude(0);
+                                } else {
+                                        double absoluteAngleValue = canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
+                                                        .getPosition();
+                                        absoluteAngle.mut_setMagnitude(absoluteAngleValue);
+                                }
 
                         };
 

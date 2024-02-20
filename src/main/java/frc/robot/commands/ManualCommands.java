@@ -21,13 +21,13 @@ public class ManualCommands {
 
         public static final class Tilt {
                 public static final Command drive = BasicCommands.Set.TiltDrive.create
-                                .apply(() -> RobotContainer.operator.rightYValue.getAsDouble() * 0.5);
+                                .apply(() -> -RobotContainer.operator.rightYValue.getAsDouble() * 0.5);
         }
 
         public static final class Shooter {
                 public static final Runnable shooterSpin = () -> {
                         RobotContainer.topShooterSubsystem.spin
-                                        .accept(RobotContainer.operator.fullTriggerValue.getAsDouble());
+                                        .accept(-RobotContainer.operator.fullTriggerValue.getAsDouble());
                         RobotContainer.bottomShooterSubsystem.spin
                                         .accept(RobotContainer.operator.fullTriggerValue.getAsDouble());
                 };
@@ -74,7 +74,7 @@ public class ManualCommands {
                 public static final Command groundPickupReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
-                public static final Command babyBirdPickup = PickupCommands.createGround.get();
+                public static final Command babyBirdPickup = PickupCommands.createBabyBird.get();
                 public static final Command babyBirdPickupReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
@@ -85,10 +85,11 @@ public class ManualCommands {
         }
 
         public static final class Scoring {
-                public static final Command ampScore = ScoringCommands.createAmp.get();
-                public static final Command ampReset = ResetAndHoldingCommands.setElevatorTiltUntil
+                public static final Command ampPosition = ScoringCommands.createAmpPosition.get();
+                public static final Command ampPositionReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
+                public static final Command ampDrop = ScoringCommands.createAmpDrop.get();
                 public static final Command fenderScore = ScoringCommands.createFender.get();
                 public static final Command fenderReset = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Meters.of(0))
@@ -97,10 +98,16 @@ public class ManualCommands {
                 public static final Command rangedReset = ResetAndHoldingCommands.setElevatorTiltForever
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
+                public static final Command spinUpCommand = ScoringCommands.createSpinUp.get();
+                public static final Command climbPrep = ScoringCommands.createClimbPrep.get();
+                public static final Command climbEnd = ScoringCommands.createClimbEnd.get();
         }
 
         public static final class ResetAndHolding {
                 public static final Command shooterAdjust = ResetAndHoldingCommands.distanceBasedShooterAdjust.get();
+                public static final Command level = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0.0))
+                                .apply(Degrees.of(0.0));
 
         }
 
@@ -110,5 +117,6 @@ public class ManualCommands {
                 Shooter.command.setName("Manual Shooter");
                 Drive.FieldCentric.command.setName("Manual Field Centric");
                 Drive.ZeroModules.command.setName("Zero Modules");
+                ResetAndHolding.level.setName("Level");
         }
 }

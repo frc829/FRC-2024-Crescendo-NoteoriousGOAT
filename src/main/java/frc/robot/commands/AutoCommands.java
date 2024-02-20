@@ -16,7 +16,7 @@ public class AutoCommands {
         NamedCommands.registerCommand("RangedShoot", ScoringCommands.createRanged.get());
         NamedCommands.registerCommand("FenderShoot", ScoringCommands.createFender.get());
         NamedCommands.registerCommand("Pickup", PickupCommands.createGround.get());
-        NamedCommands.registerCommand("Amp", ScoringCommands.createAmp.get());
+        NamedCommands.registerCommand("Amp", ScoringCommands.createAmpPosition.get());
         NamedCommands.registerCommand("GetLow",
                 ResetAndHoldingCommands.setElevatorTiltForever.apply(Meters.of(0.0)).apply(Degrees.of(0)));
         NamedCommands.registerCommand("2NoteTopStart",

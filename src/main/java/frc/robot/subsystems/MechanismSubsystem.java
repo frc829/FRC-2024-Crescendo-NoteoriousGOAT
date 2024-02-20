@@ -1,11 +1,16 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 
 public class MechanismSubsystem extends SubsystemBase {
 
@@ -26,13 +31,16 @@ public class MechanismSubsystem extends SubsystemBase {
     shooter = elevatorShaft.append(new MechanismLigament2d("shooter", 0.5, -75));
     shooter.setLineWeight(1.0);
     shooter.setColor(new Color8Bit("#FFFF00"));
-    SmartDashboard.putData("Mech", mech);
+    if (RobotBase.isSimulation()) {
+      SmartDashboard.putData("Mech", mech);
+
+    }
 
   }
 
   @Override
   public void periodic() {
-    // elevatorShaft.setLength(RobotContainer.elevatorSubsystem.position.in(Meters));
-    // shooter.setAngle(RobotContainer.shooterTiltSubsystem.angle.in(Degrees) - 75);
+    elevatorShaft.setLength(RobotContainer.elevatorSubsystem.position.in(Meters));
+    shooter.setAngle(RobotContainer.shooterTiltSubsystem.angle.in(Degrees) - 75);
   }
 }

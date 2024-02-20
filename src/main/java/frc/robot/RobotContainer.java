@@ -119,40 +119,40 @@ public class RobotContainer {
                 SmartDashboard.putData("Elevator", elevatorSubsystem);
                 SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
+
+                operator.back.onTrue(ManualCommands.ResetAndHolding.level);
                 operator.leftY.whileTrue(ManualCommands.Elevator.drive);
                 operator.rightY.whileTrue(ManualCommands.Tilt.drive);
                 operator.fullTrigger.whileTrue(ManualCommands.Shooter.command);
-                operator.a.whileTrue(ManualCommands.Pickup.barf);
-                operator.b.whileTrue(ManualCommands.Pickup.groundPickup);
-                operator.b.whileFalse(ManualCommands.Pickup.groundPickupReset);
-                operator.x.whileTrue(ManualCommands.Pickup.babyBirdPickup);
-                operator.x.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
-                operator.y.whileTrue(ManualCommands.ResetAndHolding.shooterAdjust);
-                driver.a.whileTrue(ManualCommands.Scoring.rangedScore);
-                driver.a.onFalse(Commands.parallel(
+                operator.b.whileTrue(ManualCommands.Pickup.barf);
+                operator.y.whileTrue(ManualCommands.Scoring.spinUpCommand);
+                operator.x.whileTrue(ManualCommands.Scoring.climbPrep);
+                operator.x.onFalse(ManualCommands.Scoring.climbEnd);
+                operator.a.whileTrue(ManualCommands.Scoring.ampPosition);
+                operator.a.onFalse(ManualCommands.Scoring.ampPositionReset);
+                operator.leftBumper.whileTrue(ManualCommands.Pickup.groundPickup);
+                operator.leftBumper.whileFalse(ManualCommands.Pickup.groundPickupReset);
+                operator.rightBumper.whileTrue(ManualCommands.Pickup.babyBirdPickup);
+                operator.rightBumper.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
+
+                driver.leftBumper.whileTrue(ManualCommands.Scoring.fenderScore);
+                driver.leftBumper.whileFalse(ManualCommands.Scoring.fenderReset);
+                driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
+
+                driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
+                driver.rightBumper.onFalse(Commands.parallel(
                                 ManualCommands.Scoring.rangedReset,
                                 DriveCommands.createFieldCentricCommand.get()));
-                driver.b.onTrue(TelemetryCommands.createSetStartPoseCommand
+                driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.TwoNoteTopStart));
-                driver.start.onTrue(DriveCommands.createResetEncodersCommand.get());
-                operator.leftBumper.whileTrue(ManualCommands.Scoring.ampScore);
-                operator.leftBumper.whileFalse(ManualCommands.Scoring.ampReset);
-                operator.rightBumper.whileTrue(ManualCommands.Scoring.fenderScore);
-                operator.rightBumper.whileFalse(ManualCommands.Scoring.fenderReset);
-                driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
-                driver.leftBumper.whileTrue(ManualCommands.Drive.Positions.source);
-                driver.leftBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
-                driver.rightBumper.whileTrue(ManualCommands.Pickup.noteDetectPickup);
-                driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
-                driver.padDown.whileTrue(DriveCommands.createTestFieldCentricCommand.get());
-                driver.rightBumper.whileFalse(
+                driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
+                driver.x.whileTrue(
                                 Commands.sequence(
                                                 Commands.runOnce(telemetrySubsystem.enableFieldDetectors
                                                                 .get(0)::run,
                                                                 telemetrySubsystem),
                                                 ManualCommands.Pickup.noteDetectReset));
-                operator.start.onTrue(Commands.runOnce(shooterTiltSubsystem.resetEncoder, shooterTiltSubsystem));
-
+                driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -200,11 +200,17 @@ public class RobotContainer {
                 // driver.x.onFalse(stopHogan);
                 // driver.y.whileTrue(playEastBound);
                 // driver.y.onFalse(stopEastBound);
+
                 new AutoCommands();
 
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
+        }
+
+        public void resetEncoders() {
+                shooterTiltSubsystem.resetRelEncoderFromAbsolute.run();
+                driveSubsystem.resetSteerEncodersFromAbsolutes.run();
         }
 
         public Command getAutonomousCommand() {
