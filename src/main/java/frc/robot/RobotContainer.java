@@ -146,12 +146,9 @@ public class RobotContainer {
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.TwoNoteTopStart));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
-                driver.x.whileTrue(
-                                Commands.sequence(
-                                                Commands.runOnce(telemetrySubsystem.enableFieldDetectors
-                                                                .get(0)::run,
-                                                                telemetrySubsystem),
-                                                ManualCommands.Pickup.noteDetectReset));
+
+                
+                
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);

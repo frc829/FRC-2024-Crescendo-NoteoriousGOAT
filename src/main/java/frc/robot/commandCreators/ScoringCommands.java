@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Angle;
@@ -50,9 +51,6 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-
-                        private static final double singulatorPercent = 0.0;
-                        private static final double transportPercent = 0.0;
                         private static final double shooterTolerancePercent = 0.01;
                 }
 
@@ -191,8 +189,9 @@ public class ScoringCommands {
                         if (alliance.get() == Alliance.Red) {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
                                                 .minus(fieldPosition.getTranslation());
+                                Rotation2d targetRotation = targetVector.getAngle().rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
-                                pidController.setSetpoint(targetVector.getAngle().getDegrees());
+                                pidController.setSetpoint(targetRotation.getDegrees());
                                 double distanceMeters = targetVector.getNorm();
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters
@@ -216,8 +215,9 @@ public class ScoringCommands {
                         } else {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
                                                 .minus(fieldPosition.getTranslation());
+                                Rotation2d targetRotation = targetVector.getAngle().rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
-                                pidController.setSetpoint(targetVector.getAngle().getDegrees());
+                                pidController.setSetpoint(targetRotation.getDegrees());
                                 double distanceMeters = targetVector.getNorm();
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters
