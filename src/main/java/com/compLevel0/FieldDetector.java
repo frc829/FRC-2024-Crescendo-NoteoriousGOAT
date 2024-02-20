@@ -95,7 +95,8 @@ public class FieldDetector {
                     Runnable update = () -> {
                         double[] poseArray = botpose_wpiblueSupplier.getDoubleArray(new double[7]);
                         fieldX.mut_setMagnitude(poseArray[0]);
-                        fieldX.mut_setMagnitude(poseArray[1]);
+                        fieldY.mut_setMagnitude(poseArray[1]);
+                        fieldYaw.mut_setMagnitude(poseArray[5]);
                         latencyMeasure.mut_setMagnitude(poseArray[6]);
                     };
 

@@ -22,6 +22,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import static frc.robot.RobotContainer.*;
@@ -119,6 +120,48 @@ public class ScoringCommands {
                 return command;
         };
 
+        public static final Supplier<Command> createTest = () -> {
+                SmartDashboard.putNumber("Test Shooter Speeds", Constants.Fender.topShooterPercent);
+                SmartDashboard.putNumber("Test Shooter Tolerance", Constants.Fender.shooterTolerancePercent);
+                Runnable speedUpShooters = () -> {
+                        double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
+
+                        topShooterSubsystem.spin.accept(shooterSpeed);
+                        bottomShooterSubsystem.spin.accept(shooterSpeed);
+                };
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
+                        double shooterTolerance = SmartDashboard.getNumber("Test Shooter Tolerance", 0);
+                        return MathUtil.isNear(
+                                        shooterSpeed,
+                                        topShooterSubsystem.velocity.in(Value),
+                                        shooterTolerance);
+                };
+
+                Command speedUpShootersCommand = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem)
+                                .until(shootersAtSpeed);
+
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> SmartDashboard.getNumber("Test Shooter Speeds", 0));
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> SmartDashboard.getNumber("Test Shooter Speeds", 0));
+
+                Command shootCommands = Commands
+                                .parallel(transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand);
+
+                Command command = Commands.sequence(speedUpShootersCommand, shootCommands);
+                command.setName("Test Score");
+                return command;
+        };
+
         public static final Supplier<Command> createFender = () -> {
                 Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
                                 .apply(Constants.Fender.elevatorPosition)
@@ -189,7 +232,8 @@ public class ScoringCommands {
                         if (alliance.get() == Alliance.Red) {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
                                                 .minus(fieldPosition.getTranslation());
-                                Rotation2d targetRotation = targetVector.getAngle().rotateBy(Rotation2d.fromDegrees(180));
+                                Rotation2d targetRotation = targetVector.getAngle()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
                                 double distanceMeters = targetVector.getNorm();
@@ -215,7 +259,8 @@ public class ScoringCommands {
                         } else {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
                                                 .minus(fieldPosition.getTranslation());
-                                Rotation2d targetRotation = targetVector.getAngle().rotateBy(Rotation2d.fromDegrees(180));
+                                Rotation2d targetRotation = targetVector.getAngle()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
                                 double distanceMeters = targetVector.getNorm();

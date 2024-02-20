@@ -33,10 +33,10 @@ public class TelemetrySubsystem extends SubsystemBase {
     private static final class Constants {
         private static final double poseTranslationToleranceMeters = 0.05;
         private static final double poseRotationToleranceDegrees = 1;
-        private static final List<String> fieldDetectorNames = List.of("limelightFront", "limelight-rear");
+        private static final List<String> fieldDetectorNames = List.of("limelight-front", "limelight-rear");
         private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                 new Pair<>(
-                        "limelightFront",
+                        "limelight-front",
                         new Pose3d(
                                 Units.inchesToMeters(0),
                                 Units.inchesToMeters(0),

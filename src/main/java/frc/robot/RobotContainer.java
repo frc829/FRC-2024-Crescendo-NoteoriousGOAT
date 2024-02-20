@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commandCreators.DriveCommands;
+import frc.robot.commandCreators.ScoringCommands;
 import frc.robot.commandCreators.TelemetryCommands;
 import frc.robot.commands.AutoCommands;
 import frc.robot.commands.ManualCommands;
@@ -130,6 +131,7 @@ public class RobotContainer {
                 operator.x.onFalse(ManualCommands.Scoring.climbEnd);
                 operator.a.whileTrue(ManualCommands.Scoring.ampPosition);
                 operator.a.onFalse(ManualCommands.Scoring.ampPositionReset);
+                operator.padDown.whileTrue(ScoringCommands.createTest.get());
                 operator.leftBumper.whileTrue(ManualCommands.Pickup.groundPickup);
                 operator.leftBumper.whileFalse(ManualCommands.Pickup.groundPickupReset);
                 operator.rightBumper.whileTrue(ManualCommands.Pickup.babyBirdPickup);
