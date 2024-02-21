@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.76,
+      "y": 6.51
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerTopStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerTop-TopNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopNote-SpeakerTop"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fender-2Notes",
+  "choreoAuto": false
+}

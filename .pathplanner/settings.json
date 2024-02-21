@@ -3,7 +3,11 @@
   "robotLength": 0.66,
   "holonomicMode": true,
   "pathFolders": [],
-  "autoFolders": [],
+  "autoFolders": [
+    "Fender-2Notes",
+    "Fender-3Notes",
+    "Fender-4Notes"
+  ],
   "defaultMaxVel": 5.22,
   "defaultMaxAccel": 5.22,
   "defaultMaxAngVel": 641.6,

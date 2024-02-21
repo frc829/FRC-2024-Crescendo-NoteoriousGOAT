@@ -19,12 +19,12 @@ public class AutoCommands {
         NamedCommands.registerCommand("Amp", ScoringCommands.createAmpPosition.get());
         NamedCommands.registerCommand("GetLow",
                 ResetAndHoldingCommands.setElevatorTiltForever.apply(Meters.of(0.0)).apply(Degrees.of(0)));
-        NamedCommands.registerCommand("2NoteTopStart",
-                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.TwoNoteTopStart));
-        NamedCommands.registerCommand("2NoteMidStart",
-                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.TwoNoteMidStart));
-        NamedCommands.registerCommand("2NoteBottomStart",
-                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.TwoNoteMidBottom));
+        NamedCommands.registerCommand("SpeakerTopStart",
+                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.SpeakerTopStart));
+        NamedCommands.registerCommand("SpeakerMidStart",
+                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.SpeakerMidStart));
+        NamedCommands.registerCommand("SpeakerBotStart",
+                TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.SpeakerBotStart));
         NamedCommands.registerCommand("AmpStart",
                 TelemetryCommands.createSetStartPoseCommand.apply(TelemetryCommands.Constants.AmpStart));
     }

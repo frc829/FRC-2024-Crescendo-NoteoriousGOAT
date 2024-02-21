@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.24,
+      "y": 5.53
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerMidStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerMid-MidNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidNote-SpeakerMid"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerMid-TopNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopNote-SpeakerMid"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fender-3Notes",
+  "choreoAuto": false
+}

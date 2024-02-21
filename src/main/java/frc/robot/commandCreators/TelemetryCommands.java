@@ -12,9 +12,9 @@ import frc.robot.RobotContainer;
 public class TelemetryCommands {
 
         public static final class Constants {
-                public static final Pose2d TwoNoteTopStart = new Pose2d(0.83, 6.49, Rotation2d.fromDegrees(58.50));
-                public static final Pose2d TwoNoteMidStart = new Pose2d(1.22, 5.50, Rotation2d.fromDegrees(0));
-                public static final Pose2d TwoNoteMidBottom = new Pose2d(0.68, 4.50, Rotation2d.fromDegrees(-59.62));
+                public static final Pose2d SpeakerTopStart = new Pose2d(0.76, 6.51, Rotation2d.fromDegrees(60.00));
+                public static final Pose2d SpeakerMidStart = new Pose2d(1.24, 5.53, Rotation2d.fromDegrees(0));
+                public static final Pose2d SpeakerBotStart = new Pose2d(0.73, 4.54, Rotation2d.fromDegrees(120.0));
                 public static final Pose2d AmpStart = new Pose2d(1.56, 7.41, Rotation2d.fromDegrees(90));
 
                 public static final double fieldLengthMeters = 16.542;

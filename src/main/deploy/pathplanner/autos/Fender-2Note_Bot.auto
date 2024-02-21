@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.73,
+      "y": 4.54
+    },
+    "rotation": 120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerBotStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerBot-BotNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BotNote-SpeakerBot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fender-2Notes",
+  "choreoAuto": false
+}

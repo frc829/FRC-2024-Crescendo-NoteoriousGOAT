@@ -1,0 +1,49 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.73,
+      "y": 4.54
+    },
+    "rotation": 120.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerBotStart"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerBot-BotNote"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BotNote-SpeakerBot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerBot-FarBot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBot-SpeakerBot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Fender-3Notes",
+  "choreoAuto": false
+}

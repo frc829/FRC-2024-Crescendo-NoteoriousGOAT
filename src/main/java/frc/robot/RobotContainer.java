@@ -146,10 +146,10 @@ public class RobotContainer {
                                 ManualCommands.Scoring.rangedReset,
                                 DriveCommands.createFieldCentricCommand.get()));
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
-                                .apply(TelemetryCommands.Constants.TwoNoteTopStart));
+                                .apply(TelemetryCommands.Constants.SpeakerTopStart));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
 
-                
+
                 
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 ComplexTriggers.robotCentricOriginDriveTrigger
