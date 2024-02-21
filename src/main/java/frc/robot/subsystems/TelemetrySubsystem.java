@@ -252,12 +252,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                         .accept(latency);
                                                         SmartDashboard.putNumber("Pose Added to Estimater at TimeIndex",
                                                                         Timer.getFPGATimestamp());
-                                                } else {
-                                                        telemetry.setPoseEstimate.accept(pose);
-                                                        SmartDashboard.putNumber("Pose Estimator Reset at TimeIndex",
-                                                                        Timer.getFPGATimestamp());
-
-                                                }
+                                                } 
                                         }
                                 }
                         }

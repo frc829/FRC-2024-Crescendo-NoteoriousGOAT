@@ -21,7 +21,11 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     for (int port = 5800; port <= 5807; port++) {
-      PortForwarder.add(port, "limelight.local", port);
+      PortForwarder.add(port, "limelight-front.local", port);
+    }
+
+    for (int port = 5800; port <= 5807; port++) {
+      PortForwarder.add(port+100, "limelight-rear.local", port);
     }
 
     m_robotContainer = new RobotContainer();

@@ -146,8 +146,8 @@ public class RobotContainer {
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.SpeakerTopStart));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
-                driver.x.whileTrue(PickupCommands.createNoteDetect.get());
-                driver.x.onFalse(DriveCommands.createFieldCentricCommand.get());
+                // driver.x.whileTrue(PickupCommands.createNoteDetect.get());
+                // driver.x.onFalse(DriveCommands.createFieldCentricCommand.get());
 
                 
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);

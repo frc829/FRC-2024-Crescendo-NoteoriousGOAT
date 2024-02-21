@@ -20,7 +20,7 @@ public class NotedLoadedSubsystem extends SubsystemBase {
   private static final class Constants {
     private static final int deviceId = 34;
     private static final Measure<Distance> minOn = Millimeters.of(1);
-    private static final Measure<Distance> maxOn = Inches.of(4);
+    private static final Measure<Distance> maxOn = Millimeters.of(12);
   }
 
   public final BooleanSupplier hasNote;
