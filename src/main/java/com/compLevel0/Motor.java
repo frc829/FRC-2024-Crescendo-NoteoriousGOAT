@@ -361,14 +361,6 @@ public class Motor {
                                         TalonFX talonFX = new TalonFX(deviceId, canbus);
                                         TalonFXConfiguration config = new TalonFXConfiguration();
                                         RobotContainer.orchestra.addInstrument(talonFX);
-                                        // Attempt to load the chrp
-                                        var status = RobotContainer.orchestra.loadMusic("rhapsody.chrp");
-
-                                        if (!status.isOK()) {
-                                                // log error
-                                        } else {
-                                                System.out.println(status.getDescription());
-                                        }
                                         config.Voltage.PeakForwardVoltage = 12.0;
                                         config.Voltage.PeakReverseVoltage = -12.0;
                                         config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
@@ -538,7 +530,6 @@ public class Motor {
                                         double deltaTime = currentTime.in(Seconds)
                                                         - lastTime.in(Seconds);
                                         dcMotorSim.setInputVoltage(talonFXSimState.getMotorVoltage());
-                                        System.out.println(talonFXSimState.getSupplyCurrent());
                                         dcMotorSim.update(deltaTime);
                                         talonFXSimState.setRawRotorPosition(
                                                         dcMotorSim.getAngularPositionRotations());

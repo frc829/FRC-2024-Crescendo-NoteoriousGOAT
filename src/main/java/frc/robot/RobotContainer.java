@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commandCreators.DriveCommands;
+import frc.robot.commandCreators.PickupCommands;
 import frc.robot.commandCreators.ScoringCommands;
 import frc.robot.commandCreators.TelemetryCommands;
 import frc.robot.commands.AutoCommands;
@@ -142,16 +142,16 @@ public class RobotContainer {
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
                 driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
-                driver.rightBumper.onFalse(Commands.parallel(
-                                ManualCommands.Scoring.rangedReset,
-                                DriveCommands.createFieldCentricCommand.get()));
+                driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.SpeakerTopStart));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
-
+                driver.x.whileTrue(PickupCommands.createNoteDetect.get());
+                driver.x.onFalse(DriveCommands.createFieldCentricCommand.get());
 
                 
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
+                driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
                 ComplexTriggers.fieldCentricOriginDriveTrigger

@@ -1,6 +1,5 @@
 package com.compLevel1;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Value;
@@ -15,7 +14,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Turner {
     public final Measure<Voltage> voltage;
@@ -93,7 +91,6 @@ public class Turner {
                     absoluteAngle.mut_setMagnitude(absoluteAngleValue / absGearingDown);
                     velocity.mut_setMagnitude(motor.angularVelocity.in(RPM));
                     velocity.mut_divide(motor.maxAngularVelocity.in(RPM));
-                    SmartDashboard.putNumber("Turn Setpiont", turnSetpoint.in(Degrees) / gearing);
                 };
 
                 return new Turner(

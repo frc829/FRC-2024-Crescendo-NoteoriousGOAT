@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Millimeters;
 
 import java.util.function.BooleanSupplier;
@@ -10,15 +9,18 @@ import com.compLevel0.Sensor;
 import com.compLevel1.PositionSwitch;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Unit;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class NotedLoadedSubsystem extends SubsystemBase {
 
+  public static Unit<Distance> Inches;
+
   private static final class Constants {
     private static final int deviceId = 34;
     private static final Measure<Distance> minOn = Millimeters.of(1);
-    private static final Measure<Distance> maxOn = Feet.of(0.5);
+    private static final Measure<Distance> maxOn = Inches.of(4);
   }
 
   public final BooleanSupplier hasNote;

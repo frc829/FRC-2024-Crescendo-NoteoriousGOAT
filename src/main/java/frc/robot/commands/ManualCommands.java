@@ -79,9 +79,6 @@ public class ManualCommands {
                                 .apply(Meters.of(0))
                                 .apply(Degrees.of(0));
                 public static final Command noteDetectPickup = PickupCommands.createNoteDetect.get();
-                public static final Command noteDetectReset = ResetAndHoldingCommands.setElevatorTiltUntil
-                                .apply(Meters.of(0))
-                                .apply(Degrees.of(0));
         }
 
         public static final class Scoring {

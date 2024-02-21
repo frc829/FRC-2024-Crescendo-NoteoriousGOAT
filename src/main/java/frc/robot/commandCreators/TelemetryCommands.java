@@ -1,10 +1,16 @@
 package frc.robot.commandCreators;
 
+import static frc.robot.RobotContainer.telemetrySubsystem;
+
 import java.util.function.Function;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -40,6 +46,37 @@ public class TelemetryCommands {
                 Command command = Commands.runOnce(setPose,
                                 RobotContainer.telemetrySubsystem);
                 command.setName("Set Pose");
+                return command;
+        };
+
+        public static final Supplier<Command> createResetPoseFromFrontCameraCommand = () -> {
+                Runnable setPoseFromCamera = () -> {
+                        RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0).run();
+                        var fieldPose0 = RobotContainer.telemetrySubsystem.fieldDetectorsPositions.get(0).getSecond()
+                                        .get();
+                        if (fieldPose0.isPresent()) {
+                                telemetrySubsystem.setPoseEstimator.accept(fieldPose0.get());
+                                SmartDashboard.putNumber("Pose Estimator Reset at TimeIndex",
+                                                Timer.getFPGATimestamp());
+                        }
+                };
+                Command command = Commands.runOnce(setPoseFromCamera,
+                                RobotContainer.telemetrySubsystem);
+                command.setName("Set Pose From Front Camera");
+                return command;
+        };
+        public static final Supplier<Command> createResetPoseFromBackCameraCommand = () -> {
+                Runnable setPoseFromCamera = () -> {
+                        RobotContainer.telemetrySubsystem.enableFieldDetectors.get(1).run();
+                        var fieldPose0 = RobotContainer.telemetrySubsystem.fieldDetectorsPositions.get(1).getSecond()
+                                        .get();
+                        if (fieldPose0.isPresent()) {
+                                telemetrySubsystem.setPoseEstimator.accept(fieldPose0.get());
+                        }
+                };
+                Command command = Commands.runOnce(setPoseFromCamera,
+                                RobotContainer.telemetrySubsystem);
+                command.setName("Set Pose From Back Camera");
                 return command;
         };
 

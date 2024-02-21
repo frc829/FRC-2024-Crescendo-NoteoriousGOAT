@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
+import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -33,7 +34,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Telemetry {
 
         public final Field2d field2d;
-        public final Measure<Velocity<Velocity<Distance>>> accelerationMag;
+        public final Measure<Angle> gyroYaw;
+        public final Measure<Velocity<Velocity<Distance>>> accelerationX;
+        public final Measure<Velocity<Velocity<Distance>>> accelerationY;
         public final Supplier<Pose2d> poseEstimate;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions;
         public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
@@ -46,7 +49,9 @@ public class Telemetry {
 
         private Telemetry(
                         Field2d field2d,
-                        Measure<Velocity<Velocity<Distance>>> accelerationMag,
+                        Measure<Angle> gyroYaw,
+                        Measure<Velocity<Velocity<Distance>>> accelerationX,
+                        Measure<Velocity<Velocity<Distance>>> accelerationY,
                         Supplier<Pose2d> poseEstimate,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions,
                         List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
@@ -57,7 +62,9 @@ public class Telemetry {
                         List<Runnable> enableObjectDetectors,
                         Runnable update) {
                 this.field2d = field2d;
-                this.accelerationMag = accelerationMag;
+                this.gyroYaw = gyroYaw;
+                this.accelerationX = accelerationX;
+                this.accelerationY = accelerationY;
                 this.poseEstimate = poseEstimate;
                 this.fieldDetectorOptPositions = fieldDetectorOptPositions;
                 this.fieldDetectorLatencies = fieldDetectorLatencies;
@@ -141,7 +148,9 @@ public class Telemetry {
                                 };
 
                                 return new Telemetry(field2d,
-                                                accelerationMag,
+                                                gyroscope.yaw,
+                                                gyroscope.accelerationX,
+                                                gyroscope.accelerationY,
                                                 poseEstimate,
                                                 fieldDetectorOptPositions,
                                                 fieldDetectorOptLatencies,

@@ -205,9 +205,6 @@
     }
   },
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
     "transitory": {
       "PathPlanner": {
         "open": true
