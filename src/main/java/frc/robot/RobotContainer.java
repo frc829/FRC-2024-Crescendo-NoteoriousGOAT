@@ -31,6 +31,7 @@ import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.InnerIntakeSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.MechanismSubsystem;
 import frc.robot.subsystems.NotedLoadedSubsystem;
 import frc.robot.subsystems.OuterIntakeSubsystem;
@@ -97,6 +98,7 @@ public class RobotContainer {
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
         public static final MechanismSubsystem mechanismSubsystem = new MechanismSubsystem();
+        public static final LEDSubsystem ledSubsystem = LEDSubsystem.create.get();
 
         private final SendableChooser<Command> autoChooser;
 

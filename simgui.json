@@ -1,107 +1,12 @@
 {
   "HALProvider": {
     "Other Devices": {
-      "CANCoder (v6)[30]": {
-        "header": {
-          "open": true
-        }
-      },
-      "CANCoder (v6)[31]": {
-        "header": {
-          "open": true
-        }
-      },
-      "CANCoder (v6)[33]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [10]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [11]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [14]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [15]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [20]": {
         "header": {
           "open": true
         }
       },
       "SPARK MAX [21]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [24]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [25]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [26]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Fwd Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Rev Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Rotor Sensor": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[21]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[21]/Fwd Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[21]/Rev Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[21]/Rotor Sensor": {
-        "header": {
-          "open": true
-        }
-      },
-      "navX-Sensor[0]": {
         "header": {
           "open": true
         }
