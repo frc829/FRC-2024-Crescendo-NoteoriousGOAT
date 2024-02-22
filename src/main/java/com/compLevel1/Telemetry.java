@@ -1,7 +1,6 @@
 package com.compLevel1;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveWheelPositions;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -81,8 +79,6 @@ public class Telemetry {
                         gyroscope) -> (kinematics) -> (wheelPositions) -> {
 
                                 Field2d field2d = new Field2d();
-                                MutableMeasure<Velocity<Velocity<Distance>>> accelerationMag = MutableMeasure
-                                                .zero(MetersPerSecondPerSecond);
 
                                 SwerveDrivePoseEstimator swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
                                                 kinematics, Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
@@ -134,13 +130,6 @@ public class Telemetry {
                                                                                         Rotation2d.fromDegrees(0)));
                                                 }
                                         }
-                                        accelerationMag.mut_setMagnitude(
-                                                        Math.pow(gyroscope.accelerationX.in(MetersPerSecondPerSecond),
-                                                                        2)
-                                                                        + Math.pow(gyroscope.accelerationY.in(
-                                                                                        MetersPerSecondPerSecond), 2)
-                                                                        + Math.pow(gyroscope.accelerationZ.in(
-                                                                                        MetersPerSecondPerSecond), 2));
                                         swerveDrivePoseEstimator.update(
                                                         Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
                                                         wheelPositions.get().positions);

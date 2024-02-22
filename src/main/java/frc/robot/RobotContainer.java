@@ -133,22 +133,21 @@ public class RobotContainer {
                 operator.a.onFalse(ManualCommands.Scoring.ampPositionReset);
                 operator.padDown.whileTrue(ScoringCommands.createTest.get());
                 operator.leftBumper.whileTrue(ManualCommands.Pickup.groundPickup);
-                operator.leftBumper.whileFalse(ManualCommands.Pickup.groundPickupReset);
+                operator.leftBumper.onFalse(ManualCommands.Pickup.groundPickupReset);
                 operator.rightBumper.whileTrue(ManualCommands.Pickup.babyBirdPickup);
-                operator.rightBumper.whileFalse(ManualCommands.Pickup.babyBirdPickupReset);
+                operator.rightBumper.onFalse(ManualCommands.Pickup.babyBirdPickupReset);
 
                 driver.leftBumper.whileTrue(ManualCommands.Scoring.fenderScore);
-                driver.leftBumper.whileFalse(ManualCommands.Scoring.fenderReset);
+                driver.leftBumper.onFalse(ManualCommands.Scoring.fenderReset);
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
                 driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
-                driver.rightBumper.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.SpeakerTopStart));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
-                // driver.x.whileTrue(PickupCommands.createNoteDetect.get());
-                // driver.x.onFalse(DriveCommands.createFieldCentricCommand.get());
+                driver.x.whileTrue(PickupCommands.createNoteDetect.get());
 
+                
                 
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());

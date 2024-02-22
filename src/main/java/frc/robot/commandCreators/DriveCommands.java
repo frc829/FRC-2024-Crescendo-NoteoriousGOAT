@@ -3,7 +3,6 @@ package frc.robot.commandCreators;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -225,19 +224,18 @@ public class DriveCommands {
                 return command;
         };
 
-        public static final Supplier<Supplier<Command>> goToNoteCommandSupplier = () -> {
-                Supplier<Command> commandSupplier = () -> {
-                        Optional<Pose2d> notePose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond()
-                                        .get();
-                        return AutoBuilder
-                                        .pathfindToPose(
-                                                        notePose.get(),
-                                                        Constants.NoteDetection.pathConstraints,
-                                                        Constants.NoteDetection.goalEndVelocityMPS,
-                                                        Constants.NoteDetection.rotationDelayDistance);
-
-                };
-                return commandSupplier;
+        public static final Supplier<Command> goToNoteCommandSupplier = () -> {
+                        var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
+                        if (pose.isPresent()) {
+                                return AutoBuilder
+                                                .pathfindToPose(
+                                                                pose.get(),
+                                                                Constants.NoteDetection.pathConstraints,
+                                                                Constants.NoteDetection.goalEndVelocityMPS,
+                                                                Constants.NoteDetection.rotationDelayDistance);
+                        } else {
+                                return Commands.none();
+                        }
         };
 
         public static final Supplier<Command> createGoToSource = () -> {

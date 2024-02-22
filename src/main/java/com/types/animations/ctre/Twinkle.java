@@ -33,10 +33,23 @@ public class Twinkle {
         this.divider = divider;
         this.ledOffset = ledOffset;
 
-        // TwinklePercent twinkleDivider = TwinklePercent.
-
-
-        ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, null, ledOffset);
+        if (divider <= 6) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent6, ledOffset);
+        } else if (divider <= 18) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent18, ledOffset);
+        } else if (divider <= 30) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent30, ledOffset);
+        } else if (divider <= 42) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent42, ledOffset);
+        } else if (divider <= 64) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent64, ledOffset);
+        } else if (divider <= 76) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent76, ledOffset);
+        } else if (divider <= 76) {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent88, ledOffset);
+        } else {
+            ctreVersion = new TwinkleAnimation(r, g, b, w, speed, numLed, TwinklePercent.Percent100, ledOffset);
+        }
     }
 
 }

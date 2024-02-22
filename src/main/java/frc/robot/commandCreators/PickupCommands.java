@@ -2,6 +2,7 @@ package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.RobotContainer.telemetrySubsystem;
 
 import java.util.function.Supplier;
 
@@ -152,7 +153,11 @@ public class PickupCommands implements Sendable {
                                 RobotContainer.telemetrySubsystem.enableObjectDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
 
-                Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier.get());
+                Command waitUntilNoteDetected = Commands.waitUntil(() -> {
+                        return telemetrySubsystem.objectPositions.get(0).getSecond().get().isPresent();
+                });
+
+                Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier);
 
                 Command setFieldDetectModeCommand = Commands.runOnce(
                                 RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
@@ -160,7 +165,7 @@ public class PickupCommands implements Sendable {
 
                 Command pickupDetectedNote = Commands.parallel(goToNoteCommand, createGround.get());
 
-                Command command = Commands.sequence(setObjectDetectModeCommand, pickupDetectedNote,
+                Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected, pickupDetectedNote,
                                 setFieldDetectModeCommand);
 
                 command.setName("Note Detect");
