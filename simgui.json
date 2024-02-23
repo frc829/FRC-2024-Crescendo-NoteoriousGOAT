@@ -16,6 +16,11 @@
           "open": true
         }
       },
+      "SPARK MAX [26]": {
+        "header": {
+          "open": true
+        }
+      },
       "Talon FX (v6)[20]": {
         "header": {
           "open": true
@@ -53,8 +58,8 @@
       },
       "/SmartDashboard/Field": {
         "Robot": {
-          "length": 0.6600000262260437,
-          "width": 0.6600000262260437
+          "length": 0.7400000095367432,
+          "width": 0.7400000095367432
         },
         "bottom": 1476,
         "height": 8.210550308227539,

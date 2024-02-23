@@ -7,16 +7,21 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import java.util.Optional;
 import java.util.function.BooleanSupplier;
+
+import javax.swing.text.html.Option;
 
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -149,6 +154,7 @@ public class RobotContainer {
                                 .apply(TelemetryCommands.Constants.testingStartPose));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
+                driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get());
 
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
@@ -204,11 +210,34 @@ public class RobotContainer {
                         telemetrySubsystem.field2d.getObject("path").setPoses(poses);
                 });
 
+                PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+
                 new AutoCommands();
 
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
+        }
+
+        public Optional<Rotation2d> getRotationTargetOverride() {
+                // Some condition that should decide if we want to override rotation
+                if (driver.x.getAsBoolean()) {
+                        // Return an optional containing the rotation override (this should be a field
+                        // relative rotation)
+                         var poses = telemetrySubsystem.field2d.getObject("path").getPoses();
+                         if(poses.size() != 0){
+                                var lastPose = poses.get(poses.size() - 1);
+                                var secondLastPose = poses.get(poses.size() - 2);
+                                var vector = lastPose.getTranslation().minus(secondLastPose.getTranslation());
+                                return Optional.of(vector.getAngle());
+                         }else{
+                                return Optional.empty();
+                         }
+                        
+                } else {
+                        // return an empty optional when we don't want to override the path's rotation
+                        return Optional.empty();
+                }
         }
 
         public void resetEncoders() {

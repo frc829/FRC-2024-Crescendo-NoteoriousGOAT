@@ -14,7 +14,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -33,7 +32,7 @@ public class ResetAndHoldingCommands implements Sendable {
     public static final class Constants {
         public static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
         public static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
-        public static final Measure<Distance> speakerHeight = Meters.of(2.065 - Units.inchesToMeters(20 + 4));
+        public static final Measure<Distance> speakerHeight = Meters.of(2.065);
         public static final Measure<Distance> shooterWheelRadius = Inches.of(2);
         public static double shooterSpeedTransferEfficiency = 0.80;
         public static final Measure<Velocity<Angle>> maxShooterSpeed = RadiansPerSecond

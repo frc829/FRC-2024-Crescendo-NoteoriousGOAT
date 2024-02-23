@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -19,6 +21,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -30,9 +33,9 @@ import frc.robot.RobotContainer;
 
 public class TelemetrySubsystem extends SubsystemBase {
 
-        private static final class Constants {
-                private static final double poseTranslationToleranceMeters = 1;
-                private static final double poseRotationToleranceDegrees = 5;
+        public static final class Constants {
+                public static final double poseTranslationToleranceMeters = 0.05;
+                public static final double poseRotationToleranceDegrees = 2;
                 private static final List<String> fieldDetectorNames = List.of("limelight-front", "limelight-rear");
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(
@@ -53,6 +56,7 @@ public class TelemetrySubsystem extends SubsystemBase {
         public final Supplier<ChassisSpeeds> fieldSpeeds;
         public final Supplier<Pose2d> poseEstimate;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions;
+        public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions;
         public final Consumer<Pose2d> setPoseEstimator;
         public final Runnable resetPoseEstimateFromFieldDetectors;
@@ -67,6 +71,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                         Supplier<ChassisSpeeds> fieldSpeeds,
                         Supplier<Pose2d> poseEstimate,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions,
+                        List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions,
                         Consumer<Pose2d> setPoseEstimator,
                         Runnable resetPoseEstimateFromFieldDetectors,
@@ -79,6 +84,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                 this.fieldSpeeds = fieldSpeeds;
                 this.poseEstimate = poseEstimate;
                 this.fieldDetectorsPositions = fieldDetectorsPositions;
+                this.fieldDetectorLatencies = fieldDetectorLatencies;
                 this.objectPositions = objectPositions;
                 this.setPoseEstimator = setPoseEstimator;
                 this.resetPoseEstimateFromFieldDetectors = resetPoseEstimateFromFieldDetectors;
@@ -126,15 +132,15 @@ public class TelemetrySubsystem extends SubsystemBase {
 
                 builder.addDoubleProperty(
                                 "Pose Estimate X",
-                                () -> GoatMath.round(poseEstimate.get().getX(), 3),
+                                () -> GoatMath.round(poseEstimate.get().getX(), 6),
                                 null);
                 builder.addDoubleProperty(
                                 "Pose Estimate Y",
-                                () -> GoatMath.round(poseEstimate.get().getY(), 3),
+                                () -> GoatMath.round(poseEstimate.get().getY(), 6),
                                 null);
                 builder.addDoubleProperty(
                                 "Pose Estimate Theta",
-                                () -> GoatMath.round(poseEstimate.get().getRotation().getDegrees(), 3),
+                                () -> GoatMath.round(poseEstimate.get().getRotation().getDegrees(), 6),
                                 null);
 
                 for (var fieldDetectorPosition : fieldDetectorsPositions) {
@@ -143,22 +149,50 @@ public class TelemetrySubsystem extends SubsystemBase {
                                         "Field X from " + fieldDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getX(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getX(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         },
                                         null);
                         builder.addDoubleProperty(
                                         "Field Y from " + fieldDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getY(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getY(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         }, null);
                         builder.addDoubleProperty(
                                         "Field Theta from " + fieldDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         }, null);
 
+                }
+
+                for (var fieldDetectorLatency : fieldDetectorLatencies) {
+
+                        builder.addDoubleProperty(
+                                        "Field Latency from " + fieldDetectorLatency.getFirst(),
+                                        () -> {
+                                                Optional<Measure<Time>> latency = fieldDetectorLatency.getSecond()
+                                                                .get();
+                                                if (latency.isPresent()) {
+                                                        return GoatMath.round(latency.get().in(Seconds), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
+                                        },
+                                        null);
                 }
 
                 for (var objectDetectorPosition : objectPositions) {
@@ -166,19 +200,31 @@ public class TelemetrySubsystem extends SubsystemBase {
                                         "Object X from " + objectDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getX(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getX(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         }, null);
                         builder.addDoubleProperty(
                                         "Object Y from " + objectDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getY(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getY(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         }, null);
                         builder.addDoubleProperty(
                                         "Object Theta from " + objectDetectorPosition.getFirst(),
                                         () -> {
                                                 Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
-                                                return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                                if (pose.isPresent()) {
+                                                        return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                                } else {
+                                                        return Double.NaN;
+                                                }
                                         }, null);
 
                 }
@@ -218,7 +264,8 @@ public class TelemetrySubsystem extends SubsystemBase {
 
                 Runnable update = () -> {
                         telemetry.update.run();
-                        if (!RobotBase.isSimulation()) {
+                        // if (!RobotBase.isSimulation()) {
+                        if (true) {
                                 for (int i = 0; i < telemetry.fieldDetectorOptPositions.size(); i++) {
                                         var optPose = telemetry.fieldDetectorOptPositions.get(i).getSecond().get();
                                         var optLatency = telemetry.fieldDetectorLatencies.get(i).getSecond().get();
@@ -250,6 +297,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 fieldSpeeds,
                                 telemetry.poseEstimate,
                                 telemetry.fieldDetectorOptPositions,
+                                telemetry.fieldDetectorLatencies,
                                 telemetry.objectDetectorOptPositions,
                                 telemetry.setPoseEstimate,
                                 resetPoseEstimateFromFieldDetectors,

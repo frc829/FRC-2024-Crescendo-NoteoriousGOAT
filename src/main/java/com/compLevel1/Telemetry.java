@@ -26,6 +26,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -99,10 +100,15 @@ public class Telemetry {
                                                         wheelPositions.get().positions, resetPose);
                                 };
 
-                                Function<Pose2d, Consumer<Measure<Time>>> addDetectedPoseToEstimator = (
+                                Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator = (
                                                 pose) -> (latency) -> {
                                                         swerveDrivePoseEstimator.addVisionMeasurement(pose,
                                                                         latency.in(Seconds));
+                                                        swerveDrivePoseEstimator.updateWithTime(
+                                                                        Timer.getFPGATimestamp() - latency.in(Seconds),
+                                                                        Rotation2d.fromDegrees(
+                                                                                        gyroscope.yaw.in(Degrees)),
+                                                                        wheelPositions.get().positions);
                                                 };
 
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
@@ -110,6 +116,9 @@ public class Telemetry {
 
                                 Runnable update = () -> {
                                         gyroscope.update.run();
+                                        swerveDrivePoseEstimator.update(
+                                                        Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
+                                                        wheelPositions.get().positions);
                                         for (var fieldDetector : fieldDetectors) {
                                                 fieldDetector.update.run();
                                         }
@@ -130,25 +139,14 @@ public class Telemetry {
                                                                                         Rotation2d.fromDegrees(0)));
                                                 }
                                         }
-                                        swerveDrivePoseEstimator.update(
-                                                        Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
-                                                        wheelPositions.get().positions);
 
                                 };
 
-                                return new Telemetry(field2d,
-                                                gyroscope.yaw,
-                                                gyroscope.accelerationX,
-                                                gyroscope.accelerationY,
-                                                poseEstimate,
-                                                fieldDetectorOptPositions,
-                                                fieldDetectorOptLatencies,
-                                                objectDetectorOptPositions,
-                                                setPoseEstimate,
-                                                addDetectedPoseToEstimator,
-                                                enableFieldDetectors,
-                                                enableObjectDetectors,
-                                                update);
+                                return new Telemetry(field2d, gyroscope.yaw, gyroscope.accelerationX,
+                                                gyroscope.accelerationY, poseEstimate, fieldDetectorOptPositions,
+                                                fieldDetectorOptLatencies, objectDetectorOptPositions, setPoseEstimate,
+                                                addDetectedPosesToEstimator, enableFieldDetectors,
+                                                enableObjectDetectors, update);
                         };
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (

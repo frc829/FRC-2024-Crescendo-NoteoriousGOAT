@@ -61,15 +61,16 @@ public class FieldDetector {
                     Random randX = new Random();
                     Random randY = new Random();
                     Random randTheta = new Random();
-
+                    double randomScale = 1;
                     Supplier<Optional<Pose2d>> fieldPosition = () -> {
                         if (RobotBase.isSimulation()) {
                             Pose2d simPose = simFieldPose.get();
                             Pose2d newPose = new Pose2d(
-                                    randX.nextDouble() * 0.02 - 0.01 + simPose.getX(),
-                                    randY.nextDouble() * 0.02 - 0.01 + simPose.getY(),
+                                    randX.nextDouble() * randomScale - randomScale / 2 + simPose.getX(),
+                                    randY.nextDouble() * randomScale - randomScale / 2 + simPose.getY(),
                                     Rotation2d.fromDegrees(
-                                            randTheta.nextDouble() * 2 - 1 + simPose.getRotation().getDegrees()));
+                                            randTheta.nextDouble() * randomScale - randomScale / 2
+                                                    + simPose.getRotation().getDegrees()));
                             return Optional.of(newPose);
                         } else {
                             if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
@@ -84,13 +85,15 @@ public class FieldDetector {
 
                     Supplier<Optional<Measure<Time>>> latency = () -> {
                         if (RobotBase.isSimulation()) {
-                            return Optional.of(Milliseconds.of(30));
-                        }
-                        if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
-                            return Optional.of(Milliseconds.of(latencyMeasure.in(Milliseconds)));
+                            return Optional.of(Milliseconds.of(100));
                         } else {
-                            return Optional.empty();
+                            if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
+                                return Optional.of(Milliseconds.of(latencyMeasure.in(Milliseconds)));
+                            } else {
+                                return Optional.empty();
+                            }
                         }
+
                     };
 
                     Runnable enable = () -> pipelineConsumer.setNumber(1);
