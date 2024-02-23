@@ -31,8 +31,8 @@ import frc.robot.RobotContainer;
 public class TelemetrySubsystem extends SubsystemBase {
 
         private static final class Constants {
-                private static final double poseTranslationToleranceMeters = 0.05;
-                private static final double poseRotationToleranceDegrees = 1;
+                private static final double poseTranslationToleranceMeters = 1;
+                private static final double poseRotationToleranceDegrees = 5;
                 private static final List<String> fieldDetectorNames = List.of("limelight-front", "limelight-rear");
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(
@@ -138,65 +138,49 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 null);
 
                 for (var fieldDetectorPosition : fieldDetectorsPositions) {
-                        Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
-                        if (pose.isPresent()) {
-                                builder.addDoubleProperty(
-                                                "Field X from " + fieldDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getX(), 3),
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Field Y from " + fieldDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getY(), 3),
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Field Theta from " + fieldDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getRotation().getDegrees(), 3),
-                                                null);
-                        } else {
-                                builder.addDoubleProperty(
-                                                "Field X from " + fieldDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Field Y from " + fieldDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Field Theta from " + fieldDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                        }
+
+                        builder.addDoubleProperty(
+                                        "Field X from " + fieldDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getX(), 3);
+                                        },
+                                        null);
+                        builder.addDoubleProperty(
+                                        "Field Y from " + fieldDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getY(), 3);
+                                        }, null);
+                        builder.addDoubleProperty(
+                                        "Field Theta from " + fieldDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = fieldDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                        }, null);
+
                 }
 
                 for (var objectDetectorPosition : objectPositions) {
-                        Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
-                        if (pose.isPresent()) {
-                                builder.addDoubleProperty(
-                                                "Object X from " + objectDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getX(), 3),
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Object Y from " + objectDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getY(), 3),
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Object Theta from " + objectDetectorPosition.getFirst(),
-                                                () -> GoatMath.round(pose.get().getRotation().getDegrees(), 3),
-                                                null);
-                        } else {
-                                builder.addDoubleProperty(
-                                                "Object X from " + objectDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Object Y from " + objectDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                                builder.addDoubleProperty(
-                                                "Object Theta " + objectDetectorPosition.getFirst(),
-                                                () -> Double.NaN,
-                                                null);
-                        }
+                        builder.addDoubleProperty(
+                                        "Object X from " + objectDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getX(), 3);
+                                        }, null);
+                        builder.addDoubleProperty(
+                                        "Object Y from " + objectDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getY(), 3);
+                                        }, null);
+                        builder.addDoubleProperty(
+                                        "Object Theta from " + objectDetectorPosition.getFirst(),
+                                        () -> {
+                                                Optional<Pose2d> pose = objectDetectorPosition.getSecond().get();
+                                                return GoatMath.round(pose.get().getRotation().getDegrees(), 3);
+                                        }, null);
+
                 }
 
         }
