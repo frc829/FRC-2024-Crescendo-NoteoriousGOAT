@@ -38,9 +38,9 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 new Pair<>(
                                                 "limelight-front",
                                                 new Pose3d(
+                                                                Units.inchesToMeters(13),
                                                                 Units.inchesToMeters(0),
-                                                                Units.inchesToMeters(0),
-                                                                Units.inchesToMeters(6),
+                                                                Units.inchesToMeters(19.5),
                                                                 new Rotation3d(
                                                                                 0,
                                                                                 0,
@@ -99,15 +99,15 @@ public class TelemetrySubsystem extends SubsystemBase {
         public void initSendable(SendableBuilder builder) {
                 super.initSendable(builder);
                 // builder.addDoubleProperty(
-                //                 "Linear Acceleration Mag",
-                //                 () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond), 3),
-                //                 null);
+                // "Linear Acceleration Mag",
+                // () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond), 3),
+                // null);
 
                 // builder.addDoubleProperty(
-                //                 "Angular Acceleration Mag",
-                //                 () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond)
-                //                                 / DriveSubsystem.Constants.driveRadius.in(Meters), 3),
-                //                 null);
+                // "Angular Acceleration Mag",
+                // () -> GoatMath.round(accelerationMag.in(MetersPerSecondPerSecond)
+                // / DriveSubsystem.Constants.driveRadius.in(Meters), 3),
+                // null);
 
                 builder.addDoubleProperty(
                                 "Field Forward Velocity (mps)",
@@ -209,13 +209,6 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 .apply(DriveSubsystem.Constants.kinematics)
                                 .apply(RobotContainer.driveSubsystem.swerveDriveWheelPositions);
 
-                Constants.fieldDetectorNames.forEach(
-                                (name) -> Telemetry.addFieldDetectorToTelemetry
-                                                .apply(FieldDetector.Limelight.createLimelight
-                                                                .apply(name)
-                                                                .apply(telemetry.poseEstimate))
-                                                .apply(telemetry));
-
                 Constants.objectDetectorNamesPositions.forEach(
                                 (namePosition) -> Telemetry.addObjectDetectorToTelemetry
                                                 .apply(ObjectDetector.Limelight.createLimelight
@@ -223,8 +216,15 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                 .apply(namePosition.getSecond()))
                                                 .apply(telemetry));
 
+                Constants.fieldDetectorNames.forEach(
+                                (name) -> Telemetry.addFieldDetectorToTelemetry
+                                                .apply(FieldDetector.Limelight.createLimelight
+                                                                .apply(name)
+                                                                .apply(telemetry.poseEstimate))
+                                                .apply(telemetry));
+
                 Supplier<ChassisSpeeds> fieldSpeeds = () -> {
-                        return ChassisSpeeds.fromFieldRelativeSpeeds(RobotContainer.driveSubsystem.robotSpeeds.get(),
+                        return ChassisSpeeds.fromRobotRelativeSpeeds(RobotContainer.driveSubsystem.robotSpeeds.get(),
                                         telemetry.poseEstimate.get().getRotation());
                 };
 
@@ -252,7 +252,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                         .accept(latency);
                                                         SmartDashboard.putNumber("Pose Added to Estimater at TimeIndex",
                                                                         Timer.getFPGATimestamp());
-                                                } 
+                                                }
                                         }
                                 }
                         }

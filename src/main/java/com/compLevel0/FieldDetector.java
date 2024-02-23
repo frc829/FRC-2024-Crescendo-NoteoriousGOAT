@@ -20,6 +20,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FieldDetector {
 
@@ -70,13 +71,15 @@ public class FieldDetector {
                                     Rotation2d.fromDegrees(
                                             randTheta.nextDouble() * 2 - 1 + simPose.getRotation().getDegrees()));
                             return Optional.of(newPose);
-                        }
-                        if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
-                            return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
-                                    Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
                         } else {
-                            return Optional.empty();
+                            if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
+                                return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
+                                        Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
+                            } else {
+                                return Optional.empty();
+                            }
                         }
+
                     };
 
                     Supplier<Optional<Measure<Time>>> latency = () -> {
@@ -97,6 +100,7 @@ public class FieldDetector {
                         fieldX.mut_setMagnitude(poseArray[0]);
                         fieldY.mut_setMagnitude(poseArray[1]);
                         fieldYaw.mut_setMagnitude(poseArray[5]);
+                        SmartDashboard.putNumber("FieldXTest", fieldX.in(Meters));
                         latencyMeasure.mut_setMagnitude(poseArray[6]);
                     };
 

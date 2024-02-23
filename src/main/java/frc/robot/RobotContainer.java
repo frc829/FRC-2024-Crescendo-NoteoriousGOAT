@@ -14,6 +14,7 @@ import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -59,8 +60,8 @@ public class RobotContainer {
                                 0.5);
 
                 private static final HolonomicPathFollowerConfig config = new HolonomicPathFollowerConfig(
-                                new PIDConstants(5),
-                                new PIDConstants(5),
+                                new PIDConstants(2),
+                                new PIDConstants(2),
                                 DriveSubsystem.Constants.maxLinearVelocity.in(MetersPerSecond),
                                 DriveSubsystem.Constants.driveRadius.in(Meters),
                                 replanningConfig,
@@ -145,12 +146,10 @@ public class RobotContainer {
 
                 driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
-                                .apply(TelemetryCommands.Constants.SpeakerTopStart));
+                                .apply(TelemetryCommands.Constants.testingStartPose));
                 driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
 
-                
-                
                 driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger
@@ -200,6 +199,10 @@ public class RobotContainer {
                 // driver.x.onFalse(stopHogan);
                 // driver.y.whileTrue(playEastBound);
                 // driver.y.onFalse(stopEastBound);
+                PathPlannerLogging.setLogActivePathCallback((poses) -> {
+                        // Do whatever you want with the poses here
+                        telemetrySubsystem.field2d.getObject("path").setPoses(poses);
+                });
 
                 new AutoCommands();
 

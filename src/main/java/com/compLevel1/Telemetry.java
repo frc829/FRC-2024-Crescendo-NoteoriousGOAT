@@ -160,7 +160,7 @@ public class Telemetry {
                                                 .add(new Pair<String, Supplier<Optional<Measure<Time>>>>(
                                                                 fieldDetector.name, fieldDetector.latency));
                                 telemetry.enableFieldDetectors.add(fieldDetector.enable);
-
+                                fieldDetector.enable.run();
                                 return telemetry;
                         };
 

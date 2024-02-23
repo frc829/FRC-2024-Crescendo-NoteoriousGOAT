@@ -172,10 +172,6 @@ public class PickupCommands implements Sendable {
                 return command;
         };
 
-        static {
-                SmartDashboard.putData("PickupCommands", new PickupCommands());
-        }
-
         public PickupCommands() {
         }
 

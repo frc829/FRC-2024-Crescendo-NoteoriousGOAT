@@ -61,7 +61,7 @@ public class ObjectDetector {
 
                     Supplier<Double> tyDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            return 2.0;
+                            return 5.0;
                         } else {
                             return tySupplier.getDouble(0);
                         }

@@ -136,7 +136,7 @@ public class DriveSubsystem extends SubsystemBase {
                                 null);
 
                 builder.addDoubleProperty(
-                                "Max Angular Velocity (mps)",
+                                "Max Angular Velocity (radps)",
                                 () -> GoatMath.round(Constants.maxAngularVelocity.in(RadiansPerSecond), 3),
                                 null);
                 builder.addDoubleProperty(

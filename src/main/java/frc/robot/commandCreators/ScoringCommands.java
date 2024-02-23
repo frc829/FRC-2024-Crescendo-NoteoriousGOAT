@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
@@ -52,7 +53,7 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-                        private static final double shooterTolerancePercent = 0.01;
+                        private static final double shooterTolerancePercent = 0.10;
                 }
 
                 private static final class SpinUp {
@@ -126,7 +127,7 @@ public class ScoringCommands {
                 Runnable speedUpShooters = () -> {
                         double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
 
-                        topShooterSubsystem.spin.accept(shooterSpeed);
+                        topShooterSubsystem.spin.accept(-shooterSpeed);
                         bottomShooterSubsystem.spin.accept(shooterSpeed);
                 };
 
@@ -134,9 +135,9 @@ public class ScoringCommands {
                         double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
                         double shooterTolerance = SmartDashboard.getNumber("Test Shooter Tolerance", 0);
                         return MathUtil.isNear(
-                                        shooterSpeed,
-                                        topShooterSubsystem.velocity.in(Value),
-                                        shooterTolerance);
+                                        Math.abs(shooterSpeed),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Math.abs(shooterTolerance));
                 };
 
                 Command speedUpShootersCommand = Commands.run(
@@ -185,10 +186,12 @@ public class ScoringCommands {
                                 bottomShooterSubsystem);
 
                 BooleanSupplier shootersAtSpeed = () -> {
-                        return MathUtil.isNear(
+                        boolean condition = MathUtil.isNear(
                                         Constants.Fender.topShooterPercent,
                                         topShooterSubsystem.velocity.in(Value),
                                         Constants.Fender.shooterTolerancePercent);
+                        SmartDashboard.putBoolean("ShooterAt Speed", condition);
+                        return condition;
                 };
                 Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
                 Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
@@ -222,9 +225,9 @@ public class ScoringCommands {
         public static final Supplier<Command> createRanged = () -> {
                 MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
                 MutableMeasure<Dimensionless> shooterPercentMeasure = MutableMeasure.zero(Value);
-                PIDController pidController = new PIDController(5, 0, 0);
+                PIDController pidController = new PIDController(2.5, 0, 0);
                 pidController.enableContinuousInput(-180, 180);
-                pidController.setTolerance(0.5);
+                pidController.setTolerance(2);
 
                 Runnable setValues = () -> {
                         Pose2d fieldPosition = telemetrySubsystem.poseEstimate.get();
@@ -236,7 +239,7 @@ public class ScoringCommands {
                                                 .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
-                                double distanceMeters = targetVector.getNorm();
+                                double distanceMeters = targetVector.getNorm() - Units.inchesToMeters(2.5 + 4);
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters
                                                                 + 4 * ResetAndHoldingCommands.Constants.speakerHeight
@@ -263,7 +266,7 @@ public class ScoringCommands {
                                                 .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
-                                double distanceMeters = targetVector.getNorm();
+                                double distanceMeters = targetVector.getNorm() - Units.inchesToMeters(2.5 + 4);
                                 double velocity = 9.8
                                                 * (distanceMeters * distanceMeters
                                                                 + 4 * ResetAndHoldingCommands.Constants.speakerHeight
@@ -291,7 +294,7 @@ public class ScoringCommands {
                 };
 
                 Runnable speedUpShooters = () -> {
-                        topShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
+                        topShooterSubsystem.spin.accept(-shooterPercentMeasure.in(Value));
                         bottomShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
                 };
 
@@ -308,6 +311,7 @@ public class ScoringCommands {
                         ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, radiansPerSecond);
                         driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d())
                                         .accept(chassisSpeeds);
+                        SmartDashboard.putBoolean("In Position", pidController.atSetpoint());
                 };
 
                 Command setValuesCommand = Commands.runOnce(setValues);
@@ -320,8 +324,8 @@ public class ScoringCommands {
 
                 BooleanSupplier shootersAtSpeed = () -> {
                         return MathUtil.isNear(
-                                        shooterPercentMeasure.in(Value),
-                                        topShooterSubsystem.velocity.in(Value),
+                                        Math.abs(shooterPercentMeasure.in(Value)),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
                                         Constants.Ranged.shooterTolerancePercent);
                 };
 
@@ -333,6 +337,8 @@ public class ScoringCommands {
                 };
 
                 BooleanSupplier shooterTiltDriveAtSetpoint = () -> {
+                        SmartDashboard.putBoolean("Shooters at Speed", shootersAtSpeed.getAsBoolean());
+                        SmartDashboard.putBoolean("TiltAtPosition", tiltAtPosition.getAsBoolean());
                         return shootersAtSpeed.getAsBoolean() && tiltAtPosition.getAsBoolean()
                                         && pidController.atSetpoint();
                 };
