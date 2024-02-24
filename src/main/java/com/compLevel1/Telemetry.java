@@ -15,6 +15,7 @@ import com.compLevel0.Gyroscope;
 import com.compLevel0.ObjectDetector;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -82,8 +83,12 @@ public class Telemetry {
                                 Field2d field2d = new Field2d();
 
                                 SwerveDrivePoseEstimator swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
-                                                kinematics, Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
-                                                wheelPositions.get().positions, new Pose2d());
+                                                kinematics,
+                                                Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
+                                                wheelPositions.get().positions,
+                                                new Pose2d(),
+                                                VecBuilder.fill(0.1, 0.1, 0.1),
+                                                VecBuilder.fill(0.9, 0.9, 0.9));
 
                                 Supplier<Pose2d> poseEstimate = () -> swerveDrivePoseEstimator.getEstimatedPosition();
 
@@ -103,12 +108,7 @@ public class Telemetry {
                                 Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator = (
                                                 pose) -> (latency) -> {
                                                         swerveDrivePoseEstimator.addVisionMeasurement(pose,
-                                                                        latency.in(Seconds));
-                                                        swerveDrivePoseEstimator.updateWithTime(
-                                                                        Timer.getFPGATimestamp() - latency.in(Seconds),
-                                                                        Rotation2d.fromDegrees(
-                                                                                        gyroscope.yaw.in(Degrees)),
-                                                                        wheelPositions.get().positions);
+                                                                        Timer.getFPGATimestamp() - latency.in(Seconds));
                                                 };
 
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
@@ -116,7 +116,8 @@ public class Telemetry {
 
                                 Runnable update = () -> {
                                         gyroscope.update.run();
-                                        swerveDrivePoseEstimator.update(
+                                        swerveDrivePoseEstimator.updateWithTime(
+                                                        Timer.getFPGATimestamp(),
                                                         Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
                                                         wheelPositions.get().positions);
                                         for (var fieldDetector : fieldDetectors) {

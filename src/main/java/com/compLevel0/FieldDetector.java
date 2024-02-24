@@ -71,9 +71,15 @@ public class FieldDetector {
                                     Rotation2d.fromDegrees(
                                             randTheta.nextDouble() * randomScale - randomScale / 2
                                                     + simPose.getRotation().getDegrees()));
-                            return Optional.of(newPose);
+                            return Optional.of(simPose);
                         } else {
                             if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
+                                double[] poseArray = botpose_wpiblueSupplier.getDoubleArray(new double[7]);
+                                fieldX.mut_setMagnitude(poseArray[0]);
+                                fieldY.mut_setMagnitude(poseArray[1]);
+                                fieldYaw.mut_setMagnitude(poseArray[5]);
+                                SmartDashboard.putNumber("FieldXTest", fieldX.in(Meters));
+                                latencyMeasure.mut_setMagnitude(poseArray[6]);
                                 return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
                                         Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
                             } else {
@@ -85,7 +91,7 @@ public class FieldDetector {
 
                     Supplier<Optional<Measure<Time>>> latency = () -> {
                         if (RobotBase.isSimulation()) {
-                            return Optional.of(Milliseconds.of(100));
+                            return Optional.of(Milliseconds.of(0));
                         } else {
                             if (validTargetSupplier.getInteger(0) == 1 && pipelineSupplier.getInteger(0) == 1) {
                                 return Optional.of(Milliseconds.of(latencyMeasure.in(Milliseconds)));
@@ -99,12 +105,7 @@ public class FieldDetector {
                     Runnable enable = () -> pipelineConsumer.setNumber(1);
 
                     Runnable update = () -> {
-                        double[] poseArray = botpose_wpiblueSupplier.getDoubleArray(new double[7]);
-                        fieldX.mut_setMagnitude(poseArray[0]);
-                        fieldY.mut_setMagnitude(poseArray[1]);
-                        fieldYaw.mut_setMagnitude(poseArray[5]);
-                        SmartDashboard.putNumber("FieldXTest", fieldX.in(Meters));
-                        latencyMeasure.mut_setMagnitude(poseArray[6]);
+
                     };
 
                     return new FieldDetector(name, fieldPosition, latency, enable, update);

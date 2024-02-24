@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.3,
-        "y": 5.53
+        "x": 8.279501243687172,
+        "y": 2.403622825263669
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6375094304138949,
-        "y": 4.996081053110188
+        "x": 5.025365726407128,
+        "y": 0.23111757935227617
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8003125983678605,
-        "y": 4.071977895648794
+        "x": 0.76,
+        "y": 4.49
       },
       "prevControl": {
-        "x": 1.1761312913145014,
-        "y": 4.034640394337223
+        "x": 2.1897580188893495,
+        "y": 3.265769696325995
       },
       "nextControl": null,
       "isLocked": false,
@@ -43,6 +43,12 @@
               "data": {
                 "name": "Pickup"
               }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUp"
+              }
             }
           ]
         }
@@ -57,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
-    "rotateFast": false
+    "rotation": -60.0,
+    "rotateFast": true
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 0.0,
+    "rotation": 46.974934010882016,
     "velocity": 0
   },
   "useDefaultConstraints": true

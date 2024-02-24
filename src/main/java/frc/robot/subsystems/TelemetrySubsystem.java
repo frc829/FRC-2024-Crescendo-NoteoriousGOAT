@@ -33,10 +33,9 @@ import frc.robot.RobotContainer;
 public class TelemetrySubsystem extends SubsystemBase {
 
         public static final class Constants {
-                public static final double poseTranslationToleranceMeters = 0.05;
+                public static final double poseTranslationToleranceMeters = 1;
                 public static final double poseRotationToleranceDegrees = 2;
-                private static final List<String> fieldDetectorNames = List.of("limelight-front");// ,
-                                                                                                  // "limelight-rear");
+                private static final List<String> fieldDetectorNames = List.of("limelight-front", "limelight-rear");
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(
                                                 "limelight-front",

@@ -18,6 +18,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerTop-TopNote"
@@ -27,6 +33,12 @@
           "type": "path",
           "data": {
             "pathName": "TopNote-SpeakerTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
           }
         },
         {
@@ -42,6 +54,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerTop-SecTop"
@@ -51,6 +69,12 @@
           "type": "path",
           "data": {
             "pathName": "SecTop-SpeakerTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
           }
         }
       ]

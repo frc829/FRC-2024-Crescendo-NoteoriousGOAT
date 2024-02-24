@@ -15,6 +15,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
@@ -150,6 +152,11 @@ public class DriveCommands {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d();
                 Runnable drive = () -> {
+                        double flipper = 1;
+                        var color = DriverStation.getAlliance();
+                        if (color.isPresent() && color.get() == Alliance.Red) {
+                                flipper *= -1;
+                        }
                         speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
                                         .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
                         speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
@@ -157,6 +164,9 @@ public class DriveCommands {
                         speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
                                         .in(RadiansPerSecond)
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
+                        speeds.vxMetersPerSecond *= flipper;
+                        speeds.vyMetersPerSecond *= flipper;
+                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -177,6 +187,11 @@ public class DriveCommands {
                                 Units.inchesToMeters(13),
                                 Units.inchesToMeters(13));
                 Runnable drive = () -> {
+                        double flipper = 1;
+                        var color = DriverStation.getAlliance();
+                        if (color.isPresent() && color.get() == Alliance.Red) {
+                                flipper *= -1;
+                        }
                         speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
                                         .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
                         speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
@@ -184,6 +199,9 @@ public class DriveCommands {
                         speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
                                         .in(RadiansPerSecond)
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
+                        speeds.vxMetersPerSecond *= flipper;
+                        speeds.vyMetersPerSecond *= flipper;
+                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -203,6 +221,11 @@ public class DriveCommands {
                                 Units.inchesToMeters(13),
                                 Units.inchesToMeters(-13));
                 Runnable drive = () -> {
+                        double flipper = 1;
+                        var color = DriverStation.getAlliance();
+                        if (color.isPresent() && color.get() == Alliance.Red) {
+                                flipper *= -1;
+                        }
                         speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
                                         .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
                         speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
@@ -210,6 +233,9 @@ public class DriveCommands {
                         speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
                                         .in(RadiansPerSecond)
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
+                        speeds.vxMetersPerSecond *= flipper;
+                        speeds.vyMetersPerSecond *= flipper;
+                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -225,17 +251,17 @@ public class DriveCommands {
         };
 
         public static final Supplier<Command> goToNoteCommandSupplier = () -> {
-                        var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
-                        if (pose.isPresent()) {
-                                return AutoBuilder
-                                                .pathfindToPose(
-                                                                pose.get(),
-                                                                Constants.NoteDetection.pathConstraints,
-                                                                Constants.NoteDetection.goalEndVelocityMPS,
-                                                                Constants.NoteDetection.rotationDelayDistance);
-                        } else {
-                                return Commands.none();
-                        }
+                var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
+                if (pose.isPresent()) {
+                        return AutoBuilder
+                                        .pathfindToPose(
+                                                        pose.get(),
+                                                        Constants.NoteDetection.pathConstraints,
+                                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                                        Constants.NoteDetection.rotationDelayDistance);
+                } else {
+                        return Commands.none();
+                }
         };
 
         public static final Supplier<Command> createGoToSource = () -> {

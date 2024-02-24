@@ -14,9 +14,10 @@ public class AutoCommands {
 
     public AutoCommands() {
         NamedCommands.registerCommand("RangedShoot", ScoringCommands.createRanged.get());
-        NamedCommands.registerCommand("FenderShoot", ScoringCommands.createFender.get());
+        NamedCommands.registerCommand("Fender", ScoringCommands.createFenderWithDelay.get());
         NamedCommands.registerCommand("Pickup", PickupCommands.createGround.get());
         NamedCommands.registerCommand("Amp", ScoringCommands.createAmpPosition.get());
+        NamedCommands.registerCommand("SpinUp", ScoringCommands.createSpinUp.get());
         NamedCommands.registerCommand("GetLow",
                 ResetAndHoldingCommands.setElevatorTiltForever.apply(Meters.of(0.0)).apply(Degrees.of(0)));
         NamedCommands.registerCommand("SpeakerTopStart",

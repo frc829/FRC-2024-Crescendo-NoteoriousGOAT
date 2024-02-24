@@ -40,10 +40,46 @@
           "data": {
             "name": "Fender"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerBot-FarBot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBot-SpeakerBot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerBot-SecBot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SecBot-SpeakerBot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
         }
       ]
     }
   },
-  "folder": "Fender-2Notes",
+  "folder": "Fender-4Notes",
   "choreoAuto": false
 }

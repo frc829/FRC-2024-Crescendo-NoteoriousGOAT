@@ -20,7 +20,7 @@ public class PickupCommands implements Sendable {
 
         private static final class Constants {
                 private static final class Ground {
-                        private static Measure<Angle> tiltAngle = Degrees.of(58);
+                        private static Measure<Angle> tiltAngle = Degrees.of(55);
                         private static Measure<Distance> elevatorPosition = Meters.of(0);
                         private static double transportPercent = 0.9;
                         private static double innerIntakePercent = 0.9;
@@ -28,7 +28,7 @@ public class PickupCommands implements Sendable {
                 }
 
                 private static final class BabyBird {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.0,
                                         Meters);
                         private static double topShooterPercent = 0.3;
@@ -55,13 +55,14 @@ public class PickupCommands implements Sendable {
                 Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
                 Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Ground.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create.apply(0.0);
                 Command innerIntakeCommand = BasicCommands.Set.InnerIntake.create
                                 .apply(Constants.Ground.innerIntakePercent);
                 Command outerIntakeCommand = BasicCommands.Set.OuterIntake.create
                                 .apply(Constants.Ground.outerIntakePercent);
 
                 Command groundPickupCommand = Commands
-                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, innerIntakeCommand,
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand, innerIntakeCommand,
                                                 outerIntakeCommand)
                                 .until(RobotContainer.notedLoadedSubsystem.hasNote);
 
@@ -74,12 +75,12 @@ public class PickupCommands implements Sendable {
                                 BasicCommands.Set.OuterIntake.create.apply(0.0),
                                 BasicCommands.Set.InnerIntake.create.apply(0.0),
                                 BasicCommands.Set.Transport.create.apply(0.0),
-                                BasicCommands.Set.Singulator.create.apply(0.0),
-                                BasicCommands.Set.TopShooter.create.apply(() -> 0.0),
-                                BasicCommands.Set.BottomShooter.create.apply(() -> 0.0));
+                                BasicCommands.Set.Singulator.create.apply(0.0));
 
-                Command command = Commands.sequence(elevatorTiltCommand,
+                Command pickupCommand = Commands.sequence(elevatorTiltCommand,
                                 groundPickupCommand, hasNoteCommand);
+                Command noPickupCommand = Commands.none();
+                Command command = Commands.either(noPickupCommand, pickupCommand, RobotContainer.notedLoadedSubsystem.hasNote);
                 command.setName("Ground Pickup");
                 return command;
         };

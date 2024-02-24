@@ -18,6 +18,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerTop-TopNote"
@@ -30,6 +36,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerTop-FarTop"
@@ -39,6 +51,12 @@
           "type": "path",
           "data": {
             "pathName": "FarTop-SpeakerTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
           }
         }
       ]

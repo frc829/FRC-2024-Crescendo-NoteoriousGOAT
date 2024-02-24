@@ -18,6 +18,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerMid-MidNote"
@@ -30,6 +36,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "SpeakerMid-BotNote"
@@ -39,6 +51,12 @@
           "type": "path",
           "data": {
             "pathName": "BotNote-SpeakerMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
           }
         }
       ]

@@ -38,20 +38,21 @@ public class ScoringCommands {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.30,
                                         Meters);
-                        private static double topShooterPercent = -0.6;
-                        private static double bottomShooterPercent = -0.6;
+                        private static double topShooterPercent = -0.7;
+                        private static double bottomShooterPercent = -0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(50, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = -0.6;
-                        private static double bottomShooterPercent = 0.6;
+                        private static double topShooterPercent = -0.7;
+                        private static double bottomShooterPercent = 0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
+                        private static final double endOfShootDelay = 0.2;
 
                 }
 
@@ -98,7 +99,7 @@ public class ScoringCommands {
                 };
                 Command spinUpCommand = Commands.run(spinUp, topShooterSubsystem,
                                 bottomShooterSubsystem);
-                spinUpCommand.setName("Spin Up");
+                spinUpCommand.setName("Spin");
                 return spinUpCommand;
         };
 
@@ -128,43 +129,48 @@ public class ScoringCommands {
         };
 
         public static final Supplier<Command> createTest = () -> {
-                SmartDashboard.putNumber("Test Shooter Speeds", Constants.Fender.topShooterPercent);
-                SmartDashboard.putNumber("Test Shooter Tolerance", Constants.Fender.shooterTolerancePercent);
+
                 Runnable speedUpShooters = () -> {
-                        double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
-
-                        topShooterSubsystem.spin.accept(-shooterSpeed);
-                        bottomShooterSubsystem.spin.accept(shooterSpeed);
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
                 };
 
-                BooleanSupplier shootersAtSpeed = () -> {
-                        double shooterSpeed = SmartDashboard.getNumber("Test Shooter Speeds", 0);
-                        double shooterTolerance = SmartDashboard.getNumber("Test Shooter Tolerance", 0);
-                        return MathUtil.isNear(
-                                        Math.abs(shooterSpeed),
-                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
-                                        Math.abs(shooterTolerance));
-                };
-
-                Command speedUpShootersCommand = Commands.run(
+                Command speedUpShootersCommand2 = Commands.run(
                                 speedUpShooters,
                                 topShooterSubsystem,
-                                bottomShooterSubsystem)
-                                .until(shootersAtSpeed);
+                                bottomShooterSubsystem);
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        boolean condition = MathUtil.isNear(
+                                        Math.abs(Constants.Fender.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Constants.Fender.shooterTolerancePercent);
+                        return condition;
+                };
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
+
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
 
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
                 Command singulatorCommand = BasicCommands.Set.Singulator.create
                                 .apply(Constants.Fender.singulatorPercent);
                 Command topShooterCommand = BasicCommands.Set.TopShooter.create
-                                .apply(() -> SmartDashboard.getNumber("Test Shooter Speeds", 0));
+                                .apply(() -> Constants.Fender.topShooterPercent);
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
-                                .apply(() -> SmartDashboard.getNumber("Test Shooter Speeds", 0));
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command continueUpToSpeed = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
+                                .until(shootersAtSpeed);
 
                 Command shootCommands = Commands
-                                .parallel(transportCommand, singulatorCommand,
+                                .parallel(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
                                                 topShooterCommand, bottomShooterCommand);
 
-                Command command = Commands.sequence(speedUpShootersCommand, shootCommands);
+                Command command = Commands.sequence(continueUpToSpeed,
+                                shootCommands);
                 command.setName("Test Score");
                 return command;
         };
@@ -193,8 +199,8 @@ public class ScoringCommands {
 
                 BooleanSupplier shootersAtSpeed = () -> {
                         boolean condition = MathUtil.isNear(
-                                        Constants.Fender.topShooterPercent,
-                                        topShooterSubsystem.velocity.in(Value),
+                                        Math.abs(Constants.Fender.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
                                         Constants.Fender.shooterTolerancePercent);
                         SmartDashboard.putBoolean("ShooterAt Speed", condition);
                         return condition;
@@ -224,6 +230,86 @@ public class ScoringCommands {
                 Command command = Commands.sequence(elevatorTiltShootersCommand, continueUpToSpeed,
                                 shootCommands);
                 command.setName("Fender Score");
+                return command;
+        };
+
+        public static final Supplier<Command> createFenderWithDelay = () -> {
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Constants.Fender.elevatorPosition)
+                                .apply(Constants.Fender.tiltAngle);
+
+                Runnable speedUpShooters = () -> {
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
+                };
+
+                Command speedUpShootersCommand1 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                Command elevatorTiltShootersCommand = Commands.race(speedUpShootersCommand1, elevatorTiltCommand);
+
+                Command speedUpShootersCommand2 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        boolean condition = MathUtil.isNear(
+                                        Math.abs(Constants.Fender.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Constants.Fender.shooterTolerancePercent);
+                        SmartDashboard.putBoolean("ShooterAt Speed", condition);
+                        return condition;
+                };
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand3 = BasicCommands.HoldandStop.createForElevator.get();
+
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand3 = BasicCommands.HoldandStop.createForTilt.get();
+
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+
+                Command transportCommand2 = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand2 = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command topShooterCommand2 = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand2 = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command continueUpToSpeed = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
+                                .until(shootersAtSpeed);
+
+                Command waitUntilNoteHasExited = Commands.waitUntil(() -> !notedLoadedSubsystem.hasNote.getAsBoolean());
+                Command waitUntilTime = Commands.waitSeconds(Constants.Fender.endOfShootDelay);
+
+                Command shootCommands = Commands
+                                .race(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand, waitUntilNoteHasExited);
+
+                Command finishShoot = Commands.race(elevatorHoldCommand3, tiltHoldCommand3, transportCommand2,
+                                singulatorCommand2,
+                                topShooterCommand2, bottomShooterCommand2, waitUntilTime);
+
+                Command stopTopShooter = Commands.runOnce(topShooterSubsystem.stop, topShooterSubsystem);
+                Command stopBottomShooter = Commands.runOnce(bottomShooterSubsystem.stop, bottomShooterSubsystem);
+
+                Command command = Commands.sequence(elevatorTiltShootersCommand, continueUpToSpeed,
+                                shootCommands, finishShoot, stopTopShooter, stopBottomShooter);
+                command.setName("Fender Score with Delay");
                 return command;
         };
 
