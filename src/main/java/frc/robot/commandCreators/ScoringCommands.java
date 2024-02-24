@@ -36,7 +36,7 @@ public class ScoringCommands {
         private static final class Constants {
                 private static final class Amp {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
-                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.30,
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.3,
                                         Meters);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = -0.7;
@@ -45,7 +45,7 @@ public class ScoringCommands {
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(50, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(53, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;
