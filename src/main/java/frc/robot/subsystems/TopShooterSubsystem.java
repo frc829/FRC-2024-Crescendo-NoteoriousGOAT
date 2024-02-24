@@ -78,7 +78,8 @@ public class TopShooterSubsystem extends SubsystemBase {
         .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
         .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
         .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
-        .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
+        .andThen(Motor.REV.setkF.
+        apply(0).apply(Constants.slot0kF))
         .andThen(Motor.REV.enableCoast)
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEOVortexMaxVelocity)

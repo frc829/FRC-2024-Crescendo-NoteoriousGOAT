@@ -43,7 +43,7 @@ public class BasicCommands {
             public static final Function<DoubleSupplier, Command> create = (speed) -> {
                 Command command = Commands
                         .run(() -> {
-                            if (RobotContainer.elevatorSubsystem.position.in(Meters) >= 0.37
+                            if (RobotContainer.elevatorSubsystem.position.in(Meters) >= 0.36
                                     && speed.getAsDouble() > 0) {
                                 RobotContainer.elevatorSubsystem.drive.accept(0.0);
 

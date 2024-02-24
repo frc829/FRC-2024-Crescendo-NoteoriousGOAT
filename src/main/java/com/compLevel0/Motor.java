@@ -208,8 +208,7 @@ public class Motor {
                                 canSparkBase.getPIDController().setReference(setpoint.in(Volts),
                                                 ControlType.kVoltage);
                         };
-                        Runnable stop = () -> canSparkBase.getPIDController()
-                                        .setReference(0.0, ControlType.kVelocity);
+                        Runnable stop = () -> canSparkBase.setVoltage(0);
                         Runnable update = () -> {
                                 voltage.mut_setMagnitude(
                                                 canSparkBase.getAppliedOutput()

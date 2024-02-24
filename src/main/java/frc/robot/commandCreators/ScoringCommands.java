@@ -56,10 +56,10 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-                        private static final double shooterTolerancePercent = 0.10;
+                        private static final double shooterTolerancePercent = 0.08;
                         private static final Measure<Distance> shooterRadius = Inches.of(8);
-                        private static final Measure<Distance> shooterAxisDistFromCenter = Inches.of(2.5);
-                        private static final Measure<Distance> shooterAxisHeightFromGround = Inches.of(20);
+                        private static final Measure<Distance> shooterAxisDistFromCenter = Inches.of(2.51);
+                        private static final Measure<Distance> shooterAxisHeightFromGround = Inches.of(18.43);
                 }
 
                 private static final class SpinUp {
@@ -234,7 +234,7 @@ public class ScoringCommands {
                 PIDController pidController = new PIDController(2.5, 0, 0);
                 pidController.enableContinuousInput(-180, 180);
                 pidController.setTolerance(2);
-
+                SmartDashboard.putNumber("Armstrong Fudge Factor", 5);
                 Runnable setValues = () -> {
                         Pose2d fieldPosition = telemetrySubsystem.poseEstimate.get();
                         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -260,7 +260,7 @@ public class ScoringCommands {
                                                         + Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angle);
                                 };
                                 double angleRadians = GoatMath.NewtonRaphsonSolver(angleFunction, angleDerivFunction,
-                                                guess);
+                                                guess) - Math.toRadians(15);
                                 double velocity = Math.sqrt(2 * 9.8 * (shooterAxisHeightMeters
                                                 - Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angleRadians)))
                                                 / Math.sin(angleRadians);
@@ -277,8 +277,7 @@ public class ScoringCommands {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
                                                 .minus(fieldPosition.getTranslation());
                                 Rotation2d targetRotation = targetVector.getAngle()
-                                                .rotateBy(Rotation2d.fromDegrees(
-                                                                180));
+                                                .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
                                 double shooterAxisDistanceMeters = targetVector.getNorm()
@@ -296,7 +295,7 @@ public class ScoringCommands {
                                                         + Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angle);
                                 };
                                 double angleRadians = GoatMath.NewtonRaphsonSolver(angleFunction, angleDerivFunction,
-                                                guess);
+                                                guess) - Math.toRadians(15);
                                 double velocity = Math.sqrt(2 * 9.8 * (shooterAxisHeightMeters
                                                 - Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angleRadians)))
                                                 / Math.sin(angleRadians);

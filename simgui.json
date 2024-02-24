@@ -133,12 +133,6 @@
         "CommandCreator": {
           "open": true
         },
-        "Drive": {
-          "open": true
-        },
-        "Elevator": {
-          "open": true
-        },
         "Field": {
           "double[]##v_/SmartDashboard/Field/Robot": {
             "open": true
@@ -147,16 +141,10 @@
             "open": true
           }
         },
-        "NoteLoaded": {
-          "open": true
-        },
         "Pickup": {
           "open": true
         },
         "Shooter": {
-          "open": true
-        },
-        "Shooter Tilt": {
           "open": true
         },
         "Telemetry": {
@@ -165,8 +153,7 @@
           },
           "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
             "open": true
-          },
-          "open": true
+          }
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
           "open": true
