@@ -10,8 +10,6 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
-import javax.swing.text.html.Option;
-
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
