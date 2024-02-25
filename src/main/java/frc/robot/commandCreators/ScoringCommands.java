@@ -9,6 +9,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import javax.swing.plaf.basic.BasicScrollBarUI;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -100,9 +102,15 @@ public class ScoringCommands {
         };
 
         public static final Supplier<Command> createAmpPosition = () -> {
-                Command command = ResetAndHoldingCommands.setElevatorTiltForever
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Amp.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Amp.bottomShooterPercent);
+
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltForever
                                 .apply(Constants.Amp.elevatorPosition)
                                 .apply(Constants.Amp.tiltAngle);
+                Command command = Commands.parallel(topShooterCommand, bottomShooterCommand, elevatorTiltCommand);
 
                 command.setName("Amp Position");
                 return command;
@@ -117,10 +125,60 @@ public class ScoringCommands {
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Amp.bottomShooterPercent);
 
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
                 Command command = Commands
-                                .parallel(transportCommand, singulatorCommand,
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
                                                 topShooterCommand, bottomShooterCommand);
                 command.setName("Amp Drop");
+                return command;
+        };
+
+        public static final Supplier<Command> createTrap = () -> {
+
+                Runnable speedUpShooters = () -> {
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
+                };
+
+                Command speedUpShootersCommand2 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        boolean condition = MathUtil.isNear(
+                                        Math.abs(Constants.Fender.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Constants.Fender.shooterTolerancePercent);
+                        SmartDashboard.putBoolean("ShooterAt Speed", condition);
+                        return condition;
+                };
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
+
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
+
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command continueUpToSpeed = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
+                                .until(shootersAtSpeed);
+
+                Command shootCommands = Commands
+                                .parallel(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand);
+
+                Command command = Commands.sequence(continueUpToSpeed,
+                                shootCommands);
+                command.setName("Trap Score");
                 return command;
         };
 

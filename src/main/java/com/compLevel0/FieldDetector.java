@@ -81,7 +81,7 @@ public class FieldDetector {
                                 fieldY.mut_setMagnitude(poseArray[1]);
                                 fieldYaw.mut_setMagnitude(poseArray[5]);
                                 latencyMeasure.mut_setMagnitude(poseArray[6]);
-                                tagCountValue.mut_setMagnitude(poseArray[7]);
+                                // tagCountValue.mut_setMagnitude(poseArray[7]);
                                 return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
                                         Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
                             } else {

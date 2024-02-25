@@ -62,7 +62,8 @@ public class PickupCommands implements Sendable {
                                 .apply(Constants.Ground.outerIntakePercent);
 
                 Command groundPickupCommand = Commands
-                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand, innerIntakeCommand,
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
+                                                innerIntakeCommand,
                                                 outerIntakeCommand)
                                 .until(RobotContainer.notedLoadedSubsystem.hasNote);
 
@@ -80,7 +81,45 @@ public class PickupCommands implements Sendable {
                 Command pickupCommand = Commands.sequence(elevatorTiltCommand,
                                 groundPickupCommand, hasNoteCommand);
                 Command noPickupCommand = Commands.none();
-                Command command = Commands.either(noPickupCommand, pickupCommand, RobotContainer.notedLoadedSubsystem.hasNote);
+                Command command = Commands.either(noPickupCommand, pickupCommand,
+                                RobotContainer.notedLoadedSubsystem.hasNote);
+                command.setName("Ground Pickup");
+                return command;
+        };
+
+        public static final Supplier<Command> createGroundNoLevel = () -> {
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Constants.Ground.elevatorPosition)
+                                .apply(Constants.Ground.tiltAngle);
+
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Ground.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create.apply(0.0);
+                Command innerIntakeCommand = BasicCommands.Set.InnerIntake.create
+                                .apply(Constants.Ground.innerIntakePercent);
+                Command outerIntakeCommand = BasicCommands.Set.OuterIntake.create
+                                .apply(Constants.Ground.outerIntakePercent);
+
+                Command groundPickupCommand = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, transportCommand, singulatorCommand,
+                                                innerIntakeCommand,
+                                                outerIntakeCommand)
+                                .until(RobotContainer.notedLoadedSubsystem.hasNote);
+
+
+
+                Command hasNoteCommand = Commands.parallel(
+                                BasicCommands.Set.OuterIntake.create.apply(0.0),
+                                BasicCommands.Set.InnerIntake.create.apply(0.0),
+                                BasicCommands.Set.Transport.create.apply(0.0),
+                                BasicCommands.Set.Singulator.create.apply(0.0));
+
+                Command pickupCommand = Commands.sequence(elevatorTiltCommand,
+                                groundPickupCommand, hasNoteCommand);
+                Command noPickupCommand = Commands.none();
+                Command command = Commands.either(noPickupCommand, pickupCommand,
+                                RobotContainer.notedLoadedSubsystem.hasNote);
                 command.setName("Ground Pickup");
                 return command;
         };
@@ -165,7 +204,8 @@ public class PickupCommands implements Sendable {
 
                 Command pickupDetectedNote = Commands.parallel(goToNoteCommand, createGround.get());
 
-                Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected, pickupDetectedNote,
+                Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected,
+                                pickupDetectedNote,
                                 setFieldDetectModeCommand);
 
                 command.setName("Note Detect");
