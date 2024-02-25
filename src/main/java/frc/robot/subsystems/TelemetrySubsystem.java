@@ -35,7 +35,9 @@ public class TelemetrySubsystem extends SubsystemBase {
         public static final class Constants {
                 public static final double poseTranslationToleranceMeters = 1;
                 public static final double poseRotationToleranceDegrees = 2;
-                private static final List<String> fieldDetectorNames = List.of("limelight-front", "limelight-rear");
+                private static final List<Pair<String, Pose3d>> fieldDetectorNames = List.of(
+                                new Pair<>("limelight-front", new Pose3d()),
+                                new Pair<>("limelight-rear", new Pose3d()));
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(
                                                 "limelight-front",
@@ -246,9 +248,10 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                 .apply(telemetry));
 
                 Constants.fieldDetectorNames.forEach(
-                                (name) -> Telemetry.addFieldDetectorToTelemetry
+                                (namePosition) -> Telemetry.addFieldDetectorToTelemetry
                                                 .apply(FieldDetector.Limelight.createLimelight
-                                                                .apply(name)
+                                                                .apply(namePosition.getFirst())
+                                                                .apply(namePosition.getSecond())
                                                                 .apply(telemetry.poseEstimate))
                                                 .apply(telemetry));
 
@@ -280,7 +283,10 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                 if (translationGood && rotationGood) {
                                                         telemetry.addDetectedPosesToEstimator.apply(pose)
                                                                         .accept(latency);
-                                                        SmartDashboard.putNumber("Pose Added to Estimater at TimeIndex",
+                                                        SmartDashboard.putNumber("Pose Added from "
+                                                                        + telemetry.fieldDetectorOptPositions.get(i)
+                                                                                        .getFirst()
+                                                                        + " at Time Index",
                                                                         Timer.getFPGATimestamp());
                                                 }
                                         }

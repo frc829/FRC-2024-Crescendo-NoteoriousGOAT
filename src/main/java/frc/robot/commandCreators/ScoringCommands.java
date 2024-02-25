@@ -1,17 +1,13 @@
 package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Value;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.utility.GoatMath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -20,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Angle;
-import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
@@ -45,7 +40,7 @@ public class ScoringCommands {
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(53, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;
@@ -57,10 +52,11 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-                        private static final double shooterTolerancePercent = 0.08;
-                        private static final Measure<Distance> shooterRadius = Inches.of(8);
-                        private static final Measure<Distance> shooterAxisDistFromCenter = Inches.of(2.51);
-                        private static final Measure<Distance> shooterAxisHeightFromGround = Inches.of(18.43);
+                        private static final double shooterTolerancePercent = 0.05;
+                        private static final Function<Double, Double> regression = (distance) -> {
+                                return -9.21 * distance + 66.6;
+                        };
+
                 }
 
                 private static final class SpinUp {
@@ -316,11 +312,9 @@ public class ScoringCommands {
         @SuppressWarnings({ "resource" })
         public static final Supplier<Command> createRanged = () -> {
                 MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
-                MutableMeasure<Dimensionless> shooterPercentMeasure = MutableMeasure.zero(Value);
                 PIDController pidController = new PIDController(2.5, 0, 0);
                 pidController.enableContinuousInput(-180, 180);
                 pidController.setTolerance(2);
-                SmartDashboard.putNumber("Armstrong Fudge Factor", 5);
                 Runnable setValues = () -> {
                         Pose2d fieldPosition = telemetrySubsystem.poseEstimate.get();
                         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -331,33 +325,8 @@ public class ScoringCommands {
                                                 .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
-                                double shooterAxisDistanceMeters = targetVector.getNorm()
-                                                - Constants.Ranged.shooterAxisDistFromCenter.in(Meters);
-                                double shooterAxisHeightMeters = ResetAndHoldingCommands.Constants.speakerHeight
-                                                .in(Meters) - Constants.Ranged.shooterAxisHeightFromGround.in(Meters);
-                                double guess = Math.atan(2 * shooterAxisHeightMeters / shooterAxisDistanceMeters);
-                                Function<Double, Double> angleFunction = (angle) -> {
-                                        return shooterAxisDistanceMeters * Math.tan(angle)
-                                                        + Constants.Ranged.shooterRadius.in(Meters) * Math.sin(angle)
-                                                        - 2 * shooterAxisHeightMeters;
-                                };
-                                Function<Double, Double> angleDerivFunction = (angle) -> {
-                                        return shooterAxisDistanceMeters * (1.0 / Math.pow(Math.cos(angle), 2))
-                                                        + Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angle);
-                                };
-                                double angleRadians = GoatMath.NewtonRaphsonSolver(angleFunction, angleDerivFunction,
-                                                guess) - Math.toRadians(15);
-                                double velocity = Math.sqrt(2 * 9.8 * (shooterAxisHeightMeters
-                                                - Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angleRadians)))
-                                                / Math.sin(angleRadians);
-                                double shooterOmega = velocity
-                                                / ResetAndHoldingCommands.Constants.shooterWheelRadius.in(
-                                                                Meters);
-                                shooterOmega /= ResetAndHoldingCommands.Constants.shooterSpeedTransferEfficiency;
-                                double shooterPercent = shooterOmega / ResetAndHoldingCommands.Constants.maxShooterSpeed
-                                                .in(RadiansPerSecond);
-                                shooterPercentMeasure.mut_setMagnitude(shooterPercent);
-                                double angleDegs = Math.toDegrees(angleRadians);
+                                double shooterAxisDistanceMeters = targetVector.getNorm();
+                                double angleDegs = Constants.Ranged.regression.apply(shooterAxisDistanceMeters);
                                 tiltAngle.mut_setMagnitude(angleDegs);
                         } else {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
@@ -366,33 +335,8 @@ public class ScoringCommands {
                                                 .rotateBy(Rotation2d.fromDegrees(180));
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
-                                double shooterAxisDistanceMeters = targetVector.getNorm()
-                                                - Constants.Ranged.shooterAxisDistFromCenter.in(Meters);
-                                double shooterAxisHeightMeters = ResetAndHoldingCommands.Constants.speakerHeight
-                                                .in(Meters) - Constants.Ranged.shooterAxisHeightFromGround.in(Meters);
-                                double guess = Math.atan(2 * shooterAxisHeightMeters / shooterAxisDistanceMeters);
-                                Function<Double, Double> angleFunction = (angle) -> {
-                                        return shooterAxisDistanceMeters * Math.tan(angle)
-                                                        + Constants.Ranged.shooterRadius.in(Meters) * Math.sin(angle)
-                                                        - 2 * shooterAxisHeightMeters;
-                                };
-                                Function<Double, Double> angleDerivFunction = (angle) -> {
-                                        return shooterAxisDistanceMeters * (1.0 / Math.pow(Math.cos(angle), 2))
-                                                        + Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angle);
-                                };
-                                double angleRadians = GoatMath.NewtonRaphsonSolver(angleFunction, angleDerivFunction,
-                                                guess) - Math.toRadians(15);
-                                double velocity = Math.sqrt(2 * 9.8 * (shooterAxisHeightMeters
-                                                - Constants.Ranged.shooterRadius.in(Meters) * Math.cos(angleRadians)))
-                                                / Math.sin(angleRadians);
-                                double shooterOmega = velocity
-                                                / ResetAndHoldingCommands.Constants.shooterWheelRadius.in(
-                                                                Meters);
-                                shooterOmega /= ResetAndHoldingCommands.Constants.shooterSpeedTransferEfficiency;
-                                double shooterPercent = shooterOmega / ResetAndHoldingCommands.Constants.maxShooterSpeed
-                                                .in(RadiansPerSecond);
-                                shooterPercentMeasure.mut_setMagnitude(shooterPercent);
-                                double angleDegs = Math.toDegrees(angleRadians);
+                                double shooterAxisDistanceMeters = targetVector.getNorm();
+                                double angleDegs = Constants.Ranged.regression.apply(shooterAxisDistanceMeters);
                                 tiltAngle.mut_setMagnitude(angleDegs);
                         }
                 };
@@ -402,8 +346,8 @@ public class ScoringCommands {
                 };
 
                 Runnable speedUpShooters = () -> {
-                        topShooterSubsystem.spin.accept(-shooterPercentMeasure.in(Value));
-                        bottomShooterSubsystem.spin.accept(shooterPercentMeasure.in(Value));
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
                 };
 
                 Runnable rotateInPlace = () -> {
@@ -432,7 +376,7 @@ public class ScoringCommands {
 
                 BooleanSupplier shootersAtSpeed = () -> {
                         return MathUtil.isNear(
-                                        Math.abs(shooterPercentMeasure.in(Value)),
+                                        Math.abs(Constants.Fender.topShooterPercent),
                                         Math.abs(topShooterSubsystem.velocity.in(Value)),
                                         Constants.Ranged.shooterTolerancePercent);
                 };

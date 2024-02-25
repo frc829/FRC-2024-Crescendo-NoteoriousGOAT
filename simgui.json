@@ -6,7 +6,7 @@
           "open": true
         }
       },
-      "SPARK MAX [16]": {
+      "SPARK MAX [18]": {
         "header": {
           "open": true
         }
@@ -17,16 +17,6 @@
         }
       },
       "SPARK MAX [21]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [25]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]": {
         "header": {
           "open": true
         }
@@ -138,9 +128,6 @@
         "CommandCreator": {
           "open": true
         },
-        "Drive": {
-          "open": true
-        },
         "Field": {
           "double[]##v_/SmartDashboard/Field/Robot": {
             "open": true
@@ -153,6 +140,9 @@
           "open": true
         },
         "Shooter": {
+          "open": true
+        },
+        "Shooter Tilt": {
           "open": true
         },
         "Telemetry": {
@@ -189,9 +179,6 @@
     }
   },
   "NetworkTables Info": {
-    "Connections": {
-      "open": true
-    },
     "visible": true
   }
 }
