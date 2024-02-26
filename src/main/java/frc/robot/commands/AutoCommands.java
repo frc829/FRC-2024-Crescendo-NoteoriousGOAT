@@ -13,6 +13,7 @@ import frc.robot.commandCreators.TelemetryCommands;
 public class AutoCommands {
 
     public AutoCommands() {
+        NamedCommands.registerCommand("BackReset", TelemetryCommands.createResetPoseFromBackCameraCommand.get());
         NamedCommands.registerCommand("RangedShoot", ScoringCommands.createRanged.get());
         NamedCommands.registerCommand("Fender", ScoringCommands.createFenderWithDelay.get());
         NamedCommands.registerCommand("Pickup", PickupCommands.createGroundNoLevel.get());

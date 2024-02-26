@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.150131501165936,
-        "y": 6.834952992705083
+        "x": 7.227032411309479,
+        "y": 6.922328333967831
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.3348156718886803,
-        "y": 5.5654779481116545
+        "x": 1.2991794154609702,
+        "y": 5.557362183607978
       },
       "prevControl": {
-        "x": 2.3802657086126815,
-        "y": 5.640152950734795
+        "x": 4.39960252842121,
+        "y": 5.615860732909115
       },
       "nextControl": null,
       "isLocked": false,
@@ -56,7 +56,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.25,
+    "maxVelocity": 4.25,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 180.0
@@ -67,10 +67,10 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PathsNotesToSpeaker",
   "previewStartingState": {
     "rotation": 0.0,
     "velocity": 0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

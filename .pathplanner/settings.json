@@ -2,7 +2,10 @@
   "robotWidth": 0.74,
   "robotLength": 0.74,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "PathsNotesToSpeaker",
+    "PathSpeakerToNotes"
+  ],
   "autoFolders": [
     "Fender-2Notes",
     "Fender-3Notes",

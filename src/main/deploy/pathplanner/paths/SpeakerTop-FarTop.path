@@ -61,7 +61,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PathSpeakerToNotes",
   "previewStartingState": {
     "rotation": 60.0,
     "velocity": 0

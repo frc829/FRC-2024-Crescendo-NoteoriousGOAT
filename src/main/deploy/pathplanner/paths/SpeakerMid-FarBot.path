@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1083469841883256,
-        "y": 0.8982902841652186
+        "x": 0.8896895703530137,
+        "y": 1.90120285228694
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.307594041824652,
-        "y": 0.7582746542468258
+        "x": 8.309255573380506,
+        "y": 0.7994801737822012
       },
       "prevControl": {
-        "x": 6.902399159362815,
-        "y": 0.887700498684098
+        "x": 6.904060690918669,
+        "y": 0.9289060182194743
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,7 +61,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PathSpeakerToNotes",
   "previewStartingState": {
     "rotation": 0.0,
     "velocity": 0

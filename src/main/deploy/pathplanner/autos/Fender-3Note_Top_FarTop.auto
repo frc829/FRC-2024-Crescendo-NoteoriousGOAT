@@ -38,6 +38,12 @@
         {
           "type": "named",
           "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Fender"
           }
         },
@@ -51,6 +57,12 @@
           "type": "path",
           "data": {
             "pathName": "FarTop-SpeakerTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackReset"
           }
         },
         {

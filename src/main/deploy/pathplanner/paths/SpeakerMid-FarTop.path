@@ -20,8 +20,8 @@
         "y": 7.441986055143282
       },
       "prevControl": {
-        "x": 6.906639371037757,
-        "y": 7.441986055143282
+        "x": 6.883551064399425,
+        "y": 7.571411899580555
       },
       "nextControl": null,
       "isLocked": false,
@@ -61,7 +61,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PathSpeakerToNotes",
   "previewStartingState": {
     "rotation": 0.0,
     "velocity": 0

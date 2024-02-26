@@ -38,6 +38,12 @@
         {
           "type": "named",
           "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Fender"
           }
         },
@@ -56,6 +62,12 @@
         {
           "type": "named",
           "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Fender"
           }
         },
@@ -69,6 +81,12 @@
           "type": "path",
           "data": {
             "pathName": "TopNote-SpeakerMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackReset"
           }
         },
         {

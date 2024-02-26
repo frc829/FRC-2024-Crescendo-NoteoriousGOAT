@@ -60,8 +60,8 @@ public class ScoringCommands {
                 }
 
                 private static final class SpinUp {
-                        private static final double topShooterPercent = Constants.Fender.topShooterPercent * 0.75;
-                        private static final double bottomShooterPercent = Constants.Fender.bottomShooterPercent * 0.75;
+                        private static final double topShooterPercent = Constants.Fender.topShooterPercent * 1;
+                        private static final double bottomShooterPercent = Constants.Fender.bottomShooterPercent * 1;
                 }
 
                 private static final class Climb {
@@ -177,53 +177,6 @@ public class ScoringCommands {
                 Command command = Commands.sequence(continueUpToSpeed,
                                 shootCommands);
                 command.setName("Trap Score");
-                return command;
-        };
-
-        public static final Supplier<Command> createTest = () -> {
-
-                Runnable speedUpShooters = () -> {
-                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
-                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
-                };
-
-                Command speedUpShootersCommand2 = Commands.run(
-                                speedUpShooters,
-                                topShooterSubsystem,
-                                bottomShooterSubsystem);
-
-                BooleanSupplier shootersAtSpeed = () -> {
-                        boolean condition = MathUtil.isNear(
-                                        Math.abs(Constants.Fender.topShooterPercent),
-                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
-                                        Constants.Fender.shooterTolerancePercent);
-                        return condition;
-                };
-                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
-                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
-
-                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
-                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
-
-                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
-                Command singulatorCommand = BasicCommands.Set.Singulator.create
-                                .apply(Constants.Fender.singulatorPercent);
-                Command topShooterCommand = BasicCommands.Set.TopShooter.create
-                                .apply(() -> Constants.Fender.topShooterPercent);
-                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
-                                .apply(() -> Constants.Fender.bottomShooterPercent);
-
-                Command continueUpToSpeed = Commands
-                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
-                                .until(shootersAtSpeed);
-
-                Command shootCommands = Commands
-                                .parallel(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
-                                                topShooterCommand, bottomShooterCommand);
-
-                Command command = Commands.sequence(continueUpToSpeed,
-                                shootCommands);
-                command.setName("Test Score");
                 return command;
         };
 
@@ -422,6 +375,8 @@ public class ScoringCommands {
                         SmartDashboard.putBoolean("In Position", pidController.atSetpoint());
                 };
 
+                Command telemetryReset = TelemetryCommands.createResetPoseFromBackCameraCommand.get();
+
                 Command setValuesCommand = Commands.runOnce(setValues);
                 Command tiltCommand = Commands.run(tilt, shooterTiltSubsystem);
                 Command speedUpShootersCommand = Commands.run(
@@ -464,7 +419,7 @@ public class ScoringCommands {
                 Command shootCommands = Commands
                                 .parallel(tiltHoldCommand, driveStopCommand, transportCommand, singulatorCommand);
 
-                Command command = Commands.sequence(setValuesCommand, spinUpAndTilt,
+                Command command = Commands.sequence(telemetryReset, setValuesCommand, spinUpAndTilt,
                                 shootCommands);
                 command.setName("Ranged Score");
                 return command;

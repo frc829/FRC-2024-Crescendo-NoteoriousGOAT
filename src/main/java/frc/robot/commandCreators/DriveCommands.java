@@ -107,8 +107,8 @@ public class DriveCommands {
         public static final Supplier<Command> createRobotCentricFLCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(13),
-                                Units.inchesToMeters(13));
+                                Units.inchesToMeters(-20),
+                                Units.inchesToMeters(20));
                 Runnable drive = () -> {
                         speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
                                         .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
@@ -129,8 +129,8 @@ public class DriveCommands {
         public static final Supplier<Command> createRobotCentricFRCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(13),
-                                Units.inchesToMeters(-13));
+                                Units.inchesToMeters(-20),
+                                Units.inchesToMeters(-20));
                 Runnable drive = () -> {
                         speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
                                         .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
@@ -184,8 +184,8 @@ public class DriveCommands {
         public static final Supplier<Command> createFieldCentricFLCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(13),
-                                Units.inchesToMeters(13));
+                                Units.inchesToMeters(-20),
+                                Units.inchesToMeters(20));
                 Runnable drive = () -> {
                         double flipper = 1;
                         var color = DriverStation.getAlliance();
@@ -218,8 +218,8 @@ public class DriveCommands {
         public static final Supplier<Command> createFieldCentricFRCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(13),
-                                Units.inchesToMeters(-13));
+                                Units.inchesToMeters(-20),
+                                Units.inchesToMeters(-20));
                 Runnable drive = () -> {
                         double flipper = 1;
                         var color = DriverStation.getAlliance();

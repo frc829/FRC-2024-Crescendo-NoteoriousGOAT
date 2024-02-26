@@ -38,6 +38,12 @@
         {
           "type": "named",
           "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Fender"
           }
         }

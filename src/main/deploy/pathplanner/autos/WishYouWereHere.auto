@@ -38,6 +38,12 @@
         {
           "type": "named",
           "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "Fender"
           }
         },
@@ -51,6 +57,18 @@
           "type": "path",
           "data": {
             "pathName": "SecBot-SpeakerBot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackReset"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
           }
         }
       ]
