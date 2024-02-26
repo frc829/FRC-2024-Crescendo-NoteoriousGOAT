@@ -58,6 +58,24 @@
           "data": {
             "name": "Fender"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerMid-FarTop"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarTop-SpeakerMid"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
         }
       ]
     }

@@ -58,6 +58,24 @@
           "data": {
             "name": "Fender"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpeakerMid-FarBot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarBot-SpeakerBot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Fender"
+          }
         }
       ]
     }

@@ -43,6 +43,7 @@ public class Telemetry {
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions;
         public final Consumer<Pose2d> setPoseEstimate;
         public final Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator;
+        public final List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors;
         public final List<Runnable> enableFieldDetectors;
         public final List<Runnable> enableObjectDetectors;
         public final Runnable update;
@@ -58,6 +59,7 @@ public class Telemetry {
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions,
                         Consumer<Pose2d> setPoseEstimate,
                         Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator,
+                        List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors,
                         List<Runnable> enableFieldDetectors,
                         List<Runnable> enableObjectDetectors,
                         Runnable update) {
@@ -71,6 +73,7 @@ public class Telemetry {
                 this.objectDetectorOptPositions = objectDetectorOptPositions;
                 this.setPoseEstimate = setPoseEstimate;
                 this.addDetectedPosesToEstimator = addDetectedPosesToEstimator;
+                this.setPriorityTargetsFromFieldDetectors = setPriorityTargetsFromFieldDetectors;
                 this.enableFieldDetectors = enableFieldDetectors;
                 this.enableObjectDetectors = enableObjectDetectors;
                 this.update = update;
@@ -111,6 +114,8 @@ public class Telemetry {
                                                                         Timer.getFPGATimestamp() - latency.in(Seconds));
                                                 };
 
+                                List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors = new ArrayList<>();
+
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
                                 List<Runnable> enableObjectDetectors = new ArrayList<>();
 
@@ -146,7 +151,7 @@ public class Telemetry {
                                 return new Telemetry(field2d, gyroscope.yaw, gyroscope.accelerationX,
                                                 gyroscope.accelerationY, poseEstimate, fieldDetectorOptPositions,
                                                 fieldDetectorOptLatencies, objectDetectorOptPositions, setPoseEstimate,
-                                                addDetectedPosesToEstimator, enableFieldDetectors,
+                                                addDetectedPosesToEstimator, setPriorityTargetsFromFieldDetectors, enableFieldDetectors,
                                                 enableObjectDetectors, update);
                         };
 
@@ -158,6 +163,7 @@ public class Telemetry {
                                 telemetry.fieldDetectorLatencies
                                                 .add(new Pair<String, Supplier<Optional<Measure<Time>>>>(
                                                                 fieldDetector.name, fieldDetector.latency));
+                                telemetry.setPriorityTargetsFromFieldDetectors.add(fieldDetector.setPriorityTarget);
                                 telemetry.enableFieldDetectors.add(fieldDetector.enable);
                                 fieldDetector.enable.run();
                                 return telemetry;
