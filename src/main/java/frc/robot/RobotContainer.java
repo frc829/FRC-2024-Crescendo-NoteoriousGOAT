@@ -168,6 +168,10 @@ public class RobotContainer {
                 ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
                 ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
+                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.whileTrue(DriveCommands.createPointingFieldCentricCommand.get());
+                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
+                // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.whileTrue(DriveCommands.createRotationAlongHeadingFieldCentricCommand.get());
+                // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
                 // Runnable loadRhapsody = () -> orchestra.loadMusic("rhapsody.chrp");
                 // Runnable loadGiveYouUp = () ->
                 // orchestra.loadMusic("Never-Gonna-Give-You-Up-1.chrp");

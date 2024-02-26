@@ -10,16 +10,21 @@ public class ComplexTriggers {
         }
 
         public static final Trigger fieldCentricOriginDriveTrigger = (new Trigger(RobotContainer.driver.leftX)
-                        .or(RobotContainer.driver.leftY)).and(RobotContainer.driver.x.negate()).and(RobotContainer.driver.rightBumper.negate());
+                        .or(RobotContainer.driver.leftY)).and(RobotContainer.driver.x.negate())
+                        .and(RobotContainer.driver.rightBumper.negate());
 
         public static final Trigger fieldCentricFLDriveTrigger = fieldCentricOriginDriveTrigger
                         .and(RobotContainer.driver.padLeft);
         public static final Trigger fieldCentricFRDriveTrigger = fieldCentricOriginDriveTrigger
                         .and(RobotContainer.driver.padRight);
 
+        public static final Trigger fieldCentricRotateAlongHeadingDriveTrigger = fieldCentricOriginDriveTrigger
+                        .and(RobotContainer.driver.y);
+
         public static final Trigger robotCentricOriginDriveTrigger = fieldCentricOriginDriveTrigger.negate().and(
                         RobotContainer.driver.rightX.or(RobotContainer.driver.rightY)
-                                        .or(RobotContainer.driver.fullTrigger)).and(RobotContainer.driver.x.negate()).and(RobotContainer.driver.rightBumper.negate());
+                                        .or(RobotContainer.driver.fullTrigger))
+                        .and(RobotContainer.driver.x.negate()).and(RobotContainer.driver.rightBumper.negate());
 
         public static final Trigger robotCentricFLDriveTrigger = robotCentricOriginDriveTrigger
                         .and(RobotContainer.driver.padLeft);
