@@ -1,8 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.RobotContainer.telemetrySubsystem;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -310,7 +308,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 telemetry.objectDetectorOptPositions,
                                 telemetry.setPoseEstimate,
                                 resetPoseEstimateFromFieldDetectors,
-                                telemetrySubsystem.setPriorityTargetsFromFieldDetectors,
+                                telemetry.setPriorityTargetsFromFieldDetectors,
                                 telemetry.enableFieldDetectors,
                                 telemetry.enableObjectDetectors,
                                 update);

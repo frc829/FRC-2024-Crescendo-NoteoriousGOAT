@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class FieldDetector {
 
     public final String name;
+    public final Supplier<Double> taNumberSupplier;
     public final Supplier<Optional<Pose2d>> fieldPosition;
     public final Supplier<Optional<Translation2d>> robotSpaceTargetTranslation;
     public final Supplier<Optional<Measure<Time>>> latency;
@@ -38,6 +39,7 @@ public class FieldDetector {
 
     private FieldDetector(
             String name,
+            Supplier<Double> taNumberSupplier,
             Supplier<Optional<Pose2d>> fieldPosition,
             Supplier<Optional<Translation2d>> robotSpaceTargetTranslation,
             Supplier<Optional<Measure<Time>>> latency,
@@ -46,6 +48,7 @@ public class FieldDetector {
             Runnable enable,
             Runnable update) {
         this.name = name;
+        this.taNumberSupplier = taNumberSupplier;
         this.fieldPosition = fieldPosition;
         this.tagCount = tagCount;
         this.robotSpaceTargetTranslation = robotSpaceTargetTranslation;
@@ -63,6 +66,7 @@ public class FieldDetector {
                     NetworkTableEntry validTargetSupplier = table.getEntry("tv");
                     NetworkTableEntry txSupplier = table.getEntry("tx");
                     NetworkTableEntry tySupplier = table.getEntry("ty");
+                    NetworkTableEntry taSupplier = table.getEntry("ta");
                     NetworkTableEntry pipelineSupplier = table.getEntry("getpipe");
                     NetworkTableEntry botpose_wpiblueSupplier = table.getEntry("botpose_wpiblue");
                     NetworkTableEntry pipelineConsumer = table.getEntry("pipeline");
@@ -87,6 +91,14 @@ public class FieldDetector {
                             return 5.0;
                         } else {
                             return tySupplier.getDouble(0);
+                        }
+                    };
+
+                    Supplier<Double> taNumberSupplier = () -> {
+                        if(RobotBase.isSimulation()){
+                            return 0.0;
+                        }else{
+                            return taSupplier.getDouble(0.0);
                         }
                     };
 
@@ -166,7 +178,7 @@ public class FieldDetector {
 
                     };
 
-                    return new FieldDetector(name, fieldPosition, robotSpaceTargetTranslation, latency, tagCount, setPriorityTarget, enable, update);
+                    return new FieldDetector(name, taNumberSupplier, fieldPosition, robotSpaceTargetTranslation, latency, tagCount, setPriorityTarget, enable, update);
                 };
     }
 

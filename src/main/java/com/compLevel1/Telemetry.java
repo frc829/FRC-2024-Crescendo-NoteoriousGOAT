@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Telemetry {
 
         public final Field2d field2d;
+        public final List<Supplier<Double>> taNumberSuppliers;
         public final Measure<Angle> gyroYaw;
         public final Measure<Velocity<Velocity<Distance>>> accelerationX;
         public final Measure<Velocity<Velocity<Distance>>> accelerationY;
@@ -50,6 +51,7 @@ public class Telemetry {
 
         private Telemetry(
                         Field2d field2d,
+                        List<Supplier<Double>> taNumberSuppliers,
                         Measure<Angle> gyroYaw,
                         Measure<Velocity<Velocity<Distance>>> accelerationX,
                         Measure<Velocity<Velocity<Distance>>> accelerationY,
@@ -64,6 +66,7 @@ public class Telemetry {
                         List<Runnable> enableObjectDetectors,
                         Runnable update) {
                 this.field2d = field2d;
+                this.taNumberSuppliers = taNumberSuppliers;
                 this.gyroYaw = gyroYaw;
                 this.accelerationX = accelerationX;
                 this.accelerationY = accelerationY;
@@ -84,7 +87,7 @@ public class Telemetry {
                         gyroscope) -> (kinematics) -> (wheelPositions) -> {
 
                                 Field2d field2d = new Field2d();
-
+                                List<Supplier<Double>> taNumberSuppliers = new ArrayList<>();
                                 SwerveDrivePoseEstimator swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
                                                 kinematics,
                                                 Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
@@ -148,7 +151,7 @@ public class Telemetry {
 
                                 };
 
-                                return new Telemetry(field2d, gyroscope.yaw, gyroscope.accelerationX,
+                                return new Telemetry(field2d, taNumberSuppliers, gyroscope.yaw, gyroscope.accelerationX,
                                                 gyroscope.accelerationY, poseEstimate, fieldDetectorOptPositions,
                                                 fieldDetectorOptLatencies, objectDetectorOptPositions, setPoseEstimate,
                                                 addDetectedPosesToEstimator, setPriorityTargetsFromFieldDetectors, enableFieldDetectors,
@@ -157,6 +160,7 @@ public class Telemetry {
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (
                         fieldDetector) -> (telemetry) -> {
+                                telemetry.taNumberSuppliers.add(fieldDetector.taNumberSupplier);
                                 telemetry.fieldDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(fieldDetector.name,
                                                                 fieldDetector.fieldPosition));
