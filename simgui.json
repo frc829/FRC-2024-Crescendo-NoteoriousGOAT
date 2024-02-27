@@ -6,17 +6,32 @@
           "open": true
         }
       },
-      "SPARK MAX [18]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [20]": {
         "header": {
           "open": true
         }
       },
       "SPARK MAX [21]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[20]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[20]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[20]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[20]/Rotor Sensor": {
         "header": {
           "open": true
         }

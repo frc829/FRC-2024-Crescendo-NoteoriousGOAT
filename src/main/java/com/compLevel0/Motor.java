@@ -490,7 +490,7 @@ public class Motor {
                                         0,
                                         0,
                                         1,
-                                        true,
+                                        false,
                                         false,
                                         false);
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
