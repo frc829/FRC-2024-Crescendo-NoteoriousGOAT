@@ -2,6 +2,8 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+
+import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,8 +17,17 @@ import frc.robot.commandCreators.ScoringCommands;
 
 public class ManualCommands {
         public static final class Elevator {
+
+                public static final DoubleSupplier elevatorSpeedSupplier = () -> {
+                        if(RobotContainer.operator.leftYValue.getAsDouble() > 0){
+                                return RobotContainer.operator.leftYValue.getAsDouble();
+                        }else{
+                                return 0.5 * RobotContainer.operator.leftYValue.getAsDouble();
+                        }
+                };
+
                 public static final Command drive = BasicCommands.Set.ElevatorDrive.create
-                                .apply(RobotContainer.operator.leftYValue);
+                                .apply(elevatorSpeedSupplier);
         }
 
         public static final class Tilt {

@@ -41,9 +41,9 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 new Pair<>(
                                                 "limelight-front",
                                                 new Pose3d(
-                                                                Units.inchesToMeters(13),
+                                                                Units.inchesToMeters(15.5),
                                                                 Units.inchesToMeters(0),
-                                                                Units.inchesToMeters(19.5),
+                                                                Units.inchesToMeters(18.7),
                                                                 new Rotation3d(
                                                                                 0,
                                                                                 0,
