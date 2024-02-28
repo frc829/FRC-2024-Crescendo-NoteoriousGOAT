@@ -44,8 +44,8 @@ public class ScoringCommands {
                 private static final class Fender {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = 0.7;
-                        private static double bottomShooterPercent = -0.7;
+                        private static double topShooterPercent = -0.7;
+                        private static double bottomShooterPercent = 0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
@@ -54,16 +54,20 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-                        private static final double shooterTolerancePercent = 0.05;
+                        private static final double shooterTolerancePercent = 0.10;
                         private static final double[] distances = new double[] {
                                         1.28,
-                                        2.3,
-                                        3.45
+                                        2.22,
+                                        2.87,
+                                        4.29,
+                                        4.8514
                         };
                         private static final double[] anglesDegrees = new double[] {
                                         55.0,
-                                        45.0,
-                                        35.0
+                                        42.0,
+                                        35.0,
+                                        30.0,
+                                        29.0
                         };
                         private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                                         anglesDegrees);
@@ -331,6 +335,13 @@ public class ScoringCommands {
 
         @SuppressWarnings({ "resource" })
         public static final Supplier<Command> createRanged = () -> {
+                Command tiltUpALittle = BasicCommands.Set.TiltAngle.create.apply(Degrees.of(15));
+                Command tiltUpALittleUntil = tiltUpALittle.until(() -> {
+                        return MathUtil.isNear(
+                                        15.0,
+                                        shooterTiltSubsystem.angle.in(Degrees),
+                                        BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
+                });
                 MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
                 PIDController pidController = new PIDController(2.5, 0, 0);
                 pidController.enableContinuousInput(-180, 180);
@@ -387,6 +398,7 @@ public class ScoringCommands {
                 };
 
                 Command telemetryReset = TelemetryCommands.createResetPoseFromBackCameraCommand.get();
+                Command telemetryResetFront = TelemetryCommands.createResetPoseFromFrontCameraCommand.get();
 
                 Command setValuesCommand = Commands.runOnce(setValues);
                 Command tiltCommand = Commands.run(tilt, shooterTiltSubsystem);
@@ -443,19 +455,13 @@ public class ScoringCommands {
                 Command bottomShooterCommand2 = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Fender.bottomShooterPercent);
 
-                Command waitUntilNoteHasExited = Commands.waitUntil(() -> !notedLoadedSubsystem.hasNote.getAsBoolean());
-                Command waitUntilTime = Commands.waitSeconds(Constants.Fender.endOfShootDelay);
-
                 Command shootCommands = Commands
                                 .race(driveStopCommand, tiltHoldCommand2, transportCommand, singulatorCommand,
-                                                topShooterCommand, bottomShooterCommand, waitUntilNoteHasExited);
+                                                topShooterCommand, bottomShooterCommand);
 
-                Command finishShoot = Commands.race(tiltHoldCommand3, transportCommand2,
-                                singulatorCommand2,
-                                topShooterCommand2, bottomShooterCommand2, waitUntilTime);
-
-                Command command = Commands.sequence(telemetryReset, setValuesCommand, spinUpAndTilt,
-                                shootCommands, finishShoot);
+                Command command = Commands.sequence(tiltUpALittleUntil, telemetryReset, telemetryResetFront,
+                                setValuesCommand, spinUpAndTilt,
+                                shootCommands);
                 command.setName("Ranged Score");
                 return command;
         };
