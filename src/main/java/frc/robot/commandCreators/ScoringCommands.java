@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Value;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.utility.Spline;
