@@ -167,7 +167,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -202,7 +201,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -236,7 +234,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
