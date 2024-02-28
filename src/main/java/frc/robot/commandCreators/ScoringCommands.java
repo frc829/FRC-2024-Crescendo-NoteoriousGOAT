@@ -35,8 +35,8 @@ public class ScoringCommands {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.3,
                                         Meters);
-                        private static double topShooterPercent = -0.7;
-                        private static double bottomShooterPercent = -0.7;
+                        private static double topShooterPercent = 0.7;
+                        private static double bottomShooterPercent = 0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                 }
@@ -54,16 +54,20 @@ public class ScoringCommands {
                 }
 
                 private static final class Ranged {
-                        private static final double shooterTolerancePercent = 0.05;
+                        private static final double shooterTolerancePercent = 0.10;
                         private static final double[] distances = new double[] {
                                         1.28,
-                                        2.3,
-                                        3.45
+                                        2.22,
+                                        2.87,
+                                        4.29,
+                                        4.8514
                         };
                         private static final double[] anglesDegrees = new double[] {
                                         55.0,
-                                        45.0,
-                                        35.0
+                                        42.0,
+                                        35.0,
+                                        30.0,
+                                        29.0
                         };
                         private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                                         anglesDegrees);
@@ -331,6 +335,13 @@ public class ScoringCommands {
 
         @SuppressWarnings({ "resource" })
         public static final Supplier<Command> createRanged = () -> {
+                Command tiltUpALittle = BasicCommands.Set.TiltAngle.create.apply(Degrees.of(15));
+                Command tiltUpALittleUntil = tiltUpALittle.until(() -> {
+                        return MathUtil.isNear(
+                                        15.0,
+                                        shooterTiltSubsystem.angle.in(Degrees),
+                                        BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
+                });
                 MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
                 PIDController pidController = new PIDController(2.5, 0, 0);
                 pidController.enableContinuousInput(-180, 180);
@@ -387,6 +398,7 @@ public class ScoringCommands {
                 };
 
                 Command telemetryReset = TelemetryCommands.createResetPoseFromBackCameraCommand.get();
+                Command telemetryResetFront = TelemetryCommands.createResetPoseFromFrontCameraCommand.get();
 
                 Command setValuesCommand = Commands.runOnce(setValues);
                 Command tiltCommand = Commands.run(tilt, shooterTiltSubsystem);
@@ -420,19 +432,170 @@ public class ScoringCommands {
                 Command spinUpAndTilt = Commands.parallel(speedUpShootersCommand, tiltCommand, rotateInPlaceCommand)
                                 .until(shooterTiltDriveAtSetpoint);
 
-                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand3 = BasicCommands.HoldandStop.createForTilt.get();
+
                 Command driveStopCommand = Commands.run(driveSubsystem.stop,
                                 driveSubsystem);
                 Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
                 Command singulatorCommand = BasicCommands.Set.Singulator.create
                                 .apply(Constants.Fender.singulatorPercent);
 
-                Command shootCommands = Commands
-                                .parallel(tiltHoldCommand, driveStopCommand, transportCommand, singulatorCommand);
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
 
-                Command command = Commands.sequence(telemetryReset, setValuesCommand, spinUpAndTilt,
+                Command transportCommand2 = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand2 = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+
+                Command topShooterCommand2 = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand2 = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command shootCommands = Commands
+                                .race(driveStopCommand, tiltHoldCommand2, transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand);
+
+                Command command = Commands.sequence(tiltUpALittleUntil, telemetryReset, telemetryResetFront,
+                                setValuesCommand, spinUpAndTilt,
                                 shootCommands);
                 command.setName("Ranged Score");
+                return command;
+        };
+
+        public static final Supplier<Command> createMovingRanged = () -> {
+                MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
+
+                Runnable tilt = () -> {
+                        telemetrySubsystem.resetPoseEstimateFromFieldDetectors.run();
+                        Pose2d fieldPosition = telemetrySubsystem.poseEstimate.get();
+                        Optional<Alliance> alliance = DriverStation.getAlliance();
+                        if (alliance.get() == Alliance.Red) {
+                                Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
+                                                .minus(fieldPosition.getTranslation());
+                                double shooterAxisDistanceMeters = targetVector.getNorm();
+                                double angleDegs = Constants.Ranged.spline.interpolate(shooterAxisDistanceMeters);
+                                tiltAngle.mut_setMagnitude(angleDegs);
+                        } else {
+                                Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
+                                                .minus(fieldPosition.getTranslation());
+                                double shooterAxisDistanceMeters = targetVector.getNorm();
+                                double angleDegs = Constants.Ranged.spline.interpolate(shooterAxisDistanceMeters);
+                                tiltAngle.mut_setMagnitude(angleDegs);
+                        }
+                        shooterTiltSubsystem.turn.accept(tiltAngle);
+                };
+
+                Runnable speedUpShooters = () -> {
+                        topShooterSubsystem.spin.accept(Constants.Fender.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.Fender.bottomShooterPercent);
+                };
+
+                Command tiltCommand = Commands.run(tilt, shooterTiltSubsystem);
+                Command tiltCommand2 = Commands.run(tilt, shooterTiltSubsystem);
+                Command tiltCommand3 = Commands.run(tilt, shooterTiltSubsystem);
+
+                Command speedUpShootersCommand = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                BooleanSupplier driveAtAngle = () -> {
+                        Pose2d fieldPose = telemetrySubsystem.poseEstimate.get();
+
+                        Rotation2d measurement = Rotation2d
+                                        .fromDegrees(telemetrySubsystem.poseEstimate.get().getRotation().unaryMinus()
+                                                        .getDegrees());
+
+                        if (DriverStation.getAlliance().isPresent()
+                                        && DriverStation.getAlliance().get() == Alliance.Red) {
+                                Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
+                                                .minus(fieldPose.getTranslation());
+                                Rotation2d targetRotation = targetVector.getAngle().unaryMinus()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
+                                Rotation2d difference = measurement.minus(targetRotation);
+                                return MathUtil.isNear(
+                                                Math.abs(difference.getDegrees()),
+                                                0,
+                                                2);
+
+                        } else {
+                                Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
+                                                .minus(fieldPose.getTranslation());
+                                Rotation2d targetRotation = targetVector.getAngle().unaryMinus()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
+                                Rotation2d difference = measurement.minus(targetRotation);
+                                return MathUtil.isNear(
+                                                Math.abs(difference.getDegrees()),
+                                                0,
+                                                2);
+                        }
+
+                };
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        return MathUtil.isNear(
+                                        Math.abs(Constants.Fender.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Constants.Ranged.shooterTolerancePercent);
+                };
+
+                BooleanSupplier tiltAtPosition = () -> {
+                        return MathUtil.isNear(
+                                        tiltAngle.in(Degrees),
+                                        shooterTiltSubsystem.angle.in(Degrees),
+                                        BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
+                };
+
+                BooleanSupplier shooterAndTiltAtSetpoint = () -> {
+                        SmartDashboard.putBoolean("Shooters at Speed", shootersAtSpeed.getAsBoolean());
+                        SmartDashboard.putBoolean("TiltAtPosition", tiltAtPosition.getAsBoolean());
+                        return shootersAtSpeed.getAsBoolean() && tiltAtPosition.getAsBoolean()
+                                        && driveAtAngle.getAsBoolean();
+                };
+
+                Command spinUpAndTilt = Commands.parallel(speedUpShootersCommand, tiltCommand)
+                                .until(shooterAndTiltAtSetpoint);
+
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command waitUntilNoteHasExited = Commands.waitUntil(() -> !notedLoadedSubsystem.hasNote.getAsBoolean());
+
+                Command shootCommands = Commands
+                                .race(waitUntilNoteHasExited, tiltCommand2, transportCommand, singulatorCommand,
+                                                topShooterCommand,
+                                                bottomShooterCommand);
+                Command waitUntilTime = Commands.waitSeconds(Constants.Fender.endOfShootDelay);
+
+                Command transportCommand2 = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
+                Command singulatorCommand2 = BasicCommands.Set.Singulator.create
+                                .apply(Constants.Fender.singulatorPercent);
+
+                Command topShooterCommand2 = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.Fender.topShooterPercent);
+                Command bottomShooterCommand2 = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command finishShoot = Commands
+                                .race(waitUntilTime, tiltCommand3, transportCommand2, singulatorCommand2,
+                                                topShooterCommand2,
+                                                bottomShooterCommand2);
+
+                Command driveCommand = DriveCommands.createPointingFieldCentricCommand.get();
+
+                Command shoot = Commands.sequence(spinUpAndTilt, shootCommands, finishShoot);
+                Command command = Commands.parallel(driveCommand, shoot);
+                command.setName("Moving Ranged Score");
                 return command;
         };
 
