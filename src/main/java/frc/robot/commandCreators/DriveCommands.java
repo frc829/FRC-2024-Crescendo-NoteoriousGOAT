@@ -167,7 +167,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -202,7 +201,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -236,7 +234,6 @@ public class DriveCommands {
                                         * RobotContainer.driver.fullTriggerValue.getAsDouble();
                         speeds.vxMetersPerSecond *= flipper;
                         speeds.vyMetersPerSecond *= flipper;
-                        speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
                                         RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
                         speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
@@ -329,8 +326,9 @@ public class DriveCommands {
         public static final Supplier<Command> createPointingFieldCentricCommand = () -> {
                 ChassisSpeeds speeds = new ChassisSpeeds();
                 Translation2d cor = new Translation2d();
-                PIDController rotationPID = new PIDController(10, 0, 0);
-                rotationPID.enableContinuousInput(-Math.PI, Math.PI);
+                PIDController rotationPID = new PIDController(2.5, 0, 0);
+                rotationPID.enableContinuousInput(-180, 180);
+                rotationPID.setTolerance(2);                
                 Runnable drive = () -> {
 
                         var pose = telemetrySubsystem.fieldDetectorsPositions.get(1).getSecond().get();
@@ -357,7 +355,7 @@ public class DriveCommands {
                         if (DriverStation.getAlliance().isPresent()
                                         && DriverStation.getAlliance().get() == Alliance.Red) {
                                 measurement = telemetrySubsystem.poseEstimate.get().getRotation().unaryMinus()
-                                                .getRadians();
+                                                .getDegrees();
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerRedVector
                                                 .minus(fieldPose.getTranslation());
                                 targetRotation = targetVector.getAngle().unaryMinus()
@@ -365,13 +363,13 @@ public class DriveCommands {
 
                         } else {
                                 measurement = telemetrySubsystem.poseEstimate.get().getRotation()
-                                                .getRadians();
+                                                .getDegrees();
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
                                                 .minus(fieldPose.getTranslation());
                                 targetRotation = targetVector.getAngle()
                                                 .rotateBy(Rotation2d.fromDegrees(180));
                         }
-                        speeds.omegaRadiansPerSecond = rotationPID.calculate(measurement, targetRotation.getRadians());
+                        speeds.omegaRadiansPerSecond = Math.toRadians(rotationPID.calculate(measurement, targetRotation.getDegrees()));
 
                         speeds.omegaRadiansPerSecond *= flipper;
                         ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
