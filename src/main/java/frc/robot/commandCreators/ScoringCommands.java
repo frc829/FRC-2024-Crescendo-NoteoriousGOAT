@@ -6,8 +6,10 @@ import static edu.wpi.first.units.Units.Value;
 
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
+
+import com.utility.Spline;
+import com.utility.Spline.MonotoneCubicSpline;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -53,9 +55,18 @@ public class ScoringCommands {
 
                 private static final class Ranged {
                         private static final double shooterTolerancePercent = 0.05;
-                        private static final Function<Double, Double> regression = (distance) -> {
-                                return -9.21 * distance + 66.6;
+                        private static final double[] distances = new double[] {
+                                        1.28,
+                                        2.3,
+                                        3.45
                         };
+                        private static final double[] anglesDegrees = new double[] {
+                                        55.0,
+                                        45.0,
+                                        35.0
+                        };
+                        private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
+                                        anglesDegrees);
 
                 }
 
@@ -335,7 +346,7 @@ public class ScoringCommands {
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
                                 double shooterAxisDistanceMeters = targetVector.getNorm();
-                                double angleDegs = Constants.Ranged.regression.apply(shooterAxisDistanceMeters);
+                                double angleDegs = Constants.Ranged.spline.interpolate(shooterAxisDistanceMeters);
                                 tiltAngle.mut_setMagnitude(angleDegs);
                         } else {
                                 Translation2d targetVector = ResetAndHoldingCommands.Constants.speakerBlueVector
@@ -345,7 +356,7 @@ public class ScoringCommands {
                                 pidController.reset();
                                 pidController.setSetpoint(targetRotation.getDegrees());
                                 double shooterAxisDistanceMeters = targetVector.getNorm();
-                                double angleDegs = Constants.Ranged.regression.apply(shooterAxisDistanceMeters);
+                                double angleDegs = Constants.Ranged.spline.interpolate(shooterAxisDistanceMeters);
                                 tiltAngle.mut_setMagnitude(angleDegs);
                         }
                 };
