@@ -64,10 +64,10 @@ public class ScoringCommands {
                         };
                         private static final double[] anglesDegrees = new double[] {
                                         55.0,
-                                        42.0,
-                                        35.0,
-                                        30.0,
-                                        29.0
+                                        42.25,
+                                        33.5,
+                                        32.0,
+                                        30.0
                         };
                         private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                                         anglesDegrees);
@@ -419,7 +419,7 @@ public class ScoringCommands {
                         return MathUtil.isNear(
                                         tiltAngle.in(Degrees),
                                         shooterTiltSubsystem.angle.in(Degrees),
-                                        BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
+                                        1.0);
                 };
 
                 BooleanSupplier shooterTiltDriveAtSetpoint = () -> {
