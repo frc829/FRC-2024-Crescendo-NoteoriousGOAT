@@ -26,14 +26,14 @@ public abstract class Spline {
      * @param x The X value.
      * @return The interpolated Y = f(X) value.
      */
-    public abstract float interpolate(float x);
+    public abstract double interpolate(double x);
     /**
      * Creates an appropriate spline based on the properties of the control points.
      *
      * If the control points are monotonic then the resulting spline will preserve that and
      * otherwise optimize for error bounds.
      */
-    public static Spline createSpline(float[] x, float[] y) {
+    public static Spline createSpline(double[] x, double[] y) {
         if (!isStrictlyIncreasing(x)) {
             throw new IllegalArgumentException("The control points must all have strictly "
                     + "increasing X values.");
@@ -62,7 +62,7 @@ public abstract class Spline {
      * different lengths or have fewer than 2 values.
      * @throws IllegalArgumentException if the control points are not monotonic.
      */
-    public static Spline createMonotoneCubicSpline(float[] x, float[] y) {
+    public static Spline createMonotoneCubicSpline(double[] x, double[] y) {
         return new MonotoneCubicSpline(x, y);
     }
     /**
@@ -80,16 +80,16 @@ public abstract class Spline {
      * @throws IllegalArgumentException if the X components of the control points are not strictly
      * increasing.
      */
-    public static Spline createLinearSpline(float[] x, float[] y) {
+    public static Spline createLinearSpline(double[] x, double[] y) {
         return new LinearSpline(x, y);
     }
-    private static boolean isStrictlyIncreasing(float[] x) {
+    private static boolean isStrictlyIncreasing(double[] x) {
         if (x == null || x.length < 2) {
             throw new IllegalArgumentException("There must be at least two control points.");
         }
-        float prev = x[0];
+        double prev = x[0];
         for (int i = 1; i < x.length; i++) {
-            float curr = x[i];
+            double curr = x[i];
             if (curr <= prev) {
                 return false;
             }
@@ -97,13 +97,13 @@ public abstract class Spline {
         }
         return true;
     }
-    private static boolean isMonotonic(float[] x) {
+    private static boolean isMonotonic(double[] x) {
         if (x == null || x.length < 2) {
             throw new IllegalArgumentException("There must be at least two control points.");
         }
-        float prev = x[0];
+        double prev = x[0];
         for (int i = 1; i < x.length; i++) {
-            float curr = x[i];
+            double curr = x[i];
             if (curr < prev) {
                 return false;
             }
@@ -112,20 +112,20 @@ public abstract class Spline {
         return true;
     }
     public static class MonotoneCubicSpline extends Spline {
-        private float[] mX;
-        private float[] mY;
-        private float[] mM;
-        public MonotoneCubicSpline(float[] x, float[] y) {
+        private double[] mX;
+        private double[] mY;
+        private double[] mM;
+        public MonotoneCubicSpline(double[] x, double[] y) {
             if (x == null || y == null || x.length != y.length || x.length < 2) {
                 throw new IllegalArgumentException("There must be at least two control "
                         + "points and the arrays must be of equal length.");
             }
             final int n = x.length;
-            float[] d = new float[n - 1]; // could optimize this out
-            float[] m = new float[n];
+            double[] d = new double[n - 1]; // could optimize this out
+            double[] m = new double[n];
             // Compute slopes of secant lines between successive points.
             for (int i = 0; i < n - 1; i++) {
-                float h = x[i + 1] - x[i];
+                double h = x[i + 1] - x[i];
                 if (h <= 0f) {
                     throw new IllegalArgumentException("The control points must all "
                             + "have strictly increasing X values.");
@@ -144,15 +144,15 @@ public abstract class Spline {
                     m[i] = 0f;
                     m[i + 1] = 0f;
                 } else {
-                    float a = m[i] / d[i];
-                    float b = m[i + 1] / d[i];
+                    double a = m[i] / d[i];
+                    double b = m[i + 1] / d[i];
                     if (a < 0f || b < 0f) {
                         throw new IllegalArgumentException("The control points must have "
                                 + "monotonic Y values.");
                     }
-                    float h = (float) Math.hypot(a, b);
+                    double h = (double) Math.hypot(a, b);
                     if (h > 3f) {
-                        float t = 3f / h;
+                        double t = 3f / h;
                         m[i] *= t;
                         m[i + 1] *= t;
                     }
@@ -163,10 +163,10 @@ public abstract class Spline {
             mM = m;
         }
         @Override
-        public float interpolate(float x) {
+        public double interpolate(double x) {
             // Handle the boundary cases.
             final int n = mX.length;
-            if (Float.isNaN(x)) {
+            if (Double.isNaN(x)) {
                 return x;
             }
             if (x <= mX[0]) {
@@ -185,8 +185,8 @@ public abstract class Spline {
                 }
             }
             // Perform cubic Hermite spline interpolation.
-            float h = mX[i + 1] - mX[i];
-            float t = (x - mX[i]) / h;
+            double h = mX[i + 1] - mX[i];
+            double t = (x - mX[i]) / h;
             return (mY[i] * (1 + 2 * t) + h * mM[i] * t) * (1 - t) * (1 - t)
                     + (mY[i + 1] * (3 - 2 * t) + h * mM[i + 1] * (t - 1)) * t * t;
         }
@@ -209,16 +209,16 @@ public abstract class Spline {
         }
     }
     public static class LinearSpline extends Spline {
-        private final float[] mX;
-        private final float[] mY;
-        private final float[] mM;
-        public LinearSpline(float[] x, float[] y) {
+        private final double[] mX;
+        private final double[] mY;
+        private final double[] mM;
+        public LinearSpline(double[] x, double[] y) {
             if (x == null || y == null || x.length != y.length || x.length < 2) {
                 throw new IllegalArgumentException("There must be at least two control "
                         + "points and the arrays must be of equal length.");
             }
             final int N = x.length;
-            mM = new float[N-1];
+            mM = new double[N-1];
             for (int i = 0; i < N-1; i++) {
                 mM[i] = (y[i+1] - y[i]) / (x[i+1] - x[i]);
             }
@@ -226,10 +226,10 @@ public abstract class Spline {
             mY = y;
         }
         @Override
-        public float interpolate(float x) {
+        public double interpolate(double x) {
             // Handle the boundary cases.
             final int n = mX.length;
-            if (Float.isNaN(x)) {
+            if (Double.isNaN(x)) {
                 return x;
             }
             if (x <= mX[0]) {
