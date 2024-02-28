@@ -148,7 +148,8 @@ public class RobotContainer {
                 driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.testingStartPose));
-                driver.y.onTrue(DriveCommands.createResetEncodersCommand.get());
+                driver.y.whileTrue(ScoringCommands.createMovingRanged.get());
+                driver.y.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get());
 
@@ -168,8 +169,10 @@ public class RobotContainer {
                 ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
                 ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
-                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.whileTrue(DriveCommands.createPointingFieldCentricCommand.get());
-                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
+                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger
+                                .whileTrue(DriveCommands.createPointingFieldCentricCommand.get());
+                ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger
+                                .onFalse(DriveCommands.createFieldCentricCommand.get());
                 // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.whileTrue(DriveCommands.createRotationAlongHeadingFieldCentricCommand.get());
                 // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
                 // Runnable loadRhapsody = () -> orchestra.loadMusic("rhapsody.chrp");

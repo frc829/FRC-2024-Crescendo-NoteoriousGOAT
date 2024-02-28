@@ -63,9 +63,9 @@ public class ScoringCommands {
                                         4.8514
                         };
                         private static final double[] anglesDegrees = new double[] {
-                                        55.0,
-                                        42.25,
-                                        33.5,
+                                        54.0,
+                                        40.5,
+                                        32.5,
                                         32.0,
                                         30.0
                         };
