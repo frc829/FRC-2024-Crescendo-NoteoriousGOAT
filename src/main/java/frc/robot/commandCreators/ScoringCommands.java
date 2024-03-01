@@ -35,10 +35,10 @@ public class ScoringCommands {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.3,
                                         Meters);
-                        private static double topShooterPercent = 0.7;
-                        private static double bottomShooterPercent = 0.7;
+                        private static double topShooterPercent = -0.8;
+                        private static double bottomShooterPercent = -0.8;
                         private static double transportPercent = 0.9;
-                        private static double singulatorPercent = -0.9;
+                        private static double singulatorPercent = -0.7;
                 }
 
                 private static final class Fender {
@@ -50,6 +50,17 @@ public class ScoringCommands {
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
                         private static final double endOfShootDelay = 0.2;
+
+                }
+
+                private static final class RangedSilly {
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(35, Degrees);
+                        private static Measure<Distance> elevatorPosition = Meters.of(0.0);
+                        private static double topShooterPercent = -0.7;
+                        private static double bottomShooterPercent = 0.7;
+                        private static double transportPercent = 0.9;
+                        private static double singulatorPercent = -0.9;
+                        private static final double shooterTolerancePercent = 0.10;
 
                 }
 
@@ -238,6 +249,64 @@ public class ScoringCommands {
                                 .apply(() -> Constants.Fender.topShooterPercent);
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Fender.bottomShooterPercent);
+
+                Command continueUpToSpeed = Commands
+                                .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)
+                                .until(shootersAtSpeed);
+
+                Command shootCommands = Commands
+                                .parallel(elevatorHoldCommand2, tiltHoldCommand2, transportCommand, singulatorCommand,
+                                                topShooterCommand, bottomShooterCommand);
+
+                Command command = Commands.sequence(elevatorTiltShootersCommand, continueUpToSpeed,
+                                shootCommands);
+                command.setName("Fender Score");
+                return command;
+        };
+
+        public static final Supplier<Command> createRangedSilly = () -> {
+                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Constants.RangedSilly.elevatorPosition)
+                                .apply(Constants.RangedSilly.tiltAngle);
+
+                Runnable speedUpShooters = () -> {
+                        topShooterSubsystem.spin.accept(Constants.RangedSilly.topShooterPercent);
+                        bottomShooterSubsystem.spin.accept(Constants.RangedSilly.bottomShooterPercent);
+                };
+
+                Command speedUpShootersCommand1 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                Command elevatorTiltShootersCommand = Commands.race(speedUpShootersCommand1, elevatorTiltCommand);
+
+                Command speedUpShootersCommand2 = Commands.run(
+                                speedUpShooters,
+                                topShooterSubsystem,
+                                bottomShooterSubsystem);
+
+                BooleanSupplier shootersAtSpeed = () -> {
+                        boolean condition = MathUtil.isNear(
+                                        Math.abs(Constants.RangedSilly.topShooterPercent),
+                                        Math.abs(topShooterSubsystem.velocity.in(Value)),
+                                        Constants.RangedSilly.shooterTolerancePercent);
+                        SmartDashboard.putBoolean("ShooterAt Speed", condition);
+                        return condition;
+                };
+                Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
+                Command elevatorHoldCommand2 = BasicCommands.HoldandStop.createForElevator.get();
+
+                Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
+                Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
+
+                Command transportCommand = BasicCommands.Set.Transport.create.apply(Constants.RangedSilly.transportPercent);
+                Command singulatorCommand = BasicCommands.Set.Singulator.create
+                                .apply(Constants.RangedSilly.singulatorPercent);
+                Command topShooterCommand = BasicCommands.Set.TopShooter.create
+                                .apply(() -> Constants.RangedSilly.topShooterPercent);
+                Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
+                                .apply(() -> Constants.RangedSilly.bottomShooterPercent);
 
                 Command continueUpToSpeed = Commands
                                 .parallel(elevatorHoldCommand, tiltHoldCommand, speedUpShootersCommand2)

@@ -13,25 +13,32 @@ import edu.wpi.first.units.Measure;
 public class PositionSwitch {
 
     public final BooleanSupplier isOn;
+    public final BooleanSupplier isOnBB;
     public final Runnable update;
 
     private PositionSwitch(
             BooleanSupplier isOn,
+            BooleanSupplier isOnBB,
             Runnable update) {
         this.isOn = isOn;
+        this.isOnBB = isOnBB;
         this.update = update;
     }
 
-    public static final Function<Sensor<Distance>, Function<Measure<Distance>, Function<Measure<Distance>, PositionSwitch>>> create = (
-            distanceSensor) -> (minOn) -> (maxOn) -> {
+    public static final Function<Sensor<Distance>, Function<Measure<Distance>, Function<Measure<Distance>, Function<Measure<Distance>, Function<Measure<Distance>, PositionSwitch>>>>> create = (
+            distanceSensor) -> (minOn) -> (maxOn) -> (minOnBB) -> (maxOnBB) -> {
                 BooleanSupplier isOn = () -> {
                     return distanceSensor.measure.in(Meters) <= maxOn.in(Meters)
                             && distanceSensor.measure.in(Meters) >= minOn.in(Meters);
                 };
+                BooleanSupplier isOnBB = () -> {
+                    return distanceSensor.measure.in(Meters) <= maxOnBB.in(Meters)
+                            && distanceSensor.measure.in(Meters) >= minOnBB.in(Meters);
+                };
                 Runnable update = () -> {
                     distanceSensor.update.run();
                 };
-                return new PositionSwitch(isOn, update);
+                return new PositionSwitch(isOn, isOnBB, update);
             };
 
 }

@@ -21,15 +21,20 @@ public class NotedLoadedSubsystem extends SubsystemBase {
     private static final int deviceId = 34;
     private static final Measure<Distance> minOn = Millimeters.of(1);
     private static final Measure<Distance> maxOn = Millimeters.of(50);
+    private static final Measure<Distance> minOnBB = Millimeters.of(1);
+    private static final Measure<Distance> maxOnBB = Millimeters.of(50);
   }
 
   public final BooleanSupplier hasNote;
+  public final BooleanSupplier hasNoteBB;
   public final Runnable update;
 
   private NotedLoadedSubsystem(
       BooleanSupplier hasNote,
+      BooleanSupplier hasNoteBB,
       Runnable update) {
     this.hasNote = hasNote;
+    this.hasNoteBB = hasNoteBB;
     this.update = update;
   }
 
@@ -51,9 +56,9 @@ public class NotedLoadedSubsystem extends SubsystemBase {
 
     Supplier<Measure<Distance>> simDistance = () -> {
       // if (RobotContainer.test.a.getAsBoolean()) {
-      //   return Millimeters.of(5);
+      // return Millimeters.of(5);
       // } else {
-        return Millimeters.of(0);
+      return Millimeters.of(0);
       // }
     };
 
@@ -61,10 +66,13 @@ public class NotedLoadedSubsystem extends SubsystemBase {
         .andThen(PositionSwitch.create)
         .apply(Constants.deviceId)
         .apply(Constants.minOn)
-        .apply(Constants.maxOn);
+        .apply(Constants.maxOn)
+        .apply(Constants.minOnBB)
+        .apply(Constants.maxOnBB);
 
     return new NotedLoadedSubsystem(
         positionSwitch.isOn,
+        positionSwitch.isOnBB,
         positionSwitch.update);
 
   };

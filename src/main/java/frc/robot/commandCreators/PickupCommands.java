@@ -31,15 +31,15 @@ public class PickupCommands implements Sendable {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.0,
                                         Meters);
-                        private static double topShooterPercent = -0.3;
-                        private static double bottomShooterPercent = 0.3;
+                        private static double topShooterPercent = 0.2;
+                        private static double bottomShooterPercent = -0.2;
                         private static double transportPercent = 0.0;
-                        private static double singulatorPercent = 0.9;
+                        private static double singulatorPercent = 0.5;
                 }
 
                 private static final class Barf {
-                        private static double topShooterPercent = 0.9;
-                        private static double bottomShooterPercent = -0.9;
+                        private static double topShooterPercent = -0.9;
+                        private static double bottomShooterPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static double transportPercent = 0.9;
                         private static double innerIntakePercent = -0.9;

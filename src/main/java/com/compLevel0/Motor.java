@@ -18,6 +18,7 @@ import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.MathUtil;
@@ -79,6 +80,7 @@ public class Motor {
                 // #region createSpark's for Specific Motors
                 public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO = (deviceId) -> {
                         var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
+                        canSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
                         if (RobotBase.isSimulation()) {
                                 REVPhysicsSim.getInstance().addSparkMax(
                                                 canSparkMax,
@@ -89,6 +91,7 @@ public class Motor {
 
                 public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO550 = (deviceId) -> {
                         var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
+                        canSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
                         if (RobotBase.isSimulation()) {
                                 REVPhysicsSim.getInstance().addSparkMax(
                                                 canSparkMax,
@@ -106,7 +109,9 @@ public class Motor {
                                 return canSparkMax;
 
                         } else {
-                                return new CANSparkFlex(deviceId, MotorType.kBrushless);
+                                CANSparkFlex canSparkFlex = new CANSparkFlex(deviceId, MotorType.kBrushless);
+                                canSparkFlex.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+                                return canSparkFlex;
                         }
                 };
                 // #endregion
@@ -362,8 +367,8 @@ public class Motor {
                                         RobotContainer.orchestra.addInstrument(talonFX);
                                         config.Voltage.PeakForwardVoltage = 12.0;
                                         config.Voltage.PeakReverseVoltage = -12.0;
-                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
+                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 60;
+                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
                                         talonFX.getConfigurator().apply(config);
                                         return talonFX;
                                 };
