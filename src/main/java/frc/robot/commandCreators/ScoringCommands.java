@@ -32,8 +32,8 @@ public class ScoringCommands {
 
         private static final class Constants {
                 private static final class Amp {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(58, Degrees);
-                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.3,
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(48, Degrees);
+                        private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.325,
                                         Meters);
                         private static double topShooterPercent = -0.8;
                         private static double bottomShooterPercent = -0.8;
