@@ -243,8 +243,8 @@ public class DriveSubsystem extends SubsystemBase {
                                         TalonFXConfiguration config = new TalonFXConfiguration();
                                         config.Voltage.PeakForwardVoltage = 12.0;
                                         config.Voltage.PeakReverseVoltage = -12.0;
-                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 60;
-                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
+                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
+                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
                                         config.Slot0.kP = Constants.wheelkPs.get(i);
                                         config.Slot0.kI = Constants.wheelkIs.get(i);
                                         config.Slot0.kD = Constants.wheelkDs.get(i);
