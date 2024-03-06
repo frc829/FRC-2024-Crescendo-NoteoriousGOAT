@@ -81,7 +81,7 @@ public class OuterIntakeSubsystem extends SubsystemBase {
   public static final Supplier<OuterIntakeSubsystem> create = () -> {
     CANSparkMax canSparkMax = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
     if (RobotBase.isSimulation()) {
-      REVPhysicsSim.getInstance().addSparkMax(canSparkMax, DCMotor.getNeoVortex(1));
+      REVPhysicsSim.getInstance().addSparkMax(canSparkMax, DCMotor.getNEO(1));
     } 
     canSparkMax.setIdleMode(IdleMode.kBrake);
     canSparkMax.getPIDController().setP(Constants.slot0kP, 0);

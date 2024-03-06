@@ -8,6 +8,10 @@ import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Spinner;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -16,6 +20,7 @@ import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -74,16 +79,19 @@ public class SingulatorSubsystem extends SubsystemBase {
   }
 
   public static final Supplier<SingulatorSubsystem> create = () -> {
-    Spinner spinner = Motor.REV.createCANSparkBaseNEO550
-        .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
-        .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
-        .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
-        .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
-        .andThen(Motor.REV.enableBrake)
-        .andThen(Motor.REV.createMotorFromCANSparkBase)
-        .andThen(Motor.REV.setNEO550MaxVelocity)
+    CANSparkMax canSparkMax = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
+    if (RobotBase.isSimulation()) {
+      REVPhysicsSim.getInstance().addSparkMax(canSparkMax, DCMotor.getNeo550(1));
+    } 
+    canSparkMax.setIdleMode(IdleMode.kBrake);
+    canSparkMax.getPIDController().setP(Constants.slot0kP, 0);
+    canSparkMax.getPIDController().setI(Constants.slot0kI, 0);
+    canSparkMax.getPIDController().setD(Constants.slot0kD, 0);
+    canSparkMax.getPIDController().setFF(Constants.slot0kF, 0);
+
+    Spinner spinner = Motor.REV.createNEO550Motor
         .andThen(Spinner.create)
-        .apply(Constants.deviceId);
+        .apply(canSparkMax);
 
     return new SingulatorSubsystem(
         spinner.voltage,

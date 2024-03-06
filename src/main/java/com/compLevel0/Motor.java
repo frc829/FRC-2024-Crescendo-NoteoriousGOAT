@@ -183,10 +183,36 @@ public class Motor {
                                                 .getEncoder()
                                                 .setPosition(setpoint.in(Rotations));
                         };
+
+                        PIDController pidController = new PIDController(
+                                        canSparkBase.getPIDController().getP(),
+                                        canSparkBase.getPIDController().getI(),
+                                        canSparkBase.getPIDController().getD());
+                        if (canSparkBase.getPIDController().getPositionPIDWrappingEnabled()) {
+                                pidController.enableContinuousInput(
+                                                canSparkBase.getPIDController()
+                                                                .getPositionPIDWrappingMinInput(),
+                                                canSparkBase.getPIDController()
+                                                                .getPositionPIDWrappingMaxInput());
+                        }
+
                         Consumer<Measure<Angle>> turn = (setpoint) -> {
-                                canSparkBase.getPIDController()
-                                                .setReference(setpoint.in(Rotations),
-                                                                ControlType.kPosition, 1);
+                                if (RobotBase.isSimulation()) {
+
+                                        MutableMeasure<Voltage> voltageSetpoint = MutableMeasure.zero(Volts);
+                                        double measurement = canSparkBase.getEncoder().getPosition();
+                                        double goal = setpoint.in(Rotations);
+                                        double volts = pidController.calculate(measurement,
+                                                        goal);
+                                        volts = MathUtil.clamp(volts, -12.0, 12.0);
+                                        voltageSetpoint.mut_setMagnitude(volts / 12.0);
+                                        canSparkBase.setVoltage(voltageSetpoint.in(Volts));
+                                } else {
+                                        canSparkBase.getPIDController()
+                                                        .setReference(setpoint.in(Rotations),
+                                                                        ControlType.kPosition, 1);
+                                }
+
                         };
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
                                 if (RobotBase.isSimulation()) {
@@ -228,8 +254,7 @@ public class Motor {
 
                         };
 
-                        return new Motor(voltage, angle, absoluteAngle, angularVelocity,
-                                        maxAngularVelocity,
+                        return new Motor(voltage, angle, absoluteAngle, angularVelocity, maxAngularVelocity,
                                         setRelativeEncoderAngle, turn, spin, setVoltage, stop, update);
                 };
                 // #endregion
@@ -241,6 +266,10 @@ public class Motor {
                 public static final Function<CANSparkBase, Motor> createNEOVortexMotor = (
                                 canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
                                                 RadiansPerSecond.of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec));
+
+                public static final Function<CANSparkBase, Motor> createNEO550Motor = (
+                                canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
+                                                RadiansPerSecond.of(DCMotor.getNeo550(1).freeSpeedRadPerSec));
 
                 // #region setMaxVelocities
                 public static final Function<Motor, Motor> setNEOMaxVelocity = (motor) -> {

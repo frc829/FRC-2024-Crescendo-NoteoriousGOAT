@@ -110,6 +110,12 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   }
 
   public static final Supplier<ShooterTiltSubsystem> create = () -> {
+                                        // if (enableWrap) {
+                                        // pidController.enableContinuousInput(-0.5 * gearing,
+                                        // 0.5 * gearing);
+                                        // }
+
+
     Turner turner = Motor.REV.createCANSparkBaseNEO
         .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
         .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
