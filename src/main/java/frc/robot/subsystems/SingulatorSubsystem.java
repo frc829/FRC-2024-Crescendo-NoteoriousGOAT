@@ -82,7 +82,6 @@ public class SingulatorSubsystem extends SubsystemBase {
         .andThen(Motor.REV.enableBrake)
         .andThen(Motor.REV.createMotorFromCANSparkBase)
         .andThen(Motor.REV.setNEO550MaxVelocity)
-        .andThen(Motor.REV.setSpinSim)
         .andThen(Spinner.create)
         .apply(Constants.deviceId);
 

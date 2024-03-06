@@ -130,7 +130,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
             .apply(Constants.slot1kD)
             .apply(true)
             .apply(Constants.gearing))
-        .andThen(Motor.REV.setSpinSim)
         .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp).apply(Constants.absoluteGearingDown))
         .apply(Constants.deviceId);
 

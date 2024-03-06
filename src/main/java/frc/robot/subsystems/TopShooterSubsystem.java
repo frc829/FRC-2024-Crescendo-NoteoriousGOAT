@@ -8,6 +8,12 @@ import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Spinner;
+import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -16,6 +22,7 @@ import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -74,18 +81,24 @@ public class TopShooterSubsystem extends SubsystemBase {
   }
 
   public static final Supplier<TopShooterSubsystem> create = () -> {
-    Spinner spinner = Motor.REV.createCANSparkBaseNEOVortex
-        .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
-        .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
-        .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
-        .andThen(Motor.REV.setkF.
-        apply(0).apply(Constants.slot0kF))
-        .andThen(Motor.REV.enableCoast)
-        .andThen(Motor.REV.createMotorFromCANSparkBase)
-        .andThen(Motor.REV.setNEOVortexMaxVelocity)
-        .andThen(Motor.REV.setSpinSim)
+    CANSparkBase canSparkBase;
+    if (RobotBase.isSimulation()) {
+      CANSparkMax canSparkMax = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
+      canSparkBase = canSparkMax;
+      REVPhysicsSim.getInstance().addSparkMax(canSparkMax, DCMotor.getNeoVortex(1));
+    } else {
+      canSparkBase = new CANSparkFlex(Constants.deviceId, MotorType.kBrushless);
+    }
+
+    canSparkBase.setIdleMode(IdleMode.kCoast);
+    canSparkBase.getPIDController().setP(Constants.slot0kP, 0);
+    canSparkBase.getPIDController().setI(Constants.slot0kI, 0);
+    canSparkBase.getPIDController().setD(Constants.slot0kD, 0);
+    canSparkBase.getPIDController().setFF(Constants.slot0kF, 0);
+
+    Spinner spinner = Motor.REV.createNEOVortexMotor
         .andThen(Spinner.create)
-        .apply(Constants.deviceId);
+        .apply(canSparkBase);
 
     return new TopShooterSubsystem(
         spinner.voltage,

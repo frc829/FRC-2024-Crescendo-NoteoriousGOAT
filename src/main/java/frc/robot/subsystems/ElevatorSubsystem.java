@@ -10,6 +10,10 @@ import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Elevator;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -19,6 +23,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -26,7 +31,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 29;
-    private static final double gearing = 4.0 * 4.0 * 3.0 * 40.0 / 30.0; 
+    private static final double gearing = 4.0 * 4.0 * 3.0 * 40.0 / 30.0;
     private static final Measure<Distance> drumRadius = Inches.of(1.0);
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
@@ -46,7 +51,6 @@ public class ElevatorSubsystem extends SubsystemBase {
   public final Consumer<Double> drive;
   public final Runnable hold;
   public final Runnable update;
-
 
   private ElevatorSubsystem(
       Measure<Voltage> voltage,
@@ -94,17 +98,22 @@ public class ElevatorSubsystem extends SubsystemBase {
   }
 
   public static final Supplier<ElevatorSubsystem> create = () -> {
-    Elevator elevator = Motor.REV.createCANSparkBaseNEO
-        .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
-        .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
-        .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
-        .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
-        .andThen(Motor.REV.setkP.apply(1).apply(Constants.slot1kP))
-        .andThen(Motor.REV.setkI.apply(1).apply(Constants.slot1kI))
-        .andThen(Motor.REV.setkD.apply(1).apply(Constants.slot1kD))
-        .andThen(Motor.REV.setkF.apply(1).apply(Constants.slot1kF))
-        .andThen(Motor.REV.enableBrake)
-        .andThen(Motor.REV.createMotorFromCANSparkBase)
+    CANSparkMax neo = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
+    neo.getPIDController().setP(Constants.slot0kP, 0);
+    neo.getPIDController().setI(Constants.slot0kI, 0);
+    neo.getPIDController().setD(Constants.slot0kD, 0);
+    neo.getPIDController().setFF(Constants.slot0kF, 0);
+    neo.getPIDController().setP(Constants.slot1kP, 1);
+    neo.getPIDController().setI(Constants.slot1kI, 1);
+    neo.getPIDController().setD(Constants.slot1kD, 1);
+    neo.getPIDController().setFF(Constants.slot1kF, 1);
+    neo.setIdleMode(IdleMode.kBrake);
+
+    if(RobotBase.isSimulation()){
+      REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
+    }
+
+    Elevator elevator = Motor.REV.createMotorFromCANSparkBase
         .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Motor.REV.setTurnSim
             .apply(Constants.slot1kP)
@@ -112,11 +121,10 @@ public class ElevatorSubsystem extends SubsystemBase {
             .apply(Constants.slot1kD)
             .apply(false)
             .apply(Double.NaN))
-        .andThen(Motor.REV.setSpinSim)
         .andThen(Elevator.create
             .apply(Constants.gearing)
             .apply(Constants.drumRadius))
-        .apply(Constants.deviceId);
+        .apply(neo);
 
     return new ElevatorSubsystem(
         elevator.voltage,
