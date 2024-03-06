@@ -28,9 +28,9 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class FieldDetector {
 
     public final String name;
-    public final Supplier<Double> taNumberSupplier;
     public final Supplier<Optional<Pose2d>> fieldPosition;
     public final Supplier<Optional<Translation2d>> robotSpaceTargetTranslation;
+    public final Supplier<Optional<Rotation2d>> robotSpaceTargetHeading;
     public final Supplier<Optional<Measure<Time>>> latency;
     public final Supplier<Integer> tagCount;
     public final Consumer<Integer> setPriorityTarget;
@@ -39,19 +39,19 @@ public class FieldDetector {
 
     private FieldDetector(
             String name,
-            Supplier<Double> taNumberSupplier,
             Supplier<Optional<Pose2d>> fieldPosition,
             Supplier<Optional<Translation2d>> robotSpaceTargetTranslation,
+            Supplier<Optional<Rotation2d>> robotSpaceTargetHeading,
             Supplier<Optional<Measure<Time>>> latency,
             Supplier<Integer> tagCount,
             Consumer<Integer> setPriorityTarget,
             Runnable enable,
             Runnable update) {
         this.name = name;
-        this.taNumberSupplier = taNumberSupplier;
         this.fieldPosition = fieldPosition;
         this.tagCount = tagCount;
         this.robotSpaceTargetTranslation = robotSpaceTargetTranslation;
+        this.robotSpaceTargetHeading = robotSpaceTargetHeading;
         this.latency = latency;
         this.setPriorityTarget = setPriorityTarget;
         this.enable = enable;
@@ -64,9 +64,8 @@ public class FieldDetector {
 
                     NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
                     NetworkTableEntry validTargetSupplier = table.getEntry("tv");
-                    NetworkTableEntry txSupplier = table.getEntry("tx");
-                    NetworkTableEntry tySupplier = table.getEntry("ty");
-                    NetworkTableEntry taSupplier = table.getEntry("ta");
+                    NetworkTableEntry tx = table.getEntry("tx");
+                    NetworkTableEntry ty = table.getEntry("ty");
                     NetworkTableEntry pipelineSupplier = table.getEntry("getpipe");
                     NetworkTableEntry botpose_wpiblueSupplier = table.getEntry("botpose_wpiblue");
                     NetworkTableEntry pipelineConsumer = table.getEntry("pipeline");
@@ -76,13 +75,13 @@ public class FieldDetector {
                     MutableMeasure<Distance> fieldY = MutableMeasure.zero(Meters);
                     MutableMeasure<Angle> fieldYaw = MutableMeasure.zero(Degrees);
                     MutableMeasure<Time> latencyMeasure = MutableMeasure.zero(Milliseconds);
-                    MutableMeasure<Dimensionless> tagCountValue = MutableMeasure.zero(Value);
+                    MutableMeasure<Dimensionless> tagCount = MutableMeasure.zero(Value);
 
                     Supplier<Double> txDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
                             return 25.0;
                         } else {
-                            return -txSupplier.getDouble(0);
+                            return -tx.getDouble(0);
                         }
                     };
 
@@ -90,15 +89,7 @@ public class FieldDetector {
                         if (RobotBase.isSimulation()) {
                             return 5.0;
                         } else {
-                            return tySupplier.getDouble(0);
-                        }
-                    };
-
-                    Supplier<Double> taNumberSupplier = () -> {
-                        if(RobotBase.isSimulation()){
-                            return 0.0;
-                        }else{
-                            return taSupplier.getDouble(0.0);
+                            return ty.getDouble(0);
                         }
                     };
 
@@ -128,6 +119,16 @@ public class FieldDetector {
                         }
                     };
 
+                    Supplier<Optional<Rotation2d>> robotSpaceTargetHeading = () -> {
+                        double tv = RobotBase.isSimulation() ? 1.0 : validTargetSupplier.getDouble(0.0);
+                        double pipeline = RobotBase.isSimulation() ? 0.0 : pipelineSupplier.getDouble(0.0);
+                        if (tv == 1 && pipeline == 1) {
+                            return Optional.of(Rotation2d.fromDegrees(-tx.getDouble(0)));
+                        } else {
+                            return Optional.empty();
+                        }
+                    };
+
                     Supplier<Optional<Pose2d>> fieldPosition = () -> {
                         if (RobotBase.isSimulation()) {
                             Pose2d simPose = simFieldPose.get();
@@ -140,7 +141,7 @@ public class FieldDetector {
                                 fieldYaw.mut_setMagnitude(poseArray[5]);
                                 latencyMeasure.mut_setMagnitude(poseArray[6]);
                                 if (poseArray.length > 7) {
-                                    tagCountValue.mut_setMagnitude(poseArray[7]);
+                                    tagCount.mut_setMagnitude(poseArray[7]);
                                 }
                                 return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
                                         Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
@@ -164,8 +165,8 @@ public class FieldDetector {
 
                     };
 
-                    Supplier<Integer> tagCount = () -> {
-                        return (int) tagCountValue.in(Value);
+                    Supplier<Integer> tagCountSupplier = () -> {
+                        return (int) tagCount.in(Value);
                     };
 
                     Consumer<Integer> setPriorityTarget = (id) -> {
@@ -178,7 +179,16 @@ public class FieldDetector {
 
                     };
 
-                    return new FieldDetector(name, taNumberSupplier, fieldPosition, robotSpaceTargetTranslation, latency, tagCount, setPriorityTarget, enable, update);
+                    return new FieldDetector(
+                            name,
+                            fieldPosition,
+                            robotSpaceTargetTranslation,
+                            robotSpaceTargetHeading,
+                            latency,
+                            tagCountSupplier,
+                            setPriorityTarget,
+                            enable,
+                            update);
                 };
     }
 

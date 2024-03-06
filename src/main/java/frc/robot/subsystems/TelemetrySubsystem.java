@@ -15,6 +15,7 @@ import com.utility.GoatMath;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -58,6 +59,8 @@ public class TelemetrySubsystem extends SubsystemBase {
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions;
         public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions;
+        public final Supplier<Optional<Double>> priorityTargetDistance;
+        public final Supplier<Optional<Rotation2d>> priorityTargetRotation;
         public final Consumer<Pose2d> setPoseEstimator;
         public final Runnable resetPoseEstimateFromFieldDetectors;
         public final List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors;
@@ -74,6 +77,8 @@ public class TelemetrySubsystem extends SubsystemBase {
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorsPositions,
                         List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectPositions,
+                        Supplier<Optional<Double>> priorityTargetDistance,
+                        Supplier<Optional<Rotation2d>> priorityTargetRotation,
                         Consumer<Pose2d> setPoseEstimator,
                         Runnable resetPoseEstimateFromFieldDetectors,
                         List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors,
@@ -88,6 +93,8 @@ public class TelemetrySubsystem extends SubsystemBase {
                 this.fieldDetectorsPositions = fieldDetectorsPositions;
                 this.fieldDetectorLatencies = fieldDetectorLatencies;
                 this.objectPositions = objectPositions;
+                this.priorityTargetDistance = priorityTargetDistance;
+                this.priorityTargetRotation = priorityTargetRotation;
                 this.setPoseEstimator = setPoseEstimator;
                 this.resetPoseEstimateFromFieldDetectors = resetPoseEstimateFromFieldDetectors;
                 this.setPriorityTargetsFromFieldDetectors = setPriorityTargetsFromFieldDetectors;
@@ -144,6 +151,30 @@ public class TelemetrySubsystem extends SubsystemBase {
                 builder.addDoubleProperty(
                                 "Pose Estimate Theta",
                                 () -> GoatMath.round(poseEstimate.get().getRotation().getDegrees(), 6),
+                                null);
+
+                builder.addDoubleProperty(
+                                "Priority Target Distance",
+                                () -> {
+                                        var priorityTarget = priorityTargetDistance.get();
+                                        if (priorityTarget.isPresent()) {
+                                                return GoatMath.round(priorityTarget.get(), 6);
+                                        }else{
+                                                return 0.0;
+                                        }
+                                },
+                                null);
+
+                builder.addDoubleProperty(
+                                "Priority Target Angle (deg)",
+                                () -> {
+                                        var priorityTarget = priorityTargetRotation.get();
+                                        if (priorityTarget.isPresent()) {
+                                                return GoatMath.round(priorityTarget.get().getDegrees(), 6);
+                                        }else{
+                                                return 0.0;
+                                        }
+                                },
                                 null);
 
                 for (var fieldDetectorPosition : fieldDetectorsPositions) {
@@ -282,7 +313,8 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                 .getNorm() <= Constants.poseTranslationToleranceMeters;
                                                 var rotationGood = pose.getRotation().minus(poseEstimate.getRotation())
                                                                 .getDegrees() <= Constants.poseRotationToleranceDegrees;
-                                                if (translationGood && rotationGood) {
+                                                if (translationGood && rotationGood && telemetry.fieldDetectorTagCounts
+                                                                .get(i).getSecond().get() >= 2) {
                                                         telemetry.addDetectedPosesToEstimator.apply(pose)
                                                                         .accept(latency);
                                                         SmartDashboard.putNumber("Pose Added from "
@@ -306,6 +338,8 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 telemetry.fieldDetectorOptPositions,
                                 telemetry.fieldDetectorLatencies,
                                 telemetry.objectDetectorOptPositions,
+                                telemetry.priorityTargetDistance,
+                                telemetry.priorityTargetRotation,
                                 telemetry.setPoseEstimate,
                                 resetPoseEstimateFromFieldDetectors,
                                 telemetry.setPriorityTargetsFromFieldDetectors,

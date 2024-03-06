@@ -34,14 +34,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Telemetry {
 
         public final Field2d field2d;
-        public final List<Supplier<Double>> taNumberSuppliers;
         public final Measure<Angle> gyroYaw;
         public final Measure<Velocity<Velocity<Distance>>> accelerationX;
         public final Measure<Velocity<Velocity<Distance>>> accelerationY;
         public final Supplier<Pose2d> poseEstimate;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions;
         public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
+        public final List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions;
+        public final Supplier<Optional<Double>> priorityTargetDistance;
+        public final Supplier<Optional<Rotation2d>> priorityTargetRotation;
         public final Consumer<Pose2d> setPoseEstimate;
         public final Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator;
         public final List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors;
@@ -51,14 +53,16 @@ public class Telemetry {
 
         private Telemetry(
                         Field2d field2d,
-                        List<Supplier<Double>> taNumberSuppliers,
                         Measure<Angle> gyroYaw,
                         Measure<Velocity<Velocity<Distance>>> accelerationX,
                         Measure<Velocity<Velocity<Distance>>> accelerationY,
                         Supplier<Pose2d> poseEstimate,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions,
                         List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
+                        List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> objectDetectorOptPositions,
+                        Supplier<Optional<Double>> priorityTargetDistance,
+                        Supplier<Optional<Rotation2d>> priorityTargetRotation,
                         Consumer<Pose2d> setPoseEstimate,
                         Function<Pose2d, Consumer<Measure<Time>>> addDetectedPosesToEstimator,
                         List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors,
@@ -66,14 +70,16 @@ public class Telemetry {
                         List<Runnable> enableObjectDetectors,
                         Runnable update) {
                 this.field2d = field2d;
-                this.taNumberSuppliers = taNumberSuppliers;
                 this.gyroYaw = gyroYaw;
                 this.accelerationX = accelerationX;
                 this.accelerationY = accelerationY;
                 this.poseEstimate = poseEstimate;
                 this.fieldDetectorOptPositions = fieldDetectorOptPositions;
                 this.fieldDetectorLatencies = fieldDetectorLatencies;
+                this.fieldDetectorTagCounts = fieldDetectorTagCounts;
                 this.objectDetectorOptPositions = objectDetectorOptPositions;
+                this.priorityTargetDistance = priorityTargetDistance;
+                this.priorityTargetRotation = priorityTargetRotation;
                 this.setPoseEstimate = setPoseEstimate;
                 this.addDetectedPosesToEstimator = addDetectedPosesToEstimator;
                 this.setPriorityTargetsFromFieldDetectors = setPriorityTargetsFromFieldDetectors;
@@ -87,7 +93,6 @@ public class Telemetry {
                         gyroscope) -> (kinematics) -> (wheelPositions) -> {
 
                                 Field2d field2d = new Field2d();
-                                List<Supplier<Double>> taNumberSuppliers = new ArrayList<>();
                                 SwerveDrivePoseEstimator swerveDrivePoseEstimator = new SwerveDrivePoseEstimator(
                                                 kinematics,
                                                 Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
@@ -121,6 +126,28 @@ public class Telemetry {
 
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
                                 List<Runnable> enableObjectDetectors = new ArrayList<>();
+                                List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts = new ArrayList<>();
+
+                                Supplier<Optional<Double>> priorityTargetDistance = () -> {
+                                        for (var fieldDetector : fieldDetectors) {
+                                                var priorityTargetTranslation = fieldDetector.robotSpaceTargetTranslation
+                                                                .get();
+                                                if (priorityTargetTranslation.isPresent()) {
+                                                        return Optional.of(priorityTargetTranslation.get().getNorm());
+                                                }
+                                        }
+                                        return Optional.empty();
+                                };
+
+                                Supplier<Optional<Rotation2d>> priorityTargetRotation = () -> {
+                                        for (var fieldDetector : fieldDetectors) {
+                                                var priorityRotatOptional = fieldDetector.robotSpaceTargetHeading.get();
+                                                if (priorityRotatOptional.isPresent()) {
+                                                        return Optional.of(priorityRotatOptional.get());
+                                                }
+                                        }
+                                        return Optional.empty();
+                                };
 
                                 Runnable update = () -> {
                                         gyroscope.update.run();
@@ -151,22 +178,36 @@ public class Telemetry {
 
                                 };
 
-                                return new Telemetry(field2d, taNumberSuppliers, gyroscope.yaw, gyroscope.accelerationX,
-                                                gyroscope.accelerationY, poseEstimate, fieldDetectorOptPositions,
-                                                fieldDetectorOptLatencies, objectDetectorOptPositions, setPoseEstimate,
-                                                addDetectedPosesToEstimator, setPriorityTargetsFromFieldDetectors, enableFieldDetectors,
+                                return new Telemetry(field2d,
+                                                gyroscope.yaw,
+                                                gyroscope.accelerationX,
+                                                gyroscope.accelerationY,
+                                                poseEstimate,
+                                                fieldDetectorOptPositions,
+                                                fieldDetectorOptLatencies,
+                                                fieldDetectorTagCounts,
+                                                objectDetectorOptPositions,
+                                                priorityTargetDistance,
+                                                priorityTargetRotation,
+                                                setPoseEstimate,
+                                                addDetectedPosesToEstimator,
+                                                setPriorityTargetsFromFieldDetectors,
+                                                enableFieldDetectors,
                                                 enableObjectDetectors, update);
                         };
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (
                         fieldDetector) -> (telemetry) -> {
-                                telemetry.taNumberSuppliers.add(fieldDetector.taNumberSupplier);
                                 telemetry.fieldDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(fieldDetector.name,
                                                                 fieldDetector.fieldPosition));
                                 telemetry.fieldDetectorLatencies
                                                 .add(new Pair<String, Supplier<Optional<Measure<Time>>>>(
                                                                 fieldDetector.name, fieldDetector.latency));
+
+                                telemetry.fieldDetectorTagCounts.add(new Pair<String, Supplier<Integer>>(
+                                                fieldDetector.name, fieldDetector.tagCount));
+
                                 telemetry.setPriorityTargetsFromFieldDetectors.add(fieldDetector.setPriorityTarget);
                                 telemetry.enableFieldDetectors.add(fieldDetector.enable);
                                 fieldDetector.enable.run();
