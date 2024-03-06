@@ -9,6 +9,10 @@ import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
 import com.compLevel1.Turner;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.MathUtil;
@@ -19,6 +23,7 @@ import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -48,9 +53,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Consumer<Double> drive;
   public final Runnable resetRelEncoderFromAbsolute;
   public final Runnable hold;
-  public final Runnable stop; 
+  public final Runnable stop;
   public final Runnable update;
-
 
   private ShooterTiltSubsystem(
       Measure<Voltage> voltage,
@@ -73,7 +77,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.hold = hold;
     this.update = update;
     this.stop = stop;
-
 
     Command defaultCommand = run(hold);
     defaultCommand.setName("HOLD");
@@ -110,34 +113,30 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   }
 
   public static final Supplier<ShooterTiltSubsystem> create = () -> {
-                                        // if (enableWrap) {
-                                        // pidController.enableContinuousInput(-0.5 * gearing,
-                                        // 0.5 * gearing);
-                                        // }
 
+    CANSparkMax neo = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
+    neo.getPIDController().setP(Constants.slot0kP, 0);
+    neo.getPIDController().setI(Constants.slot0kI, 0);
+    neo.getPIDController().setD(Constants.slot0kD, 0);
+    neo.getPIDController().setFF(Constants.slot0kF, 0);
+    neo.getPIDController().setP(Constants.slot1kP, 1);
+    neo.getPIDController().setI(Constants.slot1kI, 1);
+    neo.getPIDController().setD(Constants.slot1kD, 1);
+    neo.getPIDController().setFF(Constants.slot1kF, 1);
+    neo.setIdleMode(IdleMode.kBrake);
+    neo.setInverted(true);
+    neo.getPIDController().setPositionPIDWrappingEnabled(true);
+    neo.getPIDController().setPositionPIDWrappingMinInput(-0.5 * Constants.gearing);
+    neo.getPIDController().setPositionPIDWrappingMaxInput(0.5 * Constants.gearing);
+    if (RobotBase.isSimulation()) {
+      REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
+    }
 
-    Turner turner = Motor.REV.createCANSparkBaseNEO
-        .andThen(Motor.REV.setkP.apply(0).apply(Constants.slot0kP))
-        .andThen(Motor.REV.setkI.apply(0).apply(Constants.slot0kI))
-        .andThen(Motor.REV.setkD.apply(0).apply(Constants.slot0kD))
-        .andThen(Motor.REV.setkF.apply(0).apply(Constants.slot0kF))
-        .andThen(Motor.REV.setkP.apply(1).apply(Constants.slot1kP))
-        .andThen(Motor.REV.setkI.apply(1).apply(Constants.slot1kI))
-        .andThen(Motor.REV.setkD.apply(1).apply(Constants.slot1kD))
-        .andThen(Motor.REV.setkF.apply(1).apply(Constants.slot1kF))
-        .andThen(Motor.REV.setAngleWrapping.apply(Constants.gearing))
-        .andThen(Motor.REV.enableBrake)
-        .andThen(Motor.REV.invert)
-        .andThen(Motor.REV.createMotorFromCANSparkBase)
+    Turner turner = Motor.REV.createNEOMotor
         .andThen(Motor.REV.setNEOMaxVelocity)
-        .andThen(Motor.REV.setTurnSim
-            .apply(Constants.slot1kP)
-            .apply(Constants.slot1kI)
-            .apply(Constants.slot1kD)
-            .apply(true)
-            .apply(Constants.gearing))
-        .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp).apply(Constants.absoluteGearingDown))
-        .apply(Constants.deviceId);
+        .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp)
+            .apply(Constants.absoluteGearingDown))
+        .apply(neo);
 
     return new ShooterTiltSubsystem(
         turner.voltage,

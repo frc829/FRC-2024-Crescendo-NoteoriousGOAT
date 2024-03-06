@@ -113,14 +113,7 @@ public class ElevatorSubsystem extends SubsystemBase {
       REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
     }
 
-    Elevator elevator = Motor.REV.createMotorFromCANSparkBase
-        .andThen(Motor.REV.setNEOMaxVelocity)
-        .andThen(Motor.REV.setTurnSim
-            .apply(Constants.slot1kP)
-            .apply(Constants.slot1kI)
-            .apply(Constants.slot1kD)
-            .apply(false)
-            .apply(Double.NaN))
+    Elevator elevator = Motor.REV.createNEOMotor
         .andThen(Elevator.create
             .apply(Constants.gearing)
             .apply(Constants.drumRadius))
