@@ -1,16 +1,12 @@
 package frc.robot.commandCreators;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import java.util.Optional;
-import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -39,44 +35,6 @@ public class ResetAndHoldingCommands implements Sendable {
                 .of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec);
 
     }
-
-    public static final Function<Measure<Distance>, Function<Measure<Angle>, Command>> setElevatorTiltUntil = (
-            position) -> (angle) -> {
-                Command elevatorCommand = BasicCommands.Set.ElevatorPosition.create.apply(position);
-                Command tiltCommand = BasicCommands.Set.TiltAngle.create.apply(angle);
-
-                BooleanSupplier elevatorAtPosition = () -> {
-                    return MathUtil.isNear(
-                            position.in(Meters),
-                            RobotContainer.elevatorSubsystem.position.in(Meters),
-                            BasicCommands.Set.ElevatorPosition.tolerance.in(Meters));
-                };
-
-                BooleanSupplier tiltAtPosition = () -> {
-                    return MathUtil.isNear(
-                            angle.in(Degrees),
-                            RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
-                            BasicCommands.Set.TiltAngle.tolerance.in(Degrees));
-                };
-
-                BooleanSupplier elevatorTiltEndCondition = () -> {
-                    return elevatorAtPosition.getAsBoolean() && tiltAtPosition.getAsBoolean();
-                };
-
-                Command command = Commands.parallel(elevatorCommand, tiltCommand).until(elevatorTiltEndCondition);
-                command.setName("Set Elevator Tilt Until");
-                return command;
-            };
-
-    public static final Function<Measure<Distance>, Function<Measure<Angle>, Command>> setElevatorTiltForever = (
-            position) -> (angle) -> {
-                Command elevatorCommand = BasicCommands.Set.ElevatorPosition.create.apply(position);
-                Command tiltCommand = BasicCommands.Set.TiltAngle.create.apply(angle);
-
-                Command command = Commands.parallel(elevatorCommand, tiltCommand);
-                command.setName("Set Elevator Tilt Forever");
-                return command;
-            };
 
     public static final Supplier<Command> distanceBasedShooterAdjust = () -> {
         Runnable shooterAdjust = () -> {

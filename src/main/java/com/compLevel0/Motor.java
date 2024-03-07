@@ -105,7 +105,6 @@ public class Motor {
                                         voltageSetpoint.mut_setMagnitude(volts / 12.0);
                                         canSparkBase.getPIDController().setReference(voltageSetpoint.in(Volts),
                                                         ControlType.kVoltage);
-                                        System.out.println(measurement + ":" + goal);
                                 } else {
                                         canSparkBase.getPIDController()
                                                         .setReference(setpoint.in(Rotations),

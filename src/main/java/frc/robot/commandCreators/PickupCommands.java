@@ -4,7 +4,10 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.RobotContainer.telemetrySubsystem;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext.Basic;
 
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -15,8 +18,52 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import frc.robot.commandCreators.BasicCommands.Tilt;
 
-public class PickupCommands implements Sendable {
+public class PickupCommands {
+
+        public static final class Level{
+                               public static final Command level = ResetAndHoldingCommands.setElevatorTiltUntil
+                                .apply(Meters.of(0.0))
+                                .apply(Degrees.of(0.0)); 
+        }
+
+        public static final class Ground {
+                private static final class Constants {
+                        private static Measure<Angle> tiltAngle = Degrees.of(55);
+                        private static Measure<Distance> elevatorPosition = Meters.of(0);
+                        private static double transportPercent = 0.9;
+                        private static double innerIntakePercent = 0.9;
+                        private static double outerIntakePercent = 0.9;
+                        private static final BooleanSupplier elevatorAndTiltAtPositionCondition = () -> {
+                                return BasicCommands.Elevator.createAtPositionCondition.apply(elevatorPosition)
+                                                .getAsBoolean() &&
+                                                BasicCommands.Tilt.createAtAngleCondition.apply(tiltAngle)
+                                                                .getAsBoolean();
+
+                        };
+                }
+
+                private static final Supplier<Command> elevatorAndTiltAtPositionCommand = () -> {
+                        return Commands.parallel(
+                                        BasicCommands.Elevator.createSetElevatorPositionCommand
+                                                        .apply(Constants.elevatorPosition),
+                                        BasicCommands.Tilt.createSetTiltAngleCommand.apply(Constants.tiltAngle))
+                                        .until(Constants.elevatorAndTiltAtPositionCondition);
+                };
+
+                private static final Supplier<Command> intakeCommand = () -> {
+                        return Commands.parallel(
+                                        BasicCommands.Elevator.createHoldElevatorCommand.get(),
+                                        BasicCommands.Tilt.createHoldTiltCommand.get(),
+                                        BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
+                                        BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
+                                        BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                };
+
+                public static final Supplier<Command> groundCommand = () -> Commands
+                                .sequence(elevatorAndTiltAtPositionCommand.get(), intakeCommand.get());
+        }
 
         private static final class Constants {
                 private static final class Ground {
@@ -48,9 +95,10 @@ public class PickupCommands implements Sendable {
         }
 
         public static final Supplier<Command> createGround = () -> {
-                Command elevatorTiltCommand = ResetAndHoldingCommands.setElevatorTiltUntil
-                                .apply(Constants.Ground.elevatorPosition)
-                                .apply(Constants.Ground.tiltAngle);
+                Command setElevatorAndTilt = Commands.parallel(
+                                BasicCommands.Elevator.createSetElevatorPositionCommand
+                                                .apply(Constants.Ground.elevatorPosition),
+                                BasicCommands.Tilt.createSetTiltAngleCommand.apply(Constants.Ground.tiltAngle));
 
                 Command elevatorHoldCommand = BasicCommands.HoldandStop.createForElevator.get();
                 Command tiltHoldCommand = BasicCommands.HoldandStop.createForTilt.get();
@@ -106,8 +154,6 @@ public class PickupCommands implements Sendable {
                                                 innerIntakeCommand,
                                                 outerIntakeCommand)
                                 .until(RobotContainer.notedLoadedSubsystem.hasNote);
-
-
 
                 Command hasNoteCommand = Commands.parallel(
                                 BasicCommands.Set.OuterIntake.create.apply(0.0),
@@ -215,43 +261,4 @@ public class PickupCommands implements Sendable {
         public PickupCommands() {
         }
 
-        @Override
-        public void initSendable(SendableBuilder builder) {
-                builder.addDoubleProperty(
-                                "Ground Transport Percent",
-                                () -> Constants.Ground.transportPercent,
-                                (percent) -> Constants.Ground.transportPercent = percent);
-                builder.addDoubleProperty(
-                                "Ground Inner Percent",
-                                () -> Constants.Ground.innerIntakePercent,
-                                (percent) -> Constants.Ground.innerIntakePercent = percent);
-                builder.addDoubleProperty(
-                                "Ground Outer Percent",
-                                () -> Constants.Ground.outerIntakePercent,
-                                (percent) -> Constants.Ground.outerIntakePercent = percent);
-
-                builder.addDoubleProperty(
-                                "Baby Bird Transport Percent",
-                                () -> Constants.BabyBird.transportPercent,
-                                (percent) -> Constants.BabyBird.transportPercent = percent);
-                builder.addDoubleProperty(
-                                "Baby Bird Singulator Percent",
-                                () -> Constants.BabyBird.singulatorPercent,
-                                (percent) -> Constants.BabyBird.singulatorPercent = percent);
-                builder.addDoubleProperty(
-                                "Baby Bird Shooter Percent",
-                                () -> Constants.BabyBird.topShooterPercent,
-                                (percent) -> {
-                                        Constants.BabyBird.topShooterPercent = percent;
-                                        Constants.BabyBird.bottomShooterPercent = percent;
-                                });
-                builder.addDoubleProperty(
-                                "Baby Bird Elevator Position",
-                                () -> Constants.BabyBird.elevatorPosition.in(Meters),
-                                (meters) -> Constants.BabyBird.elevatorPosition.mut_setMagnitude(meters));
-                builder.addDoubleProperty(
-                                "Baby Bird Tilt Angle",
-                                () -> Constants.BabyBird.tiltAngle.in(Degrees),
-                                (degrees) -> Constants.BabyBird.tiltAngle.mut_setMagnitude(degrees));
-        }
 }
