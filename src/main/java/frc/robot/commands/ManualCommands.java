@@ -121,6 +121,5 @@ public class ManualCommands {
                 Shooter.command.setName("Manual Shooter");
                 Drive.FieldCentric.command.setName("Manual Field Centric");
                 Drive.ZeroModules.command.setName("Zero Modules");
-                ResetAndHolding.level.setName("Level");
         }
 }
