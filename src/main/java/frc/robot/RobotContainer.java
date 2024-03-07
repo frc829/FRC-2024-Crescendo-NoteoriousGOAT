@@ -126,7 +126,7 @@ public class RobotContainer {
                 SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
 
-                operator.back.onTrue(ManualCommands.ResetAndHolding.level);
+                operator.back.onTrue(PickupCommands.Level.command.get());
                 operator.leftY.whileTrue(ManualCommands.Elevator.drive);
                 operator.rightY.whileTrue(ManualCommands.Tilt.drive);
                 operator.fullTrigger.whileTrue(ManualCommands.Shooter.command);

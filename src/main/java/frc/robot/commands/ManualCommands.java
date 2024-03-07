@@ -113,10 +113,6 @@ public class ManualCommands {
 
         public static final class ResetAndHolding {
                 public static final Command shooterAdjust = ResetAndHoldingCommands.distanceBasedShooterAdjust.get();
-                public static final Command level = ResetAndHoldingCommands.setElevatorTiltUntil
-                                .apply(Meters.of(0.0))
-                                .apply(Degrees.of(0.0));
-
         }
 
         static {

@@ -219,6 +219,48 @@ public class BasicCommands {
         };
     }
 
+    public static final class Singulator {
+        public static final Function<Double, Runnable> spin = (speed) -> {
+            return () -> RobotContainer.singulatorSubsystem.spin.accept(speed);
+        };
+        public static final Function<Double, Command> createSpinCommand = (speed) -> {
+            Command command = Commands.run(
+                    spin.apply(speed),
+                    RobotContainer.singulatorSubsystem);
+            String name = String.format("Run at %s of Max", speed);
+            command.setName(name);
+            return command;
+        };
+    }
+
+    public static final class TopShooter {
+        public static final Function<Double, Runnable> spin = (speed) -> {
+            return () -> RobotContainer.topShooterSubsystem.spin.accept(speed);
+        };
+        public static final Function<Double, Command> createSpinCommand = (speed) -> {
+            Command command = Commands.run(
+                    spin.apply(speed),
+                    RobotContainer.topShooterSubsystem);
+            String name = String.format("Run at %s of Max", speed);
+            command.setName(name);
+            return command;
+        };
+    }
+
+    public static final class BottomShooter {
+        public static final Function<Double, Runnable> spin = (speed) -> {
+            return () -> RobotContainer.bottomShooterSubsystem.spin.accept(speed);
+        };
+        public static final Function<Double, Command> createSpinCommand = (speed) -> {
+            Command command = Commands.run(
+                    spin.apply(speed),
+                    RobotContainer.bottomShooterSubsystem);
+            String name = String.format("Run at %s of Max", speed);
+            command.setName(name);
+            return command;
+        };
+    }
+
     public static final class Set {
 
         public static final class TopShooter {
