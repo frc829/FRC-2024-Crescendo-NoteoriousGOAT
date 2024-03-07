@@ -6,10 +6,10 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
 import com.compLevel0.Motor;
 import com.compLevel0.Sensor;
+import com.types.SixFunction;
+
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
@@ -58,10 +58,8 @@ public class SwerveModule {
                 resetSteerEncoderFromAbsolute.run();
         }
 
-        public static final Function<Motor, Function<Motor, Function<Double, Function<Double, Function<Measure<Distance>, Function<Integer, Function<String, SwerveModule>>>>>>> create = (
-                        steerMotor) -> (
-                                        wheelMotor) -> (steerGearing) -> (wheelGearing) -> (
-                                                        wheelRadius) -> (angleSensorId) -> (canbus) -> {
+        public static final SixFunction<Motor, Motor, Double, Double , Measure<Distance>, Sensor<Angle>, SwerveModule> create = (
+                        steerMotor, wheelMotor, steerGearing, wheelGearing, wheelRadius, angleSensor) -> {
                                                                 MutableMeasure<Angle> angle = MutableMeasure
                                                                                 .zero(Rotations);
                                                                 MutableMeasure<Angle> absoluteAngle = MutableMeasure
@@ -70,11 +68,6 @@ public class SwerveModule {
                                                                                 .zero(Meters);
                                                                 MutableMeasure<Velocity<Distance>> wheelVelocity = MutableMeasure
                                                                                 .zero(MetersPerSecond);
-
-                                                                Sensor<Angle> angleSensor = Sensor.CTRE.createAngleSensorFromCANCoder
-                                                                                .apply(angleSensorId)
-                                                                                .apply(canbus)
-                                                                                .apply(absoluteAngle);
 
                                                                 MutableMeasure<Angle> steerSetpoint = MutableMeasure
                                                                                 .zero(Radians);

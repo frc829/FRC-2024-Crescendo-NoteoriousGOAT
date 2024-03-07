@@ -53,19 +53,11 @@ public class Sensor<T extends Unit<T>> {
 
     public static final class CTRE {
 
-        @SuppressWarnings(value = { "resource" })
-        public static final Function<Integer, Function<String, Function<Measure<Angle>, Sensor<Angle>>>> createAngleSensorFromCANCoder = (
-                deviceId) -> (canbus) -> (simAbsoluteAngle) -> {
-                    CANcoder cancoder = new CANcoder(deviceId, canbus);
-                    // CANcoderSimState cancoderSimState = cancoder.getSimState();
-                    // cancoderSimState.setRawPosition(0.0);
-                    // cancoder.setPosition(0.0);
+        public static final Function<CANcoder, Sensor<Angle>> createAngleSensorFromCANCoder = (
+                cancoder) -> {
                     MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
                     MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                     Runnable update = () -> {
-                        if (RobotBase.isSimulation()) {
-                            // cancoderSimState.setRawPosition(simAbsoluteAngle.in(Rotations));
-                        }
                         voltage.mut_setMagnitude(cancoder.getSupplyVoltage().getValueAsDouble());
                         angle.mut_setMagnitude(cancoder.getAbsolutePosition().getValueAsDouble());
                     };

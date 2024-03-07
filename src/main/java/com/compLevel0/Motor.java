@@ -457,7 +457,8 @@ public class Motor {
                 // #endregion
 
                 // #region createMotorFromTalonFX
-                public static final Function<TalonFX, Motor> createMotorFromTalonFX = (talonFX) -> {
+                public static final BiFunction<TalonFX, Measure<Velocity<Angle>>, Motor> createMotorFromTalonFX = (
+                                talonFX, maxAngularVelocity) -> {
 
                         TalonFXSimState talonFXSimState = talonFX.getSimState();
                         DCMotorSim dcMotorSim = new DCMotorSim(
@@ -474,8 +475,6 @@ public class Motor {
                         MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                         MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                         MutableMeasure<Velocity<Angle>> angularVelocity = MutableMeasure
-                                        .zero(RotationsPerSecond);
-                        MutableMeasure<Velocity<Angle>> maxAngularVelocity = MutableMeasure
                                         .zero(RotationsPerSecond);
 
                         Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> {
@@ -553,6 +552,12 @@ public class Motor {
                         return new Motor(voltage, angle, absoluteAngle, angularVelocity,
                                         maxAngularVelocity,
                                         setRelativeEncoder, turn, spin, setVoltage, stop, update);
+                };
+
+                public static final Function<TalonFX, Motor> createKrakenX60FOCMotor = (talonFX) -> {
+                        return createMotorFromTalonFX.apply(
+                                        talonFX,
+                                        RadiansPerSecond.of(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec));
                 };
                 // #endregion
 

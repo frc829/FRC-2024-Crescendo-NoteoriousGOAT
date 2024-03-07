@@ -133,7 +133,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     }
 
     Turner turner = Motor.REV.createNEOMotor
-        .andThen(Motor.REV.setNEOMaxVelocity)
         .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp)
             .apply(Constants.absoluteGearingDown))
         .apply(neo);

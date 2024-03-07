@@ -15,10 +15,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.compLevel0.Motor;
+import com.compLevel0.Sensor;
 import com.compLevel1.SwerveModule;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,7 +36,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -51,16 +56,11 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final List<Double> wheelGearings = Collections.nCopies(4, -5.90);
                 private static final List<Measure<Distance>> wheelRadii = Collections.nCopies(4, Inches.of(2));
                 private static final List<Integer> angleSensorIds = Arrays.asList(30, 31, 32, 33);
-                private static final String angleSensorCanbus = "CANIVORE";
+                private static final String canbus = "CANIVORE";
                 private static final List<Double> steerkPs = Collections.nCopies(4, 2.0);
                 private static final List<Double> steerkIs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkDs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkFs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkPs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkIs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelkDs = Collections.nCopies(4, 0.0000);
-                private static final List<Double> wheelkFs = Collections.nCopies(4,
-                                1.0 / Units.radiansToRotations(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec));
                 private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 5.0);
                 private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.00);
                 private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.000);
@@ -241,66 +241,49 @@ public class DriveSubsystem extends SubsystemBase {
 
                 List<SwerveModule> modules = Arrays.asList(0, 1, 2, 3).stream().map(
                                 (i) -> {
-                                        return SwerveModule.create.apply(null).apply(null).apply(null).apply(null)
-                                                        .apply(null).apply(null).apply(null);
-                                        // TalonFXConfiguration config = new TalonFXConfiguration();
-                                        // config.Voltage.PeakForwardVoltage = 12.0;
-                                        // config.Voltage.PeakReverseVoltage = -12.0;
-                                        // config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-                                        // config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
-                                        // config.Slot0.kP = Constants.wheelkPs.get(i);
-                                        // config.Slot0.kI = Constants.wheelkIs.get(i);
-                                        // config.Slot0.kD = Constants.wheelkDs.get(i);
-                                        // config.Slot0.kV = Constants.wheelkFs.get(i);
-                                        // config.Slot1.kP = Constants.wheelFOCkPs.get(i);
-                                        // config.Slot1.kI = Constants.wheelFOCkIs.get(i);
-                                        // config.Slot1.kD = Constants.wheelFOCkDs.get(i);
-                                        // config.Slot1.kV = Constants.wheelFOCkFs.get(i);
-                                        // config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-                                        // TalonFX wheelTalonFX = Motor.CTRE.createTalonFX.apply("CANIVORE")
-                                        // .apply(Constants.wheelDeviceIds.get(i));
-                                        // wheelTalonFX.getConfigurator().apply(config);
-                                        // return SwerveModule.create
-                                        // .apply(Motor.REV.createCANSparkBaseNEO
-                                        // .andThen(Motor.REV.setkP.apply(1).apply(
-                                        // Constants.steerkPs.get(
-                                        // i)))
-                                        // .andThen(Motor.REV.setkI.apply(1).apply(
-                                        // Constants.steerkIs.get(
-                                        // i)))
-                                        // .andThen(Motor.REV.setkD.apply(1).apply(
-                                        // Constants.steerkDs.get(
-                                        // i)))
-                                        // .andThen(Motor.REV.setkF.apply(1).apply(
-                                        // Constants.steerkFs.get(
-                                        // i)))
-                                        // .andThen(Motor.REV.setAngleWrapping
-                                        // .apply(
-                                        // Constants.steerGearings
-                                        // .get(i)))
-                                        // .andThen(Motor.REV.enableBrake)
-                                        // .andThen(
-                                        // Motor.REV.createMotorFromCANSparkBase)
-                                        // .andThen(Motor.REV.setNEOMaxVelocity)
-                                        // .andThen(Motor.REV.setTurnSim
-                                        // .apply(Constants.steerkPs
-                                        // .get(i))
-                                        // .apply(Constants.steerkIs
-                                        // .get(i))
-                                        // .apply(Constants.steerkDs
-                                        // .get(0))
-                                        // .apply(true)
-                                        // .apply(Constants.steerGearings
-                                        // .get(i)))
-                                        // .apply(Constants.steerDeviceIds.get(i)))
-                                        // .apply(Motor.CTRE.createMotorFromTalonFX
-                                        // .andThen(Motor.CTRE.setKrakenX60FOCMaxVelocity)
-                                        // .apply(wheelTalonFX))
-                                        // .apply(Constants.steerGearings.get(i))
-                                        // .apply(Constants.wheelGearings.get(i))
-                                        // .apply(Constants.wheelRadii.get(i))
-                                        // .apply(Constants.angleSensorIds.get(i))
-                                        // .apply(Constants.angleSensorCanbus);
+                                        CANSparkMax neo = new CANSparkMax(Constants.steerDeviceIds.get(i),
+                                                        MotorType.kBrushless);
+                                        neo.getPIDController().setP(Constants.steerkPs.get(i), 1);
+                                        neo.getPIDController().setI(Constants.steerkIs.get(i), 1);
+                                        neo.getPIDController().setD(Constants.steerkDs.get(i), 1);
+                                        neo.getPIDController().setFF(Constants.steerkFs.get(i), 1);
+                                        neo.setIdleMode(IdleMode.kBrake);
+                                        neo.getPIDController().setPositionPIDWrappingEnabled(true);
+                                        neo.getPIDController().setPositionPIDWrappingMinInput(
+                                                        -0.5 * Constants.steerGearings.get(i));
+                                        neo.getPIDController().setPositionPIDWrappingMaxInput(
+                                                        0.5 * Constants.steerGearings.get(i));
+                                        if (RobotBase.isSimulation()) {
+                                                REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
+                                        }
+                                        Motor steerMotor = Motor.REV.createNEOMotor.apply(neo);
+
+                                        TalonFXConfiguration config = new TalonFXConfiguration();
+                                        config.Voltage.PeakForwardVoltage = 12.0;
+                                        config.Voltage.PeakReverseVoltage = -12.0;
+                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
+                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
+                                        config.Slot0.kP = Constants.wheelFOCkPs.get(i);
+                                        config.Slot0.kI = Constants.wheelFOCkIs.get(i);
+                                        config.Slot0.kD = Constants.wheelFOCkDs.get(i);
+                                        config.Slot0.kV = Constants.wheelFOCkFs.get(i);
+                                        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+                                        TalonFX wheelTalonFX = new TalonFX(Constants.wheelDeviceIds.get(i), Constants.canbus);
+                                        wheelTalonFX.getConfigurator().apply(config);
+                                        Motor wheelMotor = Motor.CTRE.createKrakenX60FOCMotor.apply(wheelTalonFX);
+
+                                        CANcoder cancoder = new CANcoder(Constants.angleSensorIds.get(i), Constants.canbus);
+                                        Sensor<Angle> angleSensor = Sensor.CTRE.createAngleSensorFromCANCoder.apply(cancoder);
+
+                                        return SwerveModule.create.apply(
+                                                steerMotor, 
+                                                wheelMotor, 
+                                                Constants.steerGearings.get(i), 
+                                                Constants.wheelGearings.get(i), 
+                                                Constants.wheelRadii.get(i), 
+                                                angleSensor);
+                                        
+                                        
                                 }).toList();
 
                 List<Measure<Voltage>> steerVoltages = Arrays.asList(0, 1, 2, 3).stream()
