@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Gs;
 import static edu.wpi.first.units.Units.Seconds;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -19,7 +19,6 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -45,13 +44,12 @@ public class Gyroscope {
     }
 
     public static final class KauaiLabs {
-        public static Function<Supplier<ChassisSpeeds>, Gyroscope> createNavxXMP = (simChassisSpeeds) -> {
+        public static BiFunction<AHRS, Supplier<ChassisSpeeds>, Gyroscope> createNavxXMP = (navxMXP2, simChassisSpeeds) -> {
             MutableMeasure<Angle> yaw = MutableMeasure.zero(Degrees);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationX = MutableMeasure.zero(Gs);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationY = MutableMeasure.zero(Gs);
             MutableMeasure<Velocity<Velocity<Distance>>> accelerationZ = MutableMeasure.zero(Gs);
 
-            AHRS navx = new AHRS(Port.kMXP);
             int dev = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
             SimDouble simYaw = new SimDouble(SimDeviceDataJNI.getSimValueHandle(dev, "Yaw"));
             MutableMeasure<Time> lastTime = MutableMeasure.ofBaseUnits(Timer.getFPGATimestamp(), Seconds);
@@ -70,10 +68,10 @@ public class Gyroscope {
                     simYaw.set(yawValue);
                     lastTime.mut_setMagnitude(currentTime.in(Seconds));
                 }
-                yaw.mut_setMagnitude(-navx.getYaw());
-                accelerationX.mut_setMagnitude(navx.getWorldLinearAccelX());
-                accelerationY.mut_setMagnitude(navx.getWorldLinearAccelY());
-                accelerationZ.mut_setMagnitude(navx.getWorldLinearAccelZ());
+                yaw.mut_setMagnitude(-navxMXP2.getYaw());
+                accelerationX.mut_setMagnitude(navxMXP2.getWorldLinearAccelX());
+                accelerationY.mut_setMagnitude(navxMXP2.getWorldLinearAccelY());
+                accelerationZ.mut_setMagnitude(navxMXP2.getWorldLinearAccelZ());
             };
 
             return new Gyroscope(yaw, accelerationX, accelerationY, accelerationZ, update);

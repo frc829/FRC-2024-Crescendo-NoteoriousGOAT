@@ -4,21 +4,13 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.MathUtil;
@@ -35,7 +27,6 @@ import edu.wpi.first.units.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.RobotContainer;
 
 public class Motor {
         public final MutableMeasure<Voltage> voltage;
@@ -77,100 +68,6 @@ public class Motor {
 
         public static final class REV {
 
-                // #region createSpark's for Specific Motors
-                public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO = (deviceId) -> {
-                        var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
-                        canSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-                        if (RobotBase.isSimulation()) {
-                                REVPhysicsSim.getInstance().addSparkMax(
-                                                canSparkMax,
-                                                DCMotor.getNEO(1));
-                        }
-                        return canSparkMax;
-                };
-
-                public static final Function<Integer, CANSparkBase> createCANSparkBaseNEO550 = (deviceId) -> {
-                        var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
-                        canSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-                        if (RobotBase.isSimulation()) {
-                                REVPhysicsSim.getInstance().addSparkMax(
-                                                canSparkMax,
-                                                DCMotor.getNeo550(1));
-                        }
-                        return canSparkMax;
-                };
-
-                public static final Function<Integer, CANSparkBase> createCANSparkBaseNEOVortex = (deviceId) -> {
-                        if (RobotBase.isSimulation()) {
-                                var canSparkMax = new CANSparkMax(deviceId, MotorType.kBrushless);
-                                REVPhysicsSim.getInstance().addSparkMax(
-                                                canSparkMax,
-                                                DCMotor.getNeoVortex(1));
-                                return canSparkMax;
-
-                        } else {
-                                CANSparkFlex canSparkFlex = new CANSparkFlex(deviceId, MotorType.kBrushless);
-                                canSparkFlex.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-                                return canSparkFlex;
-                        }
-                };
-                // #endregion
-
-                // #region pidSetters
-                public static final Function<Integer, Function<Double, Function<CANSparkBase, CANSparkBase>>> setkP = (
-                                slotID) -> (gain) -> (canSparkBase) -> {
-                                        canSparkBase.getPIDController().setP(gain, slotID);
-                                        return canSparkBase;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<CANSparkBase, CANSparkBase>>> setkI = (
-                                slotID) -> (gain) -> (canSparkBase) -> {
-                                        canSparkBase.getPIDController().setI(gain, slotID);
-                                        return canSparkBase;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<CANSparkBase, CANSparkBase>>> setkD = (
-                                slotID) -> (gain) -> (canSparkBase) -> {
-                                        canSparkBase.getPIDController().setD(gain, slotID);
-                                        return canSparkBase;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<CANSparkBase, CANSparkBase>>> setkF = (
-                                slotID) -> (gain) -> (canSparkBase) -> {
-                                        canSparkBase.getPIDController().setFF(gain, slotID);
-                                        return canSparkBase;
-                                };
-
-                public static final Function<Double, Function<CANSparkBase, CANSparkBase>> setAngleWrapping = (
-                                gearing) -> (canSparkBase) -> {
-                                        canSparkBase.getPIDController().setPositionPIDWrappingEnabled(true);
-                                        canSparkBase.getPIDController().setPositionPIDWrappingMinInput(-0.5 * gearing);
-                                        canSparkBase.getPIDController().setPositionPIDWrappingMaxInput(0.5 * gearing);
-                                        return canSparkBase;
-                                };
-                // #endregion
-
-                // #region absoluteEncoder Setters
-                public static final Function<Double, Function<CANSparkBase, CANSparkBase>> setAbsolutEencoderScaleFactor = (
-                                factor) -> (canSparkBase) -> {
-                                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
-                                                        .setPositionConversionFactor(factor);
-                                        return canSparkBase;
-                                };
-
-                public static final Function<CANSparkBase, CANSparkBase> setInvertAbsoluteEncoder = (canSparkBase) -> {
-                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle).setInverted(true);
-                        return canSparkBase;
-                };
-
-                public static final Function<Measure<Angle>, Function<CANSparkBase, CANSparkBase>> setAbsoluteEncoderOffset = (
-                                offset) -> (canSparkBase) -> {
-                                        canSparkBase.getAbsoluteEncoder(Type.kDutyCycle)
-                                                        .setZeroOffset(offset.in(Rotations));
-                                        return canSparkBase;
-                                };
-                // #endregion
-
                 // #region createMotorFromCANSparkMax
                 public static final BiFunction<CANSparkBase, Measure<Velocity<Angle>>, Motor> createMotorFromCANSparkBase = (
                                 canSparkBase, maxAngularVelocity) -> {
@@ -185,9 +82,9 @@ public class Motor {
                         };
 
                         PIDController pidController = new PIDController(
-                                        canSparkBase.getPIDController().getP(),
-                                        canSparkBase.getPIDController().getI(),
-                                        canSparkBase.getPIDController().getD());
+                                        canSparkBase.getPIDController().getP(1),
+                                        canSparkBase.getPIDController().getI(1),
+                                        canSparkBase.getPIDController().getD(1));
                         if (canSparkBase.getPIDController().getPositionPIDWrappingEnabled()) {
                                 pidController.enableContinuousInput(
                                                 canSparkBase.getPIDController()
@@ -206,7 +103,9 @@ public class Motor {
                                                         goal);
                                         volts = MathUtil.clamp(volts, -12.0, 12.0);
                                         voltageSetpoint.mut_setMagnitude(volts / 12.0);
-                                        canSparkBase.setVoltage(voltageSetpoint.in(Volts));
+                                        canSparkBase.getPIDController().setReference(voltageSetpoint.in(Volts),
+                                                        ControlType.kVoltage);
+                                        System.out.println(measurement + ":" + goal);
                                 } else {
                                         canSparkBase.getPIDController()
                                                         .setReference(setpoint.in(Rotations),
@@ -270,191 +169,9 @@ public class Motor {
                 public static final Function<CANSparkBase, Motor> createNEO550Motor = (
                                 canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
                                                 RadiansPerSecond.of(DCMotor.getNeo550(1).freeSpeedRadPerSec));
-
-                // #region setMaxVelocities
-                public static final Function<Motor, Motor> setNEOMaxVelocity = (motor) -> {
-                        return new Motor(
-                                        motor.voltage,
-                                        motor.angle,
-                                        motor.absoluteAngle,
-                                        motor.angularVelocity,
-                                        RadiansPerSecond.of(DCMotor.getNEO(1).freeSpeedRadPerSec),
-                                        motor.setRelativeEncoderAngle,
-                                        motor.turn,
-                                        motor.spin,
-                                        motor.setVoltage,
-                                        motor.stop,
-                                        motor.update);
-                };
-
-                public static final Function<Motor, Motor> setNEO550MaxVelocity = (motor) -> {
-                        return new Motor(
-                                        motor.voltage,
-                                        motor.angle,
-                                        motor.absoluteAngle,
-                                        motor.angularVelocity,
-                                        RadiansPerSecond.of(DCMotor.getNeo550(1).freeSpeedRadPerSec),
-                                        motor.setRelativeEncoderAngle,
-                                        motor.turn,
-                                        motor.spin,
-                                        motor.setVoltage,
-                                        motor.stop,
-                                        motor.update);
-                };
-
-                public static final Function<Motor, Motor> setNEOVortexMaxVelocity = (motor) -> {
-                        return new Motor(
-                                        motor.voltage,
-                                        motor.angle,
-                                        motor.absoluteAngle,
-                                        motor.angularVelocity,
-                                        RadiansPerSecond.of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec),
-                                        motor.setRelativeEncoderAngle,
-                                        motor.turn,
-                                        motor.spin,
-                                        motor.setVoltage,
-                                        motor.stop,
-                                        motor.update);
-                };
-                // #endregion
-
-                // #region Handle REV Sim Control
-                @SuppressWarnings({ "resource" })
-                public static final Function<Double, Function<Double, Function<Double, Function<Boolean, Function<Double, Function<Motor, Motor>>>>>> setTurnSim = (
-                                kP) -> (kI) -> (kD) -> (enableWrap) -> (gearing) -> (motor) -> {
-
-                                        if (RobotBase.isSimulation()) {
-                                                PIDController pidController = new PIDController(kP, kI, kD);
-                                                if (enableWrap) {
-                                                        pidController.enableContinuousInput(-0.5 * gearing,
-                                                                        0.5 * gearing);
-                                                }
-                                                MutableMeasure<Voltage> voltageSetpoint = MutableMeasure.zero(Volts);
-                                                Consumer<Measure<Angle>> turn = (setpoint) -> {
-                                                        double measurement = motor.angle.in(Rotations);
-                                                        double goal = setpoint.in(Rotations);
-                                                        double volts = pidController.calculate(measurement, goal);
-                                                        volts = MathUtil.clamp(volts, -12.0, 12.0);
-                                                        voltageSetpoint.mut_setMagnitude(volts / 12.0);
-                                                        motor.setVoltage.accept(voltageSetpoint);
-                                                };
-                                                return new Motor(
-                                                                motor.voltage,
-                                                                motor.angle,
-                                                                motor.absoluteAngle,
-                                                                motor.angularVelocity,
-                                                                motor.maxAngularVelocity,
-                                                                motor.setRelativeEncoderAngle,
-                                                                turn,
-                                                                motor.spin,
-                                                                motor.setVoltage,
-                                                                motor.stop,
-                                                                motor.update);
-                                        }
-                                        return motor;
-                                };
-
-                // #endregion
         };
 
         public static final class CTRE {
-
-                // #region createTalonFX
-
-                public static final Function<String, Function<Integer, TalonFX>> createTalonFX = (
-                                canbus) -> (deviceId) -> {
-                                        TalonFX talonFX = new TalonFX(deviceId, canbus);
-                                        TalonFXConfiguration config = new TalonFXConfiguration();
-                                        RobotContainer.orchestra.addInstrument(talonFX);
-                                        config.Voltage.PeakForwardVoltage = 12.0;
-                                        config.Voltage.PeakReverseVoltage = -12.0;
-                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 60;
-                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -60;
-                                        talonFX.getConfigurator().apply(config);
-                                        return talonFX;
-                                };
-                // #endregion
-
-                // #region pidSetters
-                public static final Function<Integer, Function<Double, Function<TalonFXConfiguration, Function<TalonFX, TalonFX>>>> setkP = (
-                                slotID) -> (gain) -> (talonFXConfiguration) -> (talonFX) -> {
-                                        if (slotID == 0) {
-                                                talonFXConfiguration.Slot0.kP = gain;
-                                        } else if (slotID == 1) {
-                                                talonFXConfiguration.Slot1.kP = gain;
-                                        } else if (slotID == 2) {
-                                                talonFXConfiguration.Slot2.kP = gain;
-                                        }
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<TalonFXConfiguration, Function<TalonFX, TalonFX>>>> setkI = (
-                                slotID) -> (gain) -> (talonFXConfiguration) -> (talonFX) -> {
-                                        if (slotID == 0) {
-                                                talonFXConfiguration.Slot0.kI = gain;
-                                        } else if (slotID == 1) {
-                                                talonFXConfiguration.Slot1.kI = gain;
-                                        } else if (slotID == 2) {
-                                                talonFXConfiguration.Slot2.kI = gain;
-                                        }
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<TalonFXConfiguration, Function<TalonFX, TalonFX>>>> setkD = (
-                                slotID) -> (gain) -> (talonFXConfiguration) -> (talonFX) -> {
-                                        if (slotID == 0) {
-                                                talonFXConfiguration.Slot0.kD = gain;
-                                        } else if (slotID == 1) {
-                                                talonFXConfiguration.Slot1.kD = gain;
-                                        } else if (slotID == 2) {
-                                                talonFXConfiguration.Slot2.kD = gain;
-                                        }
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                public static final Function<Integer, Function<Double, Function<TalonFXConfiguration, Function<TalonFX, TalonFX>>>> setkV = (
-                                slotID) -> (gain) -> (talonFXConfiguration) -> (talonFX) -> {
-                                        if (slotID == 0) {
-                                                talonFXConfiguration.Slot0.kV = gain;
-                                        } else if (slotID == 1) {
-                                                talonFXConfiguration.Slot1.kV = gain;
-                                        } else if (slotID == 2) {
-                                                talonFXConfiguration.Slot2.kV = gain;
-                                                talonFXConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-                                                talonFXConfiguration.TorqueCurrent.PeakReverseTorqueCurrent = -40;
-                                        }
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                // #endregion
-
-                // #region Set Inverse and Set Brake
-                public static final Function<TalonFXConfiguration, Function<TalonFX, TalonFX>> setBrake = (
-                                talonFXConfiguration) -> (talonFX) -> {
-                                        talonFXConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                public static final Function<TalonFXConfiguration, Function<TalonFX, TalonFX>> setCWPositive = (
-                                talonFXConfiguration) -> (talonFX) -> {
-                                        talonFXConfiguration.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                public static final Function<TalonFXConfiguration, Function<TalonFX, TalonFX>> setCCWPositive = (
-                                talonFXConfiguration) -> (talonFX) -> {
-                                        talonFXConfiguration.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-                                        talonFX.getConfigurator().apply(talonFXConfiguration);
-                                        return talonFX;
-                                };
-
-                // #endregion
 
                 // #region createMotorFromTalonFX
                 public static final BiFunction<TalonFX, Measure<Velocity<Angle>>, Motor> createMotorFromTalonFX = (
@@ -560,25 +277,6 @@ public class Motor {
                                         RadiansPerSecond.of(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec));
                 };
                 // #endregion
-
-                // #region setMaxVelocities
-                public static final Function<Motor, Motor> setKrakenX60FOCMaxVelocity = (motor) -> {
-                        return new Motor(
-                                        motor.voltage,
-                                        motor.angle,
-                                        motor.absoluteAngle,
-                                        motor.angularVelocity,
-                                        RadiansPerSecond.of(DCMotor.getKrakenX60Foc(1).freeSpeedRadPerSec),
-                                        motor.setRelativeEncoderAngle,
-                                        motor.turn,
-                                        motor.spin,
-                                        motor.setVoltage,
-                                        motor.stop,
-                                        motor.update);
-                };
-
-                // #endregion
-
         };
 
 }

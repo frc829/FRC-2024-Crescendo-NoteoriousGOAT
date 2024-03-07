@@ -10,6 +10,7 @@ import com.compLevel0.FieldDetector;
 import com.compLevel0.Gyroscope;
 import com.compLevel0.ObjectDetector;
 import com.compLevel1.Telemetry;
+import com.kauailabs.navx.frc.AHRS;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.Pair;
@@ -24,6 +25,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -159,7 +161,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                         var priorityTarget = priorityTargetDistance.get();
                                         if (priorityTarget.isPresent()) {
                                                 return GoatMath.round(priorityTarget.get(), 6);
-                                        }else{
+                                        } else {
                                                 return 0.0;
                                         }
                                 },
@@ -171,7 +173,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                         var priorityTarget = priorityTargetRotation.get();
                                         if (priorityTarget.isPresent()) {
                                                 return GoatMath.round(priorityTarget.get().getDegrees(), 6);
-                                        }else{
+                                        } else {
                                                 return 0.0;
                                         }
                                 },
@@ -267,9 +269,11 @@ public class TelemetrySubsystem extends SubsystemBase {
 
         public static final Supplier<TelemetrySubsystem> create = () -> {
 
+                AHRS navxMXP2 = new AHRS(Port.kMXP);
+                Gyroscope gyroscope = Gyroscope.KauaiLabs.createNavxXMP.apply(navxMXP2,
+                                RobotContainer.driveSubsystem.robotSpeeds);
                 Telemetry telemetry = Telemetry.create
-                                .apply(Gyroscope.KauaiLabs.createNavxXMP
-                                                .apply(RobotContainer.driveSubsystem.robotSpeeds))
+                                .apply(gyroscope)
                                 .apply(DriveSubsystem.Constants.kinematics)
                                 .apply(RobotContainer.driveSubsystem.swerveDriveWheelPositions);
 

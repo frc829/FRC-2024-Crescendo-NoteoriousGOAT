@@ -502,7 +502,6 @@ public class ScoringCommands {
                                 .until(shooterTiltDriveAtSetpoint);
 
                 Command tiltHoldCommand2 = BasicCommands.HoldandStop.createForTilt.get();
-                Command tiltHoldCommand3 = BasicCommands.HoldandStop.createForTilt.get();
 
                 Command driveStopCommand = Commands.run(driveSubsystem.stop,
                                 driveSubsystem);
@@ -513,15 +512,6 @@ public class ScoringCommands {
                 Command topShooterCommand = BasicCommands.Set.TopShooter.create
                                 .apply(() -> Constants.Fender.topShooterPercent);
                 Command bottomShooterCommand = BasicCommands.Set.BottomShooter.create
-                                .apply(() -> Constants.Fender.bottomShooterPercent);
-
-                Command transportCommand2 = BasicCommands.Set.Transport.create.apply(Constants.Fender.transportPercent);
-                Command singulatorCommand2 = BasicCommands.Set.Singulator.create
-                                .apply(Constants.Fender.singulatorPercent);
-
-                Command topShooterCommand2 = BasicCommands.Set.TopShooter.create
-                                .apply(() -> Constants.Fender.topShooterPercent);
-                Command bottomShooterCommand2 = BasicCommands.Set.BottomShooter.create
                                 .apply(() -> Constants.Fender.bottomShooterPercent);
 
                 Command shootCommands = Commands

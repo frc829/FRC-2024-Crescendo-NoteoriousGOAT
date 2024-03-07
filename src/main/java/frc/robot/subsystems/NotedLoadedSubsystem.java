@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 
 import com.compLevel0.Sensor;
 import com.compLevel1.PositionSwitch;
+import com.playingwithfusion.TimeOfFlight;
+
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Unit;
@@ -54,21 +56,14 @@ public class NotedLoadedSubsystem extends SubsystemBase {
 
   public static final Supplier<NotedLoadedSubsystem> create = () -> {
 
-    Supplier<Measure<Distance>> simDistance = () -> {
-      // if (RobotContainer.test.a.getAsBoolean()) {
-      // return Millimeters.of(5);
-      // } else {
-      return Millimeters.of(0);
-      // }
-    };
-
-    PositionSwitch positionSwitch = Sensor.PWF.createDistanceSensorFromTimeOfFlight.apply(simDistance)
-        .andThen(PositionSwitch.create)
-        .apply(Constants.deviceId)
-        .apply(Constants.minOn)
-        .apply(Constants.maxOn)
-        .apply(Constants.minOnBB)
-        .apply(Constants.maxOnBB);
+    TimeOfFlight timeOfFlight = new TimeOfFlight(Constants.deviceId);
+    Sensor<Distance> distanceSensor = Sensor.PWF.createDistanceSensorFromTimeOfFlight.apply(timeOfFlight);
+    PositionSwitch positionSwitch = PositionSwitch.create
+        .apply(distanceSensor)
+            .apply(Constants.minOn)
+            .apply(Constants.maxOn)
+            .apply(Constants.minOnBB)
+            .apply(Constants.maxOnBB);
 
     return new NotedLoadedSubsystem(
         positionSwitch.isOn,
