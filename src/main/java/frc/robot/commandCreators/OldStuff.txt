@@ -172,3 +172,110 @@ public static final Supplier<Command> createRangedSilly = () -> {
                 command.setName("Fender Score with Delay");
                 return command;
         };
+
+            public static final Supplier<Command> distanceBasedShooterAdjust = () -> {
+        Runnable shooterAdjust = () -> {
+            Pose2d fieldPosition = RobotContainer.telemetrySubsystem.poseEstimate.get();
+            Optional<Alliance> alliance = DriverStation.getAlliance();
+
+            if (alliance.get() == Alliance.Red) {
+                Translation2d targetVector = Constants.speakerRedVector.minus(fieldPosition.getTranslation());
+                double distanceMeters = targetVector.getNorm();
+                double velocity = 9.8
+                        * (distanceMeters * distanceMeters
+                                + 4 * Constants.speakerHeight.in(Meters) * Constants.speakerHeight.in(Meters))
+                        / Constants.speakerHeight.in(Meters);
+                velocity = Math.sqrt(velocity);
+                double shooterOmega = velocity / Constants.shooterWheelRadius.in(Meters);
+                shooterOmega /= Constants.shooterSpeedTransferEfficiency;
+                double shooterPercent = shooterOmega / Constants.maxShooterSpeed.in(RadiansPerSecond);
+                RobotContainer.topShooterSubsystem.spin.accept(shooterPercent);
+                RobotContainer.bottomShooterSubsystem.spin.accept(shooterPercent);
+            } else {
+                Translation2d targetVector = Constants.speakerBlueVector.minus(fieldPosition.getTranslation());
+                double distanceMeters = targetVector.getNorm();
+                double velocity = 9.8
+                        * (distanceMeters * distanceMeters
+                                + 4 * Constants.speakerHeight.in(Meters) * Constants.speakerHeight.in(Meters))
+                        / Constants.speakerHeight.in(Meters);
+                velocity = Math.sqrt(velocity);
+                double shooterOmega = velocity / Constants.shooterWheelRadius.in(Meters);
+                shooterOmega /= Constants.shooterSpeedTransferEfficiency;
+                double shooterPercent = shooterOmega / Constants.maxShooterSpeed.in(RadiansPerSecond);
+                RobotContainer.topShooterSubsystem.spin.accept(shooterPercent);
+                RobotContainer.bottomShooterSubsystem.spin.accept(shooterPercent);
+            }
+        };
+        Command command = Commands.run(shooterAdjust, RobotContainer.topShooterSubsystem,
+                RobotContainer.bottomShooterSubsystem);
+        command.setName("Distance Based Adjust");
+        return command;
+    };
+
+            @SuppressWarnings({ "resource" })
+        public static final Supplier<Command> createPointingFieldCentricCommand = () -> {
+                ChassisSpeeds speeds = new ChassisSpeeds();
+                Translation2d cor = new Translation2d();
+                PIDController rotationPID = new PIDController(2.5, 0, 0);
+                rotationPID.enableContinuousInput(-180, 180);
+                rotationPID.setTolerance(2);
+                Runnable drive = () -> {
+
+                        var pose = telemetrySubsystem.fieldDetectorsPositions.get(1).getSecond().get();
+                        if (pose.isPresent()) {
+                                telemetrySubsystem.setPoseEstimator.accept(pose.get());
+                        }
+                        double flipper = 1;
+                        var color = DriverStation.getAlliance();
+                        if (color.isPresent() && color.get() == Alliance.Red) {
+                                flipper *= -1;
+                        }
+
+                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
+                                        .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
+                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
+                                        .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
+
+                        Rotation2d targetRotation = new Rotation2d();
+
+                        speeds.vxMetersPerSecond *= flipper;
+                        speeds.vyMetersPerSecond *= flipper;
+                        double measurement = 0;
+                        Pose2d fieldPose = telemetrySubsystem.poseEstimate.get();
+                        if (DriverStation.getAlliance().isPresent()
+                                        && DriverStation.getAlliance().get() == Alliance.Red) {
+                                measurement = telemetrySubsystem.poseEstimate.get().getRotation().unaryMinus()
+                                                .getDegrees();
+                                Translation2d targetVector = Constants.speakerRedVector
+                                                .minus(fieldPose.getTranslation());
+                                targetRotation = targetVector.getAngle().unaryMinus()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
+
+                        } else {
+                                measurement = telemetrySubsystem.poseEstimate.get().getRotation()
+                                                .getDegrees();
+                                Translation2d targetVector = Constants.speakerBlueVector
+                                                .minus(fieldPose.getTranslation());
+                                targetRotation = targetVector.getAngle()
+                                                .rotateBy(Rotation2d.fromDegrees(180));
+                        }
+                        speeds.omegaRadiansPerSecond = Math
+                                        .toRadians(rotationPID.calculate(measurement, targetRotation.getDegrees()));
+
+                        speeds.omegaRadiansPerSecond *= flipper;
+                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+                                        RobotContainer.telemetrySubsystem.poseEstimate.get()
+                                                        .getRotation());
+                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
+                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
+                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
+                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds.apply(cor).accept(speeds);
+                };
+                Command command = Commands.run(drive,
+                                RobotContainer.driveSubsystem);
+                command.setName("Manual Rotation Along Heading Field Centric");
+                return command;
+        };
+
+                        public static final Translation2d speakerBlueVector = new Translation2d(0, 5.544638);
+                public static final Translation2d speakerRedVector = new Translation2d(16.542, 5.544638);
