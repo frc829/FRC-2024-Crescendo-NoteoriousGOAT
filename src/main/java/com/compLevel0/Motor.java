@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.ctre.phoenix6.controls.NeutralOut;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -197,41 +196,27 @@ public class Motor {
                         };
                         Consumer<Measure<Angle>> turn = (setpoint) -> {
                         };
-                        VelocityDutyCycle velocityDutyCycle = new VelocityDutyCycle(
-                                        0,
-                                        0,
-                                        true,
-                                        0,
-                                        0,
-                                        false,
-                                        false,
-                                        false);
                         VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(
                                         0,
                                         0,
                                         0,
-                                        1,
+                                        0,
                                         false,
                                         false,
                                         false);
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
-                                if (RobotBase.isSimulation()) {
-                                        velocityDutyCycle.withVelocity(setpoint.in(RotationsPerSecond));
-                                        talonFX.setControl(velocityDutyCycle);
+                                if (setpoint.in(RotationsPerSecond) > 0) {
+                                        talonFX.setControl(velocityTorqueCurrentFOC
+                                                        .withVelocity(setpoint.in(RotationsPerSecond))
+                                                        .withFeedForward(1));
+                                } else if (setpoint.in(RotationsPerSecond) < 0) {
+                                        talonFX.setControl(velocityTorqueCurrentFOC
+                                                        .withVelocity(setpoint.in(RotationsPerSecond))
+                                                        .withFeedForward(-1));
                                 } else {
-                                        if (setpoint.in(RotationsPerSecond) > 0) {
-                                                talonFX.setControl(velocityTorqueCurrentFOC
-                                                                .withVelocity(setpoint.in(RotationsPerSecond))
-                                                                .withFeedForward(1));
-                                        } else if (setpoint.in(RotationsPerSecond) < 0) {
-                                                talonFX.setControl(velocityTorqueCurrentFOC
-                                                                .withVelocity(setpoint.in(RotationsPerSecond))
-                                                                .withFeedForward(-1));
-                                        } else {
-                                                talonFX.setControl(velocityTorqueCurrentFOC
-                                                                .withVelocity(setpoint.in(RotationsPerSecond))
-                                                                .withFeedForward(0));
-                                        }
+                                        talonFX.setControl(velocityTorqueCurrentFOC
+                                                        .withVelocity(setpoint.in(RotationsPerSecond))
+                                                        .withFeedForward(0));
                                 }
                         };
                         Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
