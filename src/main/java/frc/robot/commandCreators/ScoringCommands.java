@@ -36,7 +36,7 @@ public class ScoringCommands {
                         private static MutableMeasure<Distance> elevatorPosition = MutableMeasure.ofBaseUnits(0.3,
                                         Meters);
                         private static double topShooterPercent = 0.7;
-                        private static double bottomShooterPercent = 0.7;
+                        private static double bottomShooterPercent = -0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                 }
