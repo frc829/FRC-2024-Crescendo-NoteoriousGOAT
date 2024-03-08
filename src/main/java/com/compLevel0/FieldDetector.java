@@ -24,6 +24,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.MutableMeasure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class FieldDetector {
 
@@ -33,6 +34,7 @@ public class FieldDetector {
     public final Supplier<Optional<Rotation2d>> robotSpaceTargetHeading;
     public final Supplier<Optional<Measure<Time>>> latency;
     public final Supplier<Integer> tagCount;
+    public final Supplier<Integer> getPriorityTarget;
     public final Consumer<Integer> setPriorityTarget;
     public final Runnable enable;
     public final Runnable update;
@@ -44,6 +46,7 @@ public class FieldDetector {
             Supplier<Optional<Rotation2d>> robotSpaceTargetHeading,
             Supplier<Optional<Measure<Time>>> latency,
             Supplier<Integer> tagCount,
+            Supplier<Integer> getPriorityTarget,
             Consumer<Integer> setPriorityTarget,
             Runnable enable,
             Runnable update) {
@@ -53,6 +56,7 @@ public class FieldDetector {
         this.robotSpaceTargetTranslation = robotSpaceTargetTranslation;
         this.robotSpaceTargetHeading = robotSpaceTargetHeading;
         this.latency = latency;
+        this.getPriorityTarget = getPriorityTarget;
         this.setPriorityTarget = setPriorityTarget;
         this.enable = enable;
         this.update = update;
@@ -64,6 +68,7 @@ public class FieldDetector {
 
                     NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
                     NetworkTableEntry validTargetSupplier = table.getEntry("tv");
+                    NetworkTableEntry ta = table.getEntry("ta");
                     NetworkTableEntry tx = table.getEntry("tx");
                     NetworkTableEntry ty = table.getEntry("ty");
                     NetworkTableEntry pipelineSupplier = table.getEntry("getpipe");
@@ -79,7 +84,7 @@ public class FieldDetector {
 
                     Supplier<Double> txDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            return 25.0;
+                            return 90.0;
                         } else {
                             return -tx.getDouble(0);
                         }
@@ -87,9 +92,17 @@ public class FieldDetector {
 
                     Supplier<Double> tyDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            return 5.0;
+                            return 25.0;
                         } else {
                             return ty.getDouble(0) + cameraPosition.getRotation().getY();
+                        }
+                    };
+
+                    Supplier<Double> taDegreesSupplier = () -> {
+                        if (RobotBase.isSimulation()) {
+                            return 1.0;
+                        } else {
+                            return ta.getDouble(0);
                         }
                     };
 
@@ -99,9 +112,9 @@ public class FieldDetector {
                     Supplier<Optional<Translation2d>> robotSpaceTargetTranslation = () -> {
                         double txDegrees = txDegreesSupplier.get();
                         double tyDegrees = tyDegreesSupplier.get();
-                        double tv = RobotBase.isSimulation() ? 1.0 : validTargetSupplier.getDouble(0.0);
-                        double pipeline = RobotBase.isSimulation() ? 0.0 : pipelineSupplier.getDouble(0.0);
-                        if (tv == 1 && pipeline == 1) {
+                        double taNum = taDegreesSupplier.get();
+                        double pipeline = RobotBase.isSimulation() ? 1.0 : pipelineSupplier.getDouble(0.0);
+                        if (taNum != 0 && pipeline == 1) {
                             double cameraZ = cameraPosition.getZ();
                             double cameraPitch = cameraPosition.getRotation().getY();
                             double cameraYaw = cameraPosition.getRotation().getZ();
@@ -113,6 +126,7 @@ public class FieldDetector {
                                     .rotateBy(Rotation2d.fromRadians(cameraYaw));
                             Translation2d objectTranslationRobot = cameraTranslationRobotSpace
                                     .plus(objectCamSpaceRotatedIntoRobotFrame);
+                            SmartDashboard.putNumber("Robot Space Target Distance", objectTranslationRobot.getNorm());
                             return Optional.of(objectTranslationRobot);
                         } else {
                             return Optional.empty();
@@ -120,10 +134,11 @@ public class FieldDetector {
                     };
 
                     Supplier<Optional<Rotation2d>> robotSpaceTargetHeading = () -> {
-                        double tv = RobotBase.isSimulation() ? 1.0 : validTargetSupplier.getDouble(0.0);
-                        double pipeline = RobotBase.isSimulation() ? 0.0 : pipelineSupplier.getDouble(0.0);
-                        if (tv == 1 && pipeline == 1) {
-                            return Optional.of(Rotation2d.fromDegrees(-tx.getDouble(0)));
+                        double taNum = RobotBase.isSimulation() ? 1.0 : ta.getDouble(0.0);
+                        double pipeline = RobotBase.isSimulation() ? 1.0 : pipelineSupplier.getDouble(0.0);
+                        if (taNum != 0 && pipeline == 1) {
+                            SmartDashboard.putNumber("Robot Space Target Heading", txDegreesSupplier.get());
+                            return Optional.of(Rotation2d.fromDegrees(txDegreesSupplier.get()));
                         } else {
                             return Optional.empty();
                         }
@@ -169,6 +184,10 @@ public class FieldDetector {
                         return (int) tagCount.in(Value);
                     };
 
+                    Supplier<Integer> getPriorityTarget = () -> {
+                        return priorityIdConsumer.getNumber(0.0).intValue();
+                    };
+
                     Consumer<Integer> setPriorityTarget = (id) -> {
                         priorityIdConsumer.setNumber(id);
                     };
@@ -186,6 +205,7 @@ public class FieldDetector {
                             robotSpaceTargetHeading,
                             latency,
                             tagCountSupplier,
+                            getPriorityTarget,
                             setPriorityTarget,
                             enable,
                             update);

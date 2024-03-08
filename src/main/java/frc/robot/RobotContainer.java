@@ -25,10 +25,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commandCreators.AdvancedScoringCommands;
 import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commandCreators.PickupCommands;
-import frc.robot.commandCreators.ScoringCommands;
+import frc.robot.commandCreators.BasicScoringCommands;
 import frc.robot.commandCreators.TelemetryCommands;
 import frc.robot.commands.AutoCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
@@ -131,17 +132,19 @@ public class RobotContainer {
                 operator.rightY.whileTrue(BasicCommands.Tilt.createRotateTiltCommand.apply(operator.rightYValue));
                 operator.fullTrigger.whileTrue(BasicCommands.ManualSpinners.spinCommand.get());
                 operator.b.whileTrue(PickupCommands.Barf.barfCommand.get());
-                operator.y.whileTrue(ScoringCommands.SpinUp.createSpinUp.get());
-                operator.x.whileTrue(ScoringCommands.Climb.createClimbPrep.get());
-                operator.x.onFalse(ScoringCommands.Climb.createClimbEnd.get());
-                operator.a.whileTrue(ScoringCommands.Amp.createAmpPosition.get());
+                operator.y.whileTrue(BasicScoringCommands.SpinUp.createSpinUp.get());
+                operator.x.whileTrue(BasicScoringCommands.Climb.createClimbPrep.get());
+                operator.x.onFalse(BasicScoringCommands.Climb.createClimbEnd.get());
+                operator.a.whileTrue(BasicScoringCommands.Amp.createAmpPosition.get());
                 operator.leftBumper.whileTrue(PickupCommands.Ground.groundCommandThenLevel.get());
                 operator.leftBumper.onFalse(PickupCommands.Level.command.get());
                 operator.rightBumper.whileTrue(PickupCommands.BabyBird.babyBirdCommandThenLevel.get());
                 operator.rightBumper.onFalse(PickupCommands.Level.command.get());
 
-                driver.leftBumper.whileTrue(ScoringCommands.Fender.create.get());
+                driver.leftBumper.whileTrue(BasicScoringCommands.Fender.create.get());
                 driver.leftBumper.onFalse(PickupCommands.Level.command.get());
+                driver.rightBumper.whileTrue(AdvancedScoringCommands.Ranged.create.get());
+                driver.rightBumper.onFalse((PickupCommands.Level.command.get()));
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
@@ -149,7 +152,7 @@ public class RobotContainer {
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get());
 
-                driver.a.whileTrue(ScoringCommands.Amp.createAmpDrop.get());
+                driver.a.whileTrue(BasicScoringCommands.Amp.createAmpDrop.get());
                 driver.a.onFalse(PickupCommands.Level.command.get());
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger

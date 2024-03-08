@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import static frc.robot.RobotContainer.*;
 
-public class ScoringCommands {
+public class BasicScoringCommands {
 
         public static final class SpinUp {
                 private static final class Constants {
@@ -186,6 +186,6 @@ public class ScoringCommands {
                 };
         }
 
-        public ScoringCommands() {
+        public BasicScoringCommands() {
         }
 }

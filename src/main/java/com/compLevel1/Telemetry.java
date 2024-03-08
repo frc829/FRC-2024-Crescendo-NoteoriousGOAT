@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
 import java.util.function.Function;
 
 import com.compLevel0.FieldDetector;
@@ -27,7 +28,9 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -38,6 +41,8 @@ public class Telemetry {
         public final Measure<Velocity<Velocity<Distance>>> accelerationX;
         public final Measure<Velocity<Velocity<Distance>>> accelerationY;
         public final Supplier<Pose2d> poseEstimate;
+        public final List<FieldDetector> fieldDetectors;
+        public final List<ObjectDetector> objectDetectors;
         public final List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions;
         public final List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies;
         public final List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts;
@@ -57,6 +62,8 @@ public class Telemetry {
                         Measure<Velocity<Velocity<Distance>>> accelerationX,
                         Measure<Velocity<Velocity<Distance>>> accelerationY,
                         Supplier<Pose2d> poseEstimate,
+                        List<FieldDetector> fieldDetectors,
+                        List<ObjectDetector> objectDetectors,
                         List<Pair<String, Supplier<Optional<Pose2d>>>> fieldDetectorOptPositions,
                         List<Pair<String, Supplier<Optional<Measure<Time>>>>> fieldDetectorLatencies,
                         List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts,
@@ -74,6 +81,8 @@ public class Telemetry {
                 this.accelerationX = accelerationX;
                 this.accelerationY = accelerationY;
                 this.poseEstimate = poseEstimate;
+                this.fieldDetectors = fieldDetectors;
+                this.objectDetectors = objectDetectors;
                 this.fieldDetectorOptPositions = fieldDetectorOptPositions;
                 this.fieldDetectorLatencies = fieldDetectorLatencies;
                 this.fieldDetectorTagCounts = fieldDetectorTagCounts;
@@ -129,24 +138,31 @@ public class Telemetry {
                                 List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts = new ArrayList<>();
 
                                 Supplier<Optional<Double>> priorityTargetDistance = () -> {
-                                        for (var fieldDetector : fieldDetectors) {
-                                                var priorityTargetTranslation = fieldDetector.robotSpaceTargetTranslation
+                                        if (fieldDetectors.size() == 2) {
+                                                var priorityTargetTranslation = fieldDetectors
+                                                                .get(1).robotSpaceTargetTranslation
                                                                 .get();
                                                 if (priorityTargetTranslation.isPresent()) {
                                                         return Optional.of(priorityTargetTranslation.get().getNorm());
                                                 }
+                                                return Optional.empty();
+                                        } else {
+                                                return Optional.empty();
                                         }
-                                        return Optional.empty();
+
                                 };
 
                                 Supplier<Optional<Rotation2d>> priorityTargetRotation = () -> {
-                                        for (var fieldDetector : fieldDetectors) {
-                                                var priorityRotatOptional = fieldDetector.robotSpaceTargetHeading.get();
+                                        if (fieldDetectors.size() == 2) {
+                                                var priorityRotatOptional = fieldDetectors
+                                                                .get(1).robotSpaceTargetHeading.get();
                                                 if (priorityRotatOptional.isPresent()) {
                                                         return Optional.of(priorityRotatOptional.get());
                                                 }
+                                                return Optional.empty();
+                                        } else {
+                                                return Optional.empty();
                                         }
-                                        return Optional.empty();
                                 };
 
                                 Runnable update = () -> {
@@ -156,6 +172,16 @@ public class Telemetry {
                                                         Rotation2d.fromDegrees(gyroscope.yaw.in(Degrees)),
                                                         wheelPositions.get().positions);
                                         for (var fieldDetector : fieldDetectors) {
+                                                var alliance = DriverStation.getAlliance();
+                                                if (alliance.isPresent() && alliance.get() == Alliance.Red) {
+                                                        if (fieldDetector.getPriorityTarget.get() != 3) {
+                                                                fieldDetector.setPriorityTarget.accept(3);
+                                                        }
+                                                } else {
+                                                        if (fieldDetector.getPriorityTarget.get() != 8) {
+                                                                fieldDetector.setPriorityTarget.accept(8);
+                                                        }
+                                                }
                                                 fieldDetector.update.run();
                                         }
                                         for (var objectDetector : objectDetectors) {
@@ -183,6 +209,8 @@ public class Telemetry {
                                                 gyroscope.accelerationX,
                                                 gyroscope.accelerationY,
                                                 poseEstimate,
+                                                fieldDetectors,
+                                                objectDetectors,
                                                 fieldDetectorOptPositions,
                                                 fieldDetectorOptLatencies,
                                                 fieldDetectorTagCounts,
@@ -198,6 +226,7 @@ public class Telemetry {
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (
                         fieldDetector) -> (telemetry) -> {
+                                telemetry.fieldDetectors.add(fieldDetector);
                                 telemetry.fieldDetectorOptPositions
                                                 .add(new Pair<String, Supplier<Optional<Pose2d>>>(fieldDetector.name,
                                                                 fieldDetector.fieldPosition));
@@ -216,7 +245,7 @@ public class Telemetry {
 
         public static final Function<ObjectDetector, Function<Telemetry, Telemetry>> addObjectDetectorToTelemetry = (
                         objectDetector) -> (telemetry) -> {
-
+                                telemetry.objectDetectors.add(objectDetector);
                                 Supplier<Optional<Pose2d>> objectDetectorOptPose = () -> {
                                         Optional<Translation2d> objectDetectorTranslation = objectDetector.robotSpaceObjectTranslation
                                                         .get();
@@ -239,9 +268,8 @@ public class Telemetry {
                                         }
                                 };
 
-                                telemetry.objectDetectorOptPositions
-                                                .add(new Pair<String, Supplier<Optional<Pose2d>>>(objectDetector.name,
-                                                                objectDetectorOptPose));
+                                telemetry.objectDetectorOptPositions.add(new Pair<String, Supplier<Optional<Pose2d>>>(
+                                                objectDetector.name, objectDetectorOptPose));
                                 telemetry.enableObjectDetectors.add(objectDetector.enable);
                                 return telemetry;
                         };

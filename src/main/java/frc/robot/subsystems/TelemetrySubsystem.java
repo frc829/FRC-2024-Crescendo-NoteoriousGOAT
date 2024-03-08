@@ -38,8 +38,25 @@ public class TelemetrySubsystem extends SubsystemBase {
                 public static final double poseTranslationToleranceMeters = 1;
                 public static final double poseRotationToleranceDegrees = 2;
                 private static final List<Pair<String, Pose3d>> fieldDetectorNames = List.of(
-                                new Pair<>("limelight-front", new Pose3d()),
-                                new Pair<>("limelight-rear", new Pose3d()));
+                                new Pair<>(
+                                                "limelight-front",
+                                                new Pose3d(Units.inchesToMeters(15.5),
+                                                                Units.inchesToMeters(0),
+                                                                Units.inchesToMeters(18.7),
+                                                                new Rotation3d(
+                                                                                0,
+                                                                                0,
+                                                                                Math.toRadians(0)))),
+                                new Pair<>(
+                                                "limelight-rear",
+                                                new Pose3d(
+                                                                Units.inchesToMeters(-15.5),
+                                                                Units.inchesToMeters(0),
+                                                                Units.inchesToMeters(18.7),
+                                                                new Rotation3d(
+                                                                                0,
+                                                                                Math.toRadians(15),
+                                                                                Math.toRadians(180)))));
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(
                                                 "limelight-front",

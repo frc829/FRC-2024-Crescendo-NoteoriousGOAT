@@ -6,67 +6,22 @@
           "open": true
         }
       },
-      "SPARK MAX [11]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [15]": {
-        "header": {
-          "open": true
-        }
-      },
       "SPARK MAX [16]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [18]": {
         "header": {
           "open": true
         }
       },
       "SPARK MAX [20]": {
         "header": {
-          "open": true
+          "open": false
         }
       },
       "SPARK MAX [21]": {
         "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [24]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [25]": {
-        "header": {
-          "open": true
-        }
-      },
-      "SPARK MAX [26]": {
-        "header": {
-          "open": true
+          "open": false
         }
       },
       "Talon FX (v6)[20]": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Fwd Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Rev Limit": {
-        "header": {
-          "open": true
-        }
-      },
-      "Talon FX (v6)[20]/Rotor Sensor": {
         "header": {
           "open": true
         }
@@ -85,10 +40,6 @@
       "/SmartDashboard/Mech": "Mechanism2d",
       "/SmartDashboard/NoteLoaded": "Subsystem",
       "/SmartDashboard/Outer Intake": "Subsystem",
-      "/SmartDashboard/OuterIntake": "Subsystem",
-      "/SmartDashboard/Pickup": "Subsystem",
-      "/SmartDashboard/SendableChooser[0]": "String Chooser",
-      "/SmartDashboard/Shooter": "Subsystem",
       "/SmartDashboard/Shooter Tilt": "Subsystem",
       "/SmartDashboard/Singulator": "Subsystem",
       "/SmartDashboard/Telemetry": "Subsystem",
@@ -96,73 +47,33 @@
       "/SmartDashboard/Transport": "Subsystem"
     },
     "windows": {
-      "/SmartDashboard/Auto Chooser": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
-        "Robot": {
-          "length": 0.7400000095367432,
-          "width": 0.7400000095367432
-        },
         "bottom": 1476,
         "height": 8.210550308227539,
         "left": 150,
         "limelightFront-ObjectPose": {
-          "arrowColor": [
-            0.9607843160629272,
-            0.5431423783302307,
-            0.014129194431006908,
-            255.0
-          ],
-          "arrowSize": 14,
-          "arrowWeight": 1.0,
-          "style": "Track"
+          "arrowSize": 0,
+          "arrowWeight": 0.0,
+          "style": ""
         },
         "limelightFront-Pose": {
-          "style": "Hidden"
-        },
-        "limelightPickup-ObjectPose": {
-          "color": [
-            58.101253509521484,
-            0.0,
-            255.0,
-            255.0
-          ]
+          "style": ""
         },
         "limelightPickup-Pose": {
-          "style": "Hidden"
+          "style": ""
         },
         "path": {
           "arrowSize": 0,
-          "style": "Line"
+          "style": ""
         },
         "right": 2961,
         "target pose": {
-          "arrowColor": [
-            0.0,
-            103.29110717773438,
-            255.0,
-            255.0
-          ],
-          "arrowSize": 100,
-          "arrowWeight": 3.0,
-          "color": [
-            255.0,
-            0.0,
-            129.11402893066406,
-            255.0
-          ],
-          "style": "Line"
+          "arrowSize": 0,
+          "arrowWeight": 0.0,
+          "style": ""
         },
         "top": 79,
         "width": 16.541748046875,
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Mech": {
         "window": {
           "visible": true
         }
@@ -171,67 +82,65 @@
   },
   "NetworkTables": {
     "transitory": {
-      "PathPlanner": {
-        "open": true
-      },
       "SmartDashboard": {
         "CommandCreator": {
+          "open": false
+        },
+        "Drive": {
           "open": true
         },
         "Field": {
-          "double[]##v_/SmartDashboard/Field/Robot": {
-            "open": true
-          },
           "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
-            "open": true
+            "open": false
           }
         },
         "Pickup": {
-          "open": true
+          "open": false
         },
         "Shooter": {
-          "open": true
-        },
-        "Shooter Tilt": {
-          "open": true
+          "open": false
         },
         "Telemetry": {
           "double[]##v_/SmartDashboard/Telemetry/Object Pose from limelightFront": {
-            "open": true
+            "open": false
           },
           "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
-            "open": true
-          }
+            "open": false
+          },
+          "open": true
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {
-          "open": true
+          "open": false
         },
         "double[]##v_/SmartDashboard/objectCamSpaceRotatedIntoRobotFrame": {
-          "open": true
+          "open": false
         },
         "double[]##v_/SmartDashboard/objectTranslation": {
-          "open": true
+          "open": false
         },
         "double[]##v_/SmartDashboard/objectTranslationAfterRot": {
-          "open": true
+          "open": false
         },
         "double[]##v_/SmartDashboard/objectTranslationRobot": {
-          "open": true
+          "open": false
         },
+        "open": true
+      },
+      "limelight-front": {
+        "open": true
+      },
+      "limelight-rear": {
         "open": true
       },
       "limelightFront": {
-        "open": true
+        "open": false
       },
       "limelightRear": {
-        "open": true
+        "open": false
       }
     }
   },
   "NetworkTables Info": {
     "visible": true
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

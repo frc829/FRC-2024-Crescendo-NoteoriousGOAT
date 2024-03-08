@@ -30,9 +30,6 @@ public class DriveCommands {
                         private static final double goalEndVelocityMPS = 0.0;
                         private static final double rotationDelayDistance = 0.0;
                 }
-
-
-
         }
 
         public static final Supplier<Command> createResetEncodersCommand = () -> {
