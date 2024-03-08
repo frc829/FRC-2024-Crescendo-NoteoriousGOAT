@@ -22,6 +22,7 @@ import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -102,11 +103,13 @@ public class RobotContainer {
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
         public static final MechanismSubsystem mechanismSubsystem = new MechanismSubsystem();
+        public static final PowerDistribution pdh = new PowerDistribution();
         // public static final LEDSubsystem ledSubsystem = LEDSubsystem.create.get();
 
         private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
+                SmartDashboard.putData("PDH", pdh);
                 AutoBuilder.configureHolonomic(
                                 telemetrySubsystem.poseEstimate,
                                 telemetrySubsystem.setPoseEstimator,

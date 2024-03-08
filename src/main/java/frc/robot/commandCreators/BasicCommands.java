@@ -257,9 +257,9 @@ public class BasicCommands {
             RobotContainer.topShooterSubsystem.spin.accept(value);
             RobotContainer.bottomShooterSubsystem.spin.accept(value);
             RobotContainer.singulatorSubsystem.spin.accept(value);
-            RobotContainer.transportSubsystem.spin.accept(value);
-            RobotContainer.innerIntakeSubsystem.spin.accept(value);
-            RobotContainer.outerIntakeSubsystem.spin.accept(value);
+            RobotContainer.transportSubsystem.spin.accept(-value);
+            RobotContainer.innerIntakeSubsystem.spin.accept(-value);
+            RobotContainer.outerIntakeSubsystem.spin.accept(-value);
         };
 
         public static final Supplier<Command> spinCommand = () -> {
