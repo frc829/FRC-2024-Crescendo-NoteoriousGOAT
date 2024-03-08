@@ -130,32 +130,28 @@ public class RobotContainer {
                 operator.back.onTrue(PickupCommands.Level.command.get());
                 operator.leftY.whileTrue(BasicCommands.Elevator.createDriveElevatorCommand.apply(operator.leftYValue));
                 operator.rightY.whileTrue(BasicCommands.Tilt.createRotateTiltCommand.apply(operator.rightYValue));
-                operator.fullTrigger.whileTrue(ManualCommands.Shooter.command);
+                operator.fullTrigger.whileTrue(BasicCommands.ManualSpinners.spinCommand.get());
                 operator.b.whileTrue(PickupCommands.Barf.barfCommand.get());
-                operator.y.whileTrue(ManualCommands.Scoring.spinUpCommand);
-                operator.x.whileTrue(ManualCommands.Scoring.climbPrep);
-                operator.x.onFalse(ManualCommands.Scoring.climbEnd);
-                operator.a.whileTrue(ManualCommands.Scoring.ampPosition);
-                operator.padDown.whileTrue(ScoringCommands.createTrap.get());
-                operator.leftBumper.whileTrue(ManualCommands.Pickup.groundPickup);
-                operator.leftBumper.onFalse(ManualCommands.Pickup.groundPickupReset);
-                operator.rightBumper.whileTrue(ManualCommands.Pickup.babyBirdPickup);
-                operator.rightBumper.onFalse(ManualCommands.Pickup.babyBirdPickupReset);
+                operator.y.whileTrue(ScoringCommands.SpinUp.createSpinUp.get());
+                operator.x.whileTrue(ScoringCommands.Climb.createClimbPrep.get());
+                operator.x.onFalse(ScoringCommands.Climb.createClimbEnd.get());
+                operator.a.whileTrue(ScoringCommands.Amp.createAmpPosition.get());
+                operator.leftBumper.whileTrue(PickupCommands.Ground.groundCommandThenLevel.get());
+                operator.leftBumper.onFalse(PickupCommands.Level.command.get());
+                operator.rightBumper.whileTrue(PickupCommands.BabyBird.babyBirdCommandThenLevel.get());
+                operator.rightBumper.onFalse(PickupCommands.Level.command.get());
 
-                driver.leftBumper.whileTrue(ManualCommands.Scoring.fenderScore);
-                driver.leftBumper.onFalse(ManualCommands.Scoring.fenderReset);
+                driver.leftBumper.whileTrue(ScoringCommands.Fender.create.get());
+                driver.leftBumper.onFalse(PickupCommands.Level.command.get());
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
-                driver.rightBumper.whileTrue(ManualCommands.Scoring.rangedScore);
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.testingStartPose));
-                driver.y.whileTrue(ScoringCommands.createMovingRanged.get());
-                driver.y.onFalse(DriveCommands.createFieldCentricCommand.get());
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get());
 
-                driver.a.whileTrue(ManualCommands.Scoring.ampDrop);
-                driver.a.onFalse(ManualCommands.Scoring.ampPositionReset);
+                driver.a.whileTrue(ScoringCommands.Amp.createAmpDrop.get());
+                driver.a.onFalse(PickupCommands.Level.command.get());
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(ManualCommands.Drive.RobotCentric.command);
@@ -171,42 +167,6 @@ public class RobotContainer {
                 ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(ManualCommands.Drive.RobotCentric.frontRightRC);
                 ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
 
-                // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.whileTrue(DriveCommands.createRotationAlongHeadingFieldCentricCommand.get());
-                // ComplexTriggers.fieldCentricRotateAlongHeadingDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
-                // Runnable loadRhapsody = () -> orchestra.loadMusic("rhapsody.chrp");
-                // Runnable loadGiveYouUp = () ->
-                // orchestra.loadMusic("Never-Gonna-Give-You-Up-1.chrp");
-                // Runnable loadHogan = () -> orchestra.loadMusic("HogansHeroes.chrp");
-                // Runnable loadEastBound = () -> orchestra.loadMusic("EastBoundAndDown.chrp");
-
-                // Runnable playOrchestra = () -> {
-                // orchestra.play();
-                // };
-                // Command playRhapsodyCommand =
-                // Commands.runOnce(loadRhapsody).andThen(Commands.runOnce(playOrchestra));
-                // Command playGiveYouUp =
-                // Commands.runOnce(loadGiveYouUp).andThen(Commands.runOnce(playOrchestra));
-                // Command playHogan =
-                // Commands.runOnce(loadHogan).andThen(Commands.runOnce(playOrchestra));
-                // Command playEastBound =
-                // Commands.runOnce(loadEastBound).andThen(Commands.runOnce(playOrchestra));
-
-                // Runnable stopOrchestra = () -> {
-                // orchestra.stop();
-                // };
-                // Command stopRhapsody = Commands.runOnce(stopOrchestra);
-                // Command stopGiveYouUp = Commands.runOnce(stopOrchestra);
-                // Command stopHogan = Commands.runOnce(stopOrchestra);
-                // Command stopEastBound = Commands.runOnce(stopOrchestra);
-
-                // driver.a.whileTrue(playRhapsodyCommand);
-                // driver.a.onFalse(stopRhapsody);
-                // driver.b.whileTrue(playGiveYouUp);
-                // driver.b.onFalse(stopGiveYouUp);
-                // driver.x.whileTrue(playHogan);
-                // driver.x.onFalse(stopHogan);
-                // driver.y.whileTrue(playEastBound);
-                // driver.y.onFalse(stopEastBound);
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here
                         telemetrySubsystem.field2d.getObject("path").setPoses(poses);

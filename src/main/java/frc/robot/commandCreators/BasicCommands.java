@@ -21,16 +21,6 @@ import frc.robot.RobotContainer;
 
 public class BasicCommands {
 
-    public static final class HoldandStop {
-        public static final Supplier<Command> createForElevator = () -> Commands.run(
-                RobotContainer.elevatorSubsystem.hold,
-                RobotContainer.elevatorSubsystem);
-
-        public static final Supplier<Command> createForTilt = () -> Commands.run(
-                RobotContainer.shooterTiltSubsystem.hold,
-                RobotContainer.shooterTiltSubsystem);
-    }
-
     public static final class Elevator {
         public static final Measure<Distance> tolerance = Millimeters.of(5);
         public static final Measure<Distance> minPosition = Centimeters.of(0.0);
@@ -261,41 +251,30 @@ public class BasicCommands {
         };
     }
 
-    public static final class Set {
+    public static final class ManualSpinners {
+        public static final Runnable spin = () -> {
+            double value = RobotContainer.operator.fullTriggerValue.getAsDouble();
+            RobotContainer.topShooterSubsystem.spin.accept(value);
+            RobotContainer.bottomShooterSubsystem.spin.accept(value);
+            RobotContainer.singulatorSubsystem.spin.accept(value);
+            RobotContainer.transportSubsystem.spin.accept(value);
+            RobotContainer.innerIntakeSubsystem.spin.accept(value);
+            RobotContainer.outerIntakeSubsystem.spin.accept(value);
+        };
 
-        public static final class TopShooter {
-            public static final Function<DoubleSupplier, Command> create = (speed) -> {
-                Command command = Commands
-                        .run(() -> RobotContainer.topShooterSubsystem.spin.accept(speed.getAsDouble()),
-                                RobotContainer.topShooterSubsystem);
-                String name = String.format("Accelerate Top Shooter");
-                command.setName(name);
-                return command;
-            };
-        }
-
-        public static final class BottomShooter {
-            public static final Function<DoubleSupplier, Command> create = (speed) -> {
-                Command command = Commands
-                        .run(() -> RobotContainer.bottomShooterSubsystem.spin.accept(speed.getAsDouble()),
-                                RobotContainer.bottomShooterSubsystem);
-                String name = String.format("Accelerate Bottom Shooter");
-                command.setName(name);
-                return command;
-            };
-        }
-
-        public static final class Singulator {
-            public static final Function<Double, Command> create = (speed) -> {
-                Command command = Commands
-                        .run(() -> RobotContainer.singulatorSubsystem.spin.accept(speed),
-                                RobotContainer.singulatorSubsystem);
-                String name = String.format("Run Singulator");
-                command.setName(name);
-                return command;
-            };
-        }
-
+        public static final Supplier<Command> spinCommand = () -> {
+            Command command = Commands.run(
+                    spin,
+                    RobotContainer.bottomShooterSubsystem,
+                    RobotContainer.topShooterSubsystem,
+                    RobotContainer.innerIntakeSubsystem,
+                    RobotContainer.outerIntakeSubsystem,
+                    RobotContainer.transportSubsystem,
+                    RobotContainer.singulatorSubsystem);
+            String name = String.format("Run");
+            command.setName(name);
+            return command;
+        };
     }
 
     public BasicCommands() {
