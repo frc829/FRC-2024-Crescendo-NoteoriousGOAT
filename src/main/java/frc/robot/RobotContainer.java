@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commandCreators.PickupCommands;
 import frc.robot.commandCreators.ScoringCommands;
@@ -127,10 +128,10 @@ public class RobotContainer {
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
 
                 operator.back.onTrue(PickupCommands.Level.command.get());
-                operator.leftY.whileTrue(ManualCommands.Elevator.drive);
-                operator.rightY.whileTrue(ManualCommands.Tilt.drive);
+                operator.leftY.whileTrue(BasicCommands.Elevator.createDriveElevatorCommand.apply(operator.leftYValue));
+                operator.rightY.whileTrue(BasicCommands.Tilt.createRotateTiltCommand.apply(operator.rightYValue));
                 operator.fullTrigger.whileTrue(ManualCommands.Shooter.command);
-                operator.b.whileTrue(ManualCommands.Pickup.barf);
+                operator.b.whileTrue(PickupCommands.Barf.barfCommand.get());
                 operator.y.whileTrue(ManualCommands.Scoring.spinUpCommand);
                 operator.x.whileTrue(ManualCommands.Scoring.climbPrep);
                 operator.x.onFalse(ManualCommands.Scoring.climbEnd);

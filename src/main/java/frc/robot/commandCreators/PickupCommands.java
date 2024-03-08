@@ -134,7 +134,7 @@ public class PickupCommands {
                         private static double outerIntakePercent = -0.9;
                 }
 
-                private static final Supplier<Command> barfCommand = () -> Commands.parallel(
+                public static final Supplier<Command> barfCommand = () -> Commands.parallel(
                                 BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
                                 BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
                                 BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),

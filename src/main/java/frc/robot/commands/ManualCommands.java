@@ -16,24 +16,7 @@ import frc.robot.commandCreators.ResetAndHoldingCommands;
 import frc.robot.commandCreators.ScoringCommands;
 
 public class ManualCommands {
-        public static final class Elevator {
 
-                public static final DoubleSupplier elevatorSpeedSupplier = () -> {
-                        if(RobotContainer.operator.leftYValue.getAsDouble() > 0){
-                                return RobotContainer.operator.leftYValue.getAsDouble();
-                        }else{
-                                return 0.5 * RobotContainer.operator.leftYValue.getAsDouble();
-                        }
-                };
-
-                public static final Command drive = BasicCommands.Set.ElevatorDrive.create
-                                .apply(elevatorSpeedSupplier);
-        }
-
-        public static final class Tilt {
-                public static final Command drive = BasicCommands.Set.TiltDrive.create
-                                .apply(() -> -RobotContainer.operator.rightYValue.getAsDouble() * 0.5);
-        }
 
         public static final class Shooter {
                 public static final Runnable shooterSpin = () -> {
@@ -116,8 +99,6 @@ public class ManualCommands {
         }
 
         static {
-                Elevator.drive.setName("Manual Elevator");
-                Tilt.drive.setName("Manual Tilt");
                 Shooter.command.setName("Manual Shooter");
                 Drive.FieldCentric.command.setName("Manual Field Centric");
                 Drive.ZeroModules.command.setName("Zero Modules");
