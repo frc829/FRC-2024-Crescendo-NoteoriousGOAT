@@ -174,12 +174,12 @@ public class Telemetry {
                                         for (var fieldDetector : fieldDetectors) {
                                                 var alliance = DriverStation.getAlliance();
                                                 if (alliance.isPresent() && alliance.get() == Alliance.Red) {
-                                                        if (fieldDetector.getPriorityTarget.get() != 3) {
-                                                                fieldDetector.setPriorityTarget.accept(3);
+                                                        if (fieldDetector.getPriorityTarget.get() != 4) {
+                                                                fieldDetector.setPriorityTarget.accept(4);
                                                         }
                                                 } else {
-                                                        if (fieldDetector.getPriorityTarget.get() != 8) {
-                                                                fieldDetector.setPriorityTarget.accept(8);
+                                                        if (fieldDetector.getPriorityTarget.get() != 7) {
+                                                                fieldDetector.setPriorityTarget.accept(7);
                                                         }
                                                 }
                                                 fieldDetector.update.run();
