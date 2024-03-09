@@ -188,7 +188,7 @@ public class BasicScoringCommands {
 
         public static final class Pass {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(35);
+                        private static Measure<Angle> tiltAngle = Degrees.of(45);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;
