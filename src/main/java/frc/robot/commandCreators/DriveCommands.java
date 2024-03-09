@@ -86,20 +86,18 @@ public class DriveCommands {
 
         public static final Supplier<Command> createFieldCentricDriveRLCommand = () -> {
                 Command command = Commands.run(
-                                createFieldCentricDrive.apply(DriveConstants.originCOR),
+                                createFieldCentricDrive.apply(DriveConstants.bottomLeftCOR),
                                 driveSubsystem);
                 command.setName("Manual FC Rear Left Drive");
                 return command;
-
         };
 
         public static final Supplier<Command> createFieldCentricDriveRRCommand = () -> {
                 Command command = Commands.run(
-                                createFieldCentricDrive.apply(DriveConstants.originCOR),
+                                createFieldCentricDrive.apply(DriveConstants.bottomRightCOR),
                                 driveSubsystem);
                 command.setName("Manual FC Rear Right Drive");
                 return command;
-
         };
 
         private static final class Constants {
