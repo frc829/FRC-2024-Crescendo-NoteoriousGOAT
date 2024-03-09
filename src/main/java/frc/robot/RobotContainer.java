@@ -154,7 +154,7 @@ public class RobotContainer {
                                 .apply(TelemetryCommands.Constants.testingStartPose));
                 driver.x.whileTrue(PickupCommands.createNoteDetect.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get());
-
+                driver.y.whileTrue(BasicScoringCommands.Pass.create.get());
                 driver.a.whileTrue(BasicScoringCommands.Amp.createAmpDrop.get());
                 driver.a.onFalse(PickupCommands.Level.command.get());
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());

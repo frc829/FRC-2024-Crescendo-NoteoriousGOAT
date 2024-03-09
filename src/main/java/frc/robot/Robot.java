@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.revrobotics.REVPhysicsSim;
 
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,15 +18,17 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
   private boolean hasInitialized = false;
+  public static String rioComments;
 
   @Override
   public void robotInit() {
+    rioComments = RoboRioDataJNI.getComments();
     for (int port = 5800; port <= 5807; port++) {
       PortForwarder.add(port, "limelight-front.local", port);
     }
 
     for (int port = 5800; port <= 5807; port++) {
-      PortForwarder.add(port+100, "limelight-rear.local", port);
+      PortForwarder.add(port + 100, "limelight-rear.local", port);
     }
 
     m_robotContainer = new RobotContainer();
