@@ -159,18 +159,18 @@ public class RobotContainer {
                 driver.a.onFalse(PickupCommands.Level.command.get());
                 driver.b.onTrue(TelemetryCommands.createResetPoseFromFrontCameraCommand.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger
-                                .whileTrue(DriveCommands.createRobotCentricCommand.get());
+                                .whileTrue(DriveCommands.createRobotCentricDriveOriginCommand.get());
                 ComplexTriggers.fieldCentricOriginDriveTrigger
-                                .whileTrue(DriveCommands.createFieldCentricCommand.get());
-                ComplexTriggers.fieldCentricFLDriveTrigger.whileTrue(DriveCommands.createFieldCentricFLCommand.get());
-                ComplexTriggers.fieldCentricFLDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
-                ComplexTriggers.fieldCentricFRDriveTrigger.whileTrue(DriveCommands.createFieldCentricFRCommand.get());
-                ComplexTriggers.fieldCentricFRDriveTrigger.onFalse(DriveCommands.createFieldCentricCommand.get());
+                                .whileTrue(DriveCommands.createFieldCentricDriveOriginCommand.get());
+                ComplexTriggers.fieldCentricFLDriveTrigger.whileTrue(DriveCommands.createFieldCentricDriveRLCommand.get());
+                ComplexTriggers.fieldCentricFLDriveTrigger.onFalse(DriveCommands.createFieldCentricDriveOriginCommand.get());
+                ComplexTriggers.fieldCentricFRDriveTrigger.whileTrue(DriveCommands.createFieldCentricDriveRRCommand.get());
+                ComplexTriggers.fieldCentricFRDriveTrigger.onFalse(DriveCommands.createFieldCentricDriveOriginCommand.get());
 
-                ComplexTriggers.robotCentricFLDriveTrigger.whileTrue(DriveCommands.createRobotCentricFLCommand.get());
-                ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
-                ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(DriveCommands.createRobotCentricFRCommand.get());
-                ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricCommand.get());
+                ComplexTriggers.robotCentricFLDriveTrigger.whileTrue(DriveCommands.createRobotCentricDriveRLCommand.get());
+                ComplexTriggers.robotCentricFLDriveTrigger.onFalse(DriveCommands.createRobotCentricDriveOriginCommand.get());
+                ComplexTriggers.robotCentricFRDriveTrigger.whileTrue(DriveCommands.createRobotCentricDriveRRCommand.get());
+                ComplexTriggers.robotCentricFRDriveTrigger.onFalse(DriveCommands.createRobotCentricDriveOriginCommand.get());
 
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here

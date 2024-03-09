@@ -179,7 +179,7 @@ public class Motor {
                         DCMotorSim dcMotorSim = new DCMotorSim(
                                         DCMotor.getKrakenX60(1),
                                         1,
-                                        0.001);
+                                        0.00001);
 
                         MutableMeasure<Time> lastTime = MutableMeasure
                                         .ofBaseUnits(Timer.getFPGATimestamp(), Seconds);

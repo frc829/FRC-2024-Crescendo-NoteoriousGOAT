@@ -72,7 +72,8 @@ public class DriveCommands {
                         speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
                         speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
                         RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor);
+                                        .apply(cor)
+                                        .accept(speeds);
                 };
         };
 
@@ -97,6 +98,30 @@ public class DriveCommands {
                                 createFieldCentricDrive.apply(DriveConstants.bottomRightCOR),
                                 driveSubsystem);
                 command.setName("Manual FC Rear Right Drive");
+                return command;
+        };
+
+        public static final Supplier<Command> createRobotCentricDriveOriginCommand = () -> {
+                Command command = Commands.run(
+                                createRobotCentricDrive.apply(DriveConstants.originCOR),
+                                driveSubsystem);
+                command.setName("Manual RC Origin Drive");
+                return command;
+        };
+
+        public static final Supplier<Command> createRobotCentricDriveRLCommand = () -> {
+                Command command = Commands.run(
+                                createFieldCentricDrive.apply(DriveConstants.bottomLeftCOR),
+                                driveSubsystem);
+                command.setName("Manual RC Rear Left Drive");
+                return command;
+        };
+
+        public static final Supplier<Command> createRobotCentricDriveRRCommand = () -> {
+                Command command = Commands.run(
+                                createFieldCentricDrive.apply(DriveConstants.bottomRightCOR),
+                                driveSubsystem);
+                command.setName("Manual RC Rear Right Drive");
                 return command;
         };
 
@@ -132,169 +157,6 @@ public class DriveCommands {
 
                 Command command = Commands.run(zero, RobotContainer.driveSubsystem);
                 command.setName("Zero Modules");
-                return command;
-        };
-
-        public static final Supplier<Command> createRobotCentricCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d();
-                Runnable drive = () -> {
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Robot Centric");
-                return command;
-        };
-
-        public static final Supplier<Command> createRobotCentricFLCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(20));
-                Runnable drive = () -> {
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Robot Centric");
-                return command;
-        };
-
-        public static final Supplier<Command> createRobotCentricFRCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(-20));
-                Runnable drive = () -> {
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.rightXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Robot Centric");
-                return command;
-        };
-
-        public static final Supplier<Command> createFieldCentricCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d();
-                Runnable drive = () -> {
-                        double flipper = 1;
-                        var color = DriverStation.getAlliance();
-                        if (color.isPresent() && color.get() == Alliance.Red) {
-                                flipper *= -1;
-                        }
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        speeds.vxMetersPerSecond *= flipper;
-                        speeds.vyMetersPerSecond *= flipper;
-                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-                                        RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
-                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
-                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
-                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Field Centric");
-                return command;
-        };
-
-        public static final Supplier<Command> createFieldCentricFLCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(20));
-                Runnable drive = () -> {
-                        double flipper = 1;
-                        var color = DriverStation.getAlliance();
-                        if (color.isPresent() && color.get() == Alliance.Red) {
-                                flipper *= -1;
-                        }
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        speeds.vxMetersPerSecond *= flipper;
-                        speeds.vyMetersPerSecond *= flipper;
-                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-                                        RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
-                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
-                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
-                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Field Centric FL");
-                return command;
-        };
-        public static final Supplier<Command> createFieldCentricFRCommand = () -> {
-                ChassisSpeeds speeds = new ChassisSpeeds();
-                Translation2d cor = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(-20));
-                Runnable drive = () -> {
-                        double flipper = 1;
-                        var color = DriverStation.getAlliance();
-                        if (color.isPresent() && color.get() == Alliance.Red) {
-                                flipper *= -1;
-                        }
-                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
-                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
-                                        .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
-                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
-                                        .in(RadiansPerSecond)
-                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
-                        speeds.vxMetersPerSecond *= flipper;
-                        speeds.vyMetersPerSecond *= flipper;
-                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
-                                        RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
-                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
-                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
-                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
-                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
-                                        .apply(cor)
-                                        .accept(speeds);
-                };
-                Command command = Commands.run(drive, RobotContainer.driveSubsystem);
-                command.setName("Manual Field Centric FR");
                 return command;
         };
 
