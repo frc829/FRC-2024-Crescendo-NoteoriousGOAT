@@ -155,7 +155,7 @@ public class AdvancedScoringCommands {
             var angle = telemetrySubsystem.priorityTargetRotation.get();
             if (angle.isPresent()) {
                 double omegaRadiansPerSecond = Constants.rotationPIDController.calculate(angle.get().getDegrees());
-                ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, omegaRadiansPerSecond);
+                ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, -omegaRadiansPerSecond);
                 driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()).accept(chassisSpeeds);
             }
         };
@@ -197,6 +197,7 @@ public class AdvancedScoringCommands {
 
         public static final Supplier<Command> create = () -> {
             return Commands.sequence(
+                    TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     setDistanceAndAngleCommand.get(),
                     rotateDriveUntilTargetFoundSpinShootersCommand.get(),
@@ -206,6 +207,7 @@ public class AdvancedScoringCommands {
 
         public static final Supplier<Command> createWithDelay = () -> {
             return Commands.sequence(
+                    TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     setDistanceAndAngleCommand.get(),
                     rotateDriveUntilTargetFoundSpinShootersCommand.get(),

@@ -91,6 +91,16 @@ public class TelemetryCommands {
                 return command;
         };
 
+        public static final Supplier<Command> createSetRearCameraToFieldCommand = () -> {
+                Runnable setFrontCameraToField = () -> {
+                        telemetrySubsystem.enableFieldDetectors.get(1).run();
+                };
+                Command command = Commands.runOnce(setFrontCameraToField,
+                                RobotContainer.telemetrySubsystem);
+                command.setName("Set Rear Camera to Field");
+                return command;
+        };
+
         public TelemetryCommands() {
 
         }

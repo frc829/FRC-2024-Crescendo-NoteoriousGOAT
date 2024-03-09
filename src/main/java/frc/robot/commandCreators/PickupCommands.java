@@ -2,7 +2,11 @@ package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.RobotContainer.innerIntakeSubsystem;
+import static frc.robot.RobotContainer.notedLoadedSubsystem;
+import static frc.robot.RobotContainer.outerIntakeSubsystem;
 import static frc.robot.RobotContainer.telemetrySubsystem;
+import static frc.robot.RobotContainer.transportSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -73,8 +77,17 @@ public class PickupCommands {
                                         BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
                 };
 
+                private static final Supplier<Command> stop = () -> {
+                        return Commands.parallel(
+                                        Commands.runOnce(outerIntakeSubsystem.stop, outerIntakeSubsystem),
+                                        Commands.runOnce(innerIntakeSubsystem.stop, innerIntakeSubsystem),
+                                        Commands.runOnce(transportSubsystem.stop, transportSubsystem));
+                };
+
                 public static final Supplier<Command> groundCommand = () -> Commands
-                                .sequence(elevatorAndTiltAtPositionCommand.get(), intakeCommand.get());
+                                .sequence(elevatorAndTiltAtPositionCommand.get(), intakeCommand.get())
+                                .until(notedLoadedSubsystem.hasNote)
+                                .andThen(stop.get());
 
                 public static final Supplier<Command> groundCommandThenLevel = () -> groundCommand.get()
                                 .until(RobotContainer.notedLoadedSubsystem.hasNote)

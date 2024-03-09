@@ -100,7 +100,7 @@ public class BasicScoringCommands {
 
         public static final class Fender {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(55);
+                        private static Measure<Angle> tiltAngle = Degrees.of(57);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;
@@ -177,12 +177,19 @@ public class BasicScoringCommands {
                         return Commands.sequence(createAimCommand.get(), createSpinUp.get(), createShootCommand.get());
                 };
 
+                public static final Supplier<Command> stop = () -> {
+                        return Commands.runOnce(
+                                        singulatorSubsystem.stop,
+                                        singulatorSubsystem);
+                };
+
                 public static final Supplier<Command> createWithDelay = () -> {
                         return Commands.sequence(
                                         createAimCommand.get(),
                                         createSpinUp.get(),
                                         createShootCommand.get()
-                                                        .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)));
+                                                        .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
+                                        stop.get());
                 };
         }
 

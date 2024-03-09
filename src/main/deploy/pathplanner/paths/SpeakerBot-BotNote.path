@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 2.7031362544626765,
+        "x": 2.6,
         "y": 4.109116203105447
       },
       "prevControl": {
-        "x": 1.478905950788671,
+        "x": 1.3757696963259947,
         "y": 4.086776234060301
       },
       "nextControl": null,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -42,6 +42,12 @@
               "type": "named",
               "data": {
                 "name": "Pickup"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUp"
               }
             }
           ]

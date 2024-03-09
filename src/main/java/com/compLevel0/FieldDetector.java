@@ -94,7 +94,7 @@ public class FieldDetector {
                         if (RobotBase.isSimulation()) {
                             return 25.0;
                         } else {
-                            return ty.getDouble(0) + cameraPosition.getRotation().getY();
+                            return ty.getDouble(0);
                         }
                     };
 

@@ -96,7 +96,7 @@ public class BasicCommands {
 
     public static final class Tilt {
         public static final Measure<Angle> tolerance = Degrees.of(0.5);
-        public static final Measure<Angle> minAngle = Degree.of(-5);
+        public static final Measure<Angle> minAngle = Degree.of(-2);
         public static final Measure<Angle> maxAngle = Degree.of(58);
 
         public static final Function<Measure<Angle>, BooleanSupplier> createAtAngleCondition = (angle) -> {

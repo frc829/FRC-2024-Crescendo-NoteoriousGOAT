@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.51101252067442,
-        "y": 6.209713417168596
+        "x": 3.120956872544376,
+        "y": 6.036791172681445
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.8773880130148157,
-        "y": 6.986504216120264
+        "x": 3.1856697947630126,
+        "y": 7.118421444050096
       },
       "prevControl": {
-        "x": 2.6003723968550045,
-        "y": 6.530768847599283
+        "x": 3.042306759388293,
+        "y": 6.926774060886741
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -42,6 +42,12 @@
               "type": "named",
               "data": {
                 "name": "Pickup"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUp"
               }
             }
           ]
