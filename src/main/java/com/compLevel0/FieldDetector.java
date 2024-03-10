@@ -124,6 +124,8 @@ public class FieldDetector {
                             Translation2d objectTranslationRobot = cameraTranslationRobotSpace
                                     .plus(objectCamSpace);
                             SmartDashboard.putNumber("Robot Space Target Distance", objectTranslationRobot.getNorm());
+                            SmartDashboard.putNumber("Robot Space Target Heading", objectTranslationRobot.getAngle().getDegrees());
+
                             return Optional.of(objectTranslationRobot);
                         } else {
                             return Optional.empty();
@@ -134,7 +136,6 @@ public class FieldDetector {
                         double taNum = RobotBase.isSimulation() ? 1.0 : ta.getDouble(0.0);
                         double pipeline = RobotBase.isSimulation() ? 1.0 : pipelineSupplier.getDouble(0.0);
                         if (taNum != 0 && pipeline == 1) {
-                            SmartDashboard.putNumber("Robot Space Target Heading", txDegreesSupplier.get());
                             return Optional.of(Rotation2d.fromDegrees(txDegreesSupplier.get()));
                         } else {
                             return Optional.empty();
