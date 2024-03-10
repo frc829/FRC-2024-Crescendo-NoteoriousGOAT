@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.15,
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,13 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "SpinUp"
+                "name": "Pickup"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "Pickup"
+                "name": "SpinUp"
               }
             }
           ]
@@ -67,7 +67,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "PBJ",
+  "folder": "EleanorRigby",
   "previewStartingState": {
     "rotation": -39.81,
     "velocity": 0

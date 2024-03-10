@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ1"
+            "pathName": "ER1"
           }
         },
         {
@@ -38,37 +38,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoRanged1"
+            "pathName": "ER2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoRanged1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ5"
+            "pathName": "ER3"
           }
         },
         {
@@ -80,19 +56,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ6"
+            "pathName": "ER4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ7"
+            "pathName": "ER5"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged3"
+            "name": "AutoRanged2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ER6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ER7"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoRanged2"
           }
         }
       ]

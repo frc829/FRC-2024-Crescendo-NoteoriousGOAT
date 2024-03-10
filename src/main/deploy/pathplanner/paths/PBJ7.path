@@ -30,7 +30,31 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 0.1,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Pickup"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.25,
     "maxAcceleration": 4.0,
@@ -43,7 +67,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": null,
+  "folder": "PBJ",
   "previewStartingState": {
     "rotation": -26.569999999999993,
     "velocity": 0

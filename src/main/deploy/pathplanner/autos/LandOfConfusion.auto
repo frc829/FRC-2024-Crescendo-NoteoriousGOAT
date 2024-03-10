@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.32,
-      "y": 4.49
+      "x": 1.49,
+      "y": 5.5
     },
-    "rotation": -39.81
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -26,7 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ1"
+            "pathName": "LOC1"
           }
         },
         {
@@ -38,37 +38,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ2"
+            "pathName": "LOC2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LOC3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "AutoRanged3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ3"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoRanged1"
+            "pathName": "LOC4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ5"
+            "pathName": "LOC5"
           }
         },
         {
@@ -80,19 +74,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ6"
+            "pathName": "LOC6"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ7"
+            "pathName": "LOC7"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged3"
+            "name": "AutoRanged2"
           }
         }
       ]

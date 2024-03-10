@@ -3,8 +3,10 @@
   "robotLength": 0.74,
   "holonomicMode": true,
   "pathFolders": [
-    "PathsNotesToSpeaker",
-    "PathSpeakerToNotes"
+    "EleanorRigby",
+    "PBJ",
+    "PathSpeakerToNotes",
+    "PathsNotesToSpeaker"
   ],
   "autoFolders": [
     "Fender-2Notes",

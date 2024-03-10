@@ -21,6 +21,7 @@ public class TelemetryCommands {
                 public static final Pose2d SpeakerTopStart = new Pose2d(0.76, 6.60, Rotation2d.fromDegrees(60.00));
                 public static final Pose2d SpeakerMidStart = new Pose2d(1.30, 5.53, Rotation2d.fromDegrees(0));
                 public static final Pose2d SpeakerBotStart = new Pose2d(0.76, 4.49, Rotation2d.fromDegrees(-60));
+                public static final Pose2d pbjStart = new Pose2d(1.32, 4.49, Rotation2d.fromDegrees(-39.81));
                 public static final Pose2d testingStartPose = new Pose2d(1.24, 5.48, Rotation2d.fromDegrees(0.0));
                 public static final Pose2d AmpStart = new Pose2d(1.56, 7.41, Rotation2d.fromDegrees(90));
 

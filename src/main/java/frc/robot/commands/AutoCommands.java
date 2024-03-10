@@ -30,6 +30,9 @@ public class AutoCommands {
                 NamedCommands.registerCommand("AmpStart",
                                 TelemetryCommands.createSetStartPoseCommand
                                                 .apply(TelemetryCommands.Constants.AmpStart));
+                NamedCommands.registerCommand("PBJStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.pbjStart));
         }
 
 }
