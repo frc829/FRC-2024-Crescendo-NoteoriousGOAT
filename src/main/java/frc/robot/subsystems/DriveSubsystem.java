@@ -23,6 +23,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
@@ -253,6 +254,7 @@ public class DriveSubsystem extends SubsystemBase {
                                                         -0.5 * Constants.steerGearings.get(i));
                                         neo.getPIDController().setPositionPIDWrappingMaxInput(
                                                         0.5 * Constants.steerGearings.get(i));
+                                        neo.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
                                         if (RobotBase.isSimulation()) {
                                                 REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
                                         }
@@ -268,22 +270,24 @@ public class DriveSubsystem extends SubsystemBase {
                                         config.Slot0.kD = Constants.wheelFOCkDs.get(i);
                                         config.Slot0.kV = Constants.wheelFOCkFs.get(i);
                                         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-                                        TalonFX wheelTalonFX = new TalonFX(Constants.wheelDeviceIds.get(i), Constants.canbus);
+                                        TalonFX wheelTalonFX = new TalonFX(Constants.wheelDeviceIds.get(i),
+                                                        Constants.canbus);
                                         wheelTalonFX.getConfigurator().apply(config);
                                         Motor wheelMotor = Motor.CTRE.createKrakenX60FOCMotor.apply(wheelTalonFX);
 
-                                        CANcoder cancoder = new CANcoder(Constants.angleSensorIds.get(i), Constants.canbus);
-                                        Sensor<Angle> angleSensor = Sensor.CTRE.createAngleSensorFromCANCoder.apply(cancoder);
+                                        CANcoder cancoder = new CANcoder(Constants.angleSensorIds.get(i),
+                                                        Constants.canbus);
+                                        Sensor<Angle> angleSensor = Sensor.CTRE.createAngleSensorFromCANCoder
+                                                        .apply(cancoder);
 
                                         return SwerveModule.create.apply(
-                                                steerMotor, 
-                                                wheelMotor, 
-                                                Constants.steerGearings.get(i), 
-                                                Constants.wheelGearings.get(i), 
-                                                Constants.wheelRadii.get(i), 
-                                                angleSensor);
-                                        
-                                        
+                                                        steerMotor,
+                                                        wheelMotor,
+                                                        Constants.steerGearings.get(i),
+                                                        Constants.wheelGearings.get(i),
+                                                        Constants.wheelRadii.get(i),
+                                                        angleSensor);
+
                                 }).toList();
 
                 List<Measure<Voltage>> steerVoltages = Arrays.asList(0, 1, 2, 3).stream()

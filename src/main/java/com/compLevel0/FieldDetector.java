@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -81,7 +82,7 @@ public class FieldDetector {
                     MutableMeasure<Angle> fieldYaw = MutableMeasure.zero(Degrees);
                     MutableMeasure<Time> latencyMeasure = MutableMeasure.zero(Milliseconds);
                     MutableMeasure<Dimensionless> tagCount = MutableMeasure.zero(Value);
-
+                    double aprilTagHeightMeters = Units.inchesToMeters(57.13);
                     Supplier<Double> txDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
                             return 90.0;
@@ -116,8 +117,9 @@ public class FieldDetector {
                         double pipeline = RobotBase.isSimulation() ? 1.0 : pipelineSupplier.getDouble(0.0);
                         if (taNum != 0 && pipeline == 1) {
                             double cameraZ = cameraPosition.getZ();
+                            double height = aprilTagHeightMeters - cameraZ;
                             double cameraPitch = cameraPosition.getRotation().getY();
-                            double distance = Math.abs(cameraZ / Math.tan(cameraPitch + Math.toRadians(tyDegrees)));
+                            double distance = Math.abs(height / Math.tan(cameraPitch + Math.toRadians(tyDegrees)));
                             double objectYCamSpace = distance * Math.sin(Math.toRadians(txDegrees));
                             double objectXCamSpace = distance * Math.cos(Math.toRadians(txDegrees));
                             Translation2d objectCamSpace = new Translation2d(objectXCamSpace, objectYCamSpace);

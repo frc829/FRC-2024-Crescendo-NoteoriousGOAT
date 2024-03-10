@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -108,6 +109,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     neo.getPIDController().setD(Constants.slot1kD, 1);
     neo.getPIDController().setFF(Constants.slot1kF, 1);
     neo.setIdleMode(IdleMode.kBrake);
+    neo.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
 
     if(RobotBase.isSimulation()){
       REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));

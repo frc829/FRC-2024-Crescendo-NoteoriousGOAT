@@ -35,23 +35,22 @@ public class AdvancedScoringCommands {
             private static double singulatorPercent = -0.9;
             private static final double shooterTolerancePercent = 0.10;
             private static final double endOfShootDelay = 0.2;
-            private static final double findTargetOmegaRadiansPerSecond = 2.0;
 
-            private static final double tolerance = 0.5;
+            private static final double tolerance = 2;
             private static final PIDController rotationPIDController = new PIDController(0.05, 0, 0);
             private static final double[] distances = new double[] {
                     1.28,
-                    2.22,
-                    2.87,
-                    4.29,
-                    4.8514
+                    2.00,
+                    3.00,
+                    4.00,
+                    5.00
             };
             private static final double[] anglesDegrees = new double[] {
-                    55.0,
-                    42.0,
-                    35.0,
-                    30.0,
-                    29.0
+                    57.0,
+                    40.0,
+                    31.0,
+                    26.0,
+                    23.0
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);
@@ -63,14 +62,6 @@ public class AdvancedScoringCommands {
 
         private static final MutableMeasure<Distance> targetDistance = MutableMeasure.zero(Meters);
         private static final MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
-
-        private static final BooleanSupplier hasTarget = () -> {
-            var targetDistance = telemetrySubsystem.priorityTargetDistance.get();
-            var targetAngle = telemetrySubsystem.priorityTargetRotation.get();
-            boolean condition = targetDistance.isPresent() && targetAngle.isPresent();
-            SmartDashboard.putBoolean("Has Target", condition);
-            return condition;
-        };
 
         private static final BooleanSupplier shootersAtSpeed = () -> {
             boolean topCondition = MathUtil.isNear(
@@ -106,40 +97,11 @@ public class AdvancedScoringCommands {
                     && shootersAtSpeed.getAsBoolean();
         };
 
-        private static final Runnable rotateDrive = () -> {
-            double degrees = telemetrySubsystem.poseEstimate.get().getRotation().getDegrees();
-            degrees %= 360.0;
-            degrees = degrees >= 180.0 ? degrees - 360 : degrees;
-            degrees = degrees < -180.0 ? degrees + 360 : degrees;
-
-            if (degrees > 0) {
-                ChassisSpeeds rotateSpeeds = new ChassisSpeeds(0, 0, Constants.findTargetOmegaRadiansPerSecond);
-                driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()).accept(rotateSpeeds);
-            } else {
-                ChassisSpeeds rotateSpeeds = new ChassisSpeeds(0, 0, -Constants.findTargetOmegaRadiansPerSecond);
-                driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()).accept(rotateSpeeds);
-            }
-        };
-
-        private static final Supplier<Command> rotateDriveUntilTargetFoundCommand = () -> {
-            Command command = Commands.run(rotateDrive, driveSubsystem).until(hasTarget);
-            command.setName("Rotate Until Target Found");
-            return command;
-        };
-
-        private static final Supplier<Command> rotateDriveUntilTargetFoundSpinShootersCommand = () -> {
-            Command command = Commands.race(
-                    rotateDriveUntilTargetFoundCommand.get(),
-                    BasicCommands.BottomShooter.createSpinCommand.apply(Constants.bottomShooterPercent),
-                    BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent));
-            command.setName("Rotate Until Found Target");
-            return command;
-        };
-
         private static final Runnable setDistanceAndAngle = () -> {
             var distance = telemetrySubsystem.priorityTargetDistance.get();
             var angle = telemetrySubsystem.priorityTargetRotation.get();
             if (distance.isPresent() && angle.isPresent()) {
+                SmartDashboard.putBoolean("Has Priority Tag", true);
                 targetDistance.mut_setMagnitude(distance.get());
                 var aimAngle = Constants.distanceToAngle.apply(targetDistance);
                 tiltAngle.mut_setMagnitude(aimAngle.in(Degrees));
@@ -147,6 +109,8 @@ public class AdvancedScoringCommands {
                 poseAngle = poseAngle.plus(angle.get());
                 Constants.rotationPIDController.setSetpoint(poseAngle.getDegrees());
                 Constants.rotationPIDController.setTolerance(Constants.tolerance);
+            } else {
+                SmartDashboard.putBoolean("Has Priority Tag", false);
             }
         };
 
@@ -200,7 +164,6 @@ public class AdvancedScoringCommands {
             return Commands.sequence(
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     setDistanceAndAngleCommand.get(),
-                    rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     createAimCommand.get(),
                     createShootCommand.get());
         };
@@ -208,9 +171,7 @@ public class AdvancedScoringCommands {
         public static final Supplier<Command> createWithDelay = () -> {
             return Commands.sequence(
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
-                    rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     setDistanceAndAngleCommand.get(),
-                    rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     createAimCommand.get(),
                     createShootCommand.get()
                             .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)));

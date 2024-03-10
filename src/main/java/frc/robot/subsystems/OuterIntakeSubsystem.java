@@ -10,6 +10,7 @@ import com.compLevel0.Motor;
 import com.compLevel1.Spinner;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
@@ -88,6 +89,7 @@ public class OuterIntakeSubsystem extends SubsystemBase {
     canSparkMax.getPIDController().setI(Constants.slot0kI, 0);
     canSparkMax.getPIDController().setD(Constants.slot0kD, 0);
     canSparkMax.getPIDController().setFF(Constants.slot0kF, 0);
+    canSparkMax.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
 
     Spinner spinner = Motor.REV.createNEOMotor
         .andThen(Spinner.create)

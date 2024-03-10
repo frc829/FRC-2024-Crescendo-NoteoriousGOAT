@@ -11,6 +11,7 @@ import com.compLevel0.Motor;
 import com.compLevel1.Turner;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
@@ -39,7 +40,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     private static final double slot0kD = 0.0;
     private static final double slot0kF = 1.0
         / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec);
-    private static final double slot1kP = 2;
+    private static final double slot1kP = 1.0;
     private static final double slot1kI = 0.0;
     private static final double slot1kD = 0.0;
     private static final double slot1kF = 0.0;
@@ -128,6 +129,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     neo.getPIDController().setPositionPIDWrappingEnabled(true);
     neo.getPIDController().setPositionPIDWrappingMinInput(-0.5 * Constants.gearing);
     neo.getPIDController().setPositionPIDWrappingMaxInput(0.5 * Constants.gearing);
+    neo.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+
     if (RobotBase.isSimulation()) {
       REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
     }

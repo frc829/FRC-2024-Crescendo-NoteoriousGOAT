@@ -14,6 +14,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -94,6 +95,7 @@ public class BottomShooterSubsystem extends SubsystemBase {
     canSparkBase.getPIDController().setI(Constants.slot0kI, 0);
     canSparkBase.getPIDController().setD(Constants.slot0kD, 0);
     canSparkBase.getPIDController().setFF(Constants.slot0kF, 0);
+    canSparkBase.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
 
     Spinner spinner = Motor.REV.createNEOVortexMotor
         .andThen(Spinner.create)
