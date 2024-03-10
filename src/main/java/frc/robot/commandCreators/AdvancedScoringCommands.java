@@ -13,6 +13,7 @@ import com.utility.Spline.MonotoneCubicSpline;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.Angle;
@@ -142,7 +143,9 @@ public class AdvancedScoringCommands {
                 targetDistance.mut_setMagnitude(distance.get());
                 var aimAngle = Constants.distanceToAngle.apply(targetDistance);
                 tiltAngle.mut_setMagnitude(aimAngle.in(Degrees));
-                Constants.rotationPIDController.setSetpoint(angle.get().getDegrees());
+                Rotation2d poseAngle = telemetrySubsystem.poseEstimate.get().getRotation();
+                poseAngle = poseAngle.plus(angle.get());
+                Constants.rotationPIDController.setSetpoint(poseAngle.getDegrees());
                 Constants.rotationPIDController.setTolerance(Constants.tolerance);
             }
         };
@@ -152,12 +155,10 @@ public class AdvancedScoringCommands {
         };
 
         private static final Runnable rotateDriveToFoundTarget = () -> {
-            var angle = telemetrySubsystem.priorityTargetRotation.get();
-            if (angle.isPresent()) {
-                double omegaRadiansPerSecond = Constants.rotationPIDController.calculate(angle.get().getDegrees());
-                ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, -omegaRadiansPerSecond);
-                driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()).accept(chassisSpeeds);
-            }
+            var angle = telemetrySubsystem.poseEstimate.get().getRotation().getDegrees();
+            double omegaRadiansPerSecond = Constants.rotationPIDController.calculate(angle);
+            ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, omegaRadiansPerSecond);
+            driveSubsystem.controlRobotChassisSpeeds.apply(new Translation2d()).accept(chassisSpeeds);
         };
 
         private static final Supplier<Command> rotateDriveToAlignTargetCommand = () -> {
@@ -198,7 +199,6 @@ public class AdvancedScoringCommands {
         public static final Supplier<Command> create = () -> {
             return Commands.sequence(
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
-                    rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     setDistanceAndAngleCommand.get(),
                     rotateDriveUntilTargetFoundSpinShootersCommand.get(),
                     createAimCommand.get(),

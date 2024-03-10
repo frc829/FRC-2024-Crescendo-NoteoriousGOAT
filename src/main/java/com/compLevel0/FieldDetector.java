@@ -106,8 +106,8 @@ public class FieldDetector {
                         }
                     };
 
-                    Translation2d cameraTranslationRobotSpace = new Translation2d(cameraPosition.getX(),
-                            cameraPosition.getY());
+                    Translation2d cameraTranslationRobotSpace = new Translation2d(-cameraPosition.getX(),
+                            -cameraPosition.getY());
 
                     Supplier<Optional<Translation2d>> robotSpaceTargetTranslation = () -> {
                         double txDegrees = txDegreesSupplier.get();
@@ -117,15 +117,12 @@ public class FieldDetector {
                         if (taNum != 0 && pipeline == 1) {
                             double cameraZ = cameraPosition.getZ();
                             double cameraPitch = cameraPosition.getRotation().getY();
-                            double cameraYaw = cameraPosition.getRotation().getZ();
                             double distance = Math.abs(cameraZ / Math.tan(cameraPitch + Math.toRadians(tyDegrees)));
                             double objectYCamSpace = distance * Math.sin(Math.toRadians(txDegrees));
                             double objectXCamSpace = distance * Math.cos(Math.toRadians(txDegrees));
                             Translation2d objectCamSpace = new Translation2d(objectXCamSpace, objectYCamSpace);
-                            Translation2d objectCamSpaceRotatedIntoRobotFrame = objectCamSpace
-                                    .rotateBy(Rotation2d.fromRadians(cameraYaw));
                             Translation2d objectTranslationRobot = cameraTranslationRobotSpace
-                                    .plus(objectCamSpaceRotatedIntoRobotFrame);
+                                    .plus(objectCamSpace);
                             SmartDashboard.putNumber("Robot Space Target Distance", objectTranslationRobot.getNorm());
                             return Optional.of(objectTranslationRobot);
                         } else {

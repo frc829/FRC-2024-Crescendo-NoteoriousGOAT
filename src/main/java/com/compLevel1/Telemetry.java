@@ -154,10 +154,11 @@ public class Telemetry {
 
                                 Supplier<Optional<Rotation2d>> priorityTargetRotation = () -> {
                                         if (fieldDetectors.size() == 2) {
-                                                var priorityRotatOptional = fieldDetectors
-                                                                .get(1).robotSpaceTargetHeading.get();
-                                                if (priorityRotatOptional.isPresent()) {
-                                                        return Optional.of(priorityRotatOptional.get());
+                                                var priorityTargetTranslation = fieldDetectors
+                                                                .get(1).robotSpaceTargetTranslation
+                                                                .get();
+                                                if (priorityTargetTranslation.isPresent()) {
+                                                        return Optional.of(priorityTargetTranslation.get().getAngle());
                                                 }
                                                 return Optional.empty();
                                         } else {
