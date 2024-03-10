@@ -12,6 +12,9 @@ public class AutoCommands {
                 NamedCommands.registerCommand("BackReset",
                                 TelemetryCommands.createResetPoseFromBackCameraCommand.get());
                 NamedCommands.registerCommand("Fender", BasicScoringCommands.Fender.createWithDelay.get());
+                NamedCommands.registerCommand("AutoRanged1", BasicScoringCommands.AutoRanged1.createWithDelay.get());
+                NamedCommands.registerCommand("AutoRanged2", BasicScoringCommands.AutoRanged2.createWithDelay.get());
+                NamedCommands.registerCommand("AutoRanged3", BasicScoringCommands.AutoRanged3.createWithDelay.get());
                 NamedCommands.registerCommand("Pickup", PickupCommands.Ground.groundCommand.get());
                 NamedCommands.registerCommand("SpinUp", BasicScoringCommands.SpinUp.createSpinUp.get());
                 NamedCommands.registerCommand("GetLow", PickupCommands.Level.command.get());
