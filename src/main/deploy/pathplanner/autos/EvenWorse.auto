@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.503133817078445,
+      "y": 7.386517836098735
+    },
+    "rotation": 90.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of WeirdAllenYankovichP2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP4"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP5"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP6"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP7"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "WeirdAllenYankovichP8"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
