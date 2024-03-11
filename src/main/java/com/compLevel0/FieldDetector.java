@@ -37,6 +37,7 @@ public class FieldDetector {
     public final Supplier<Integer> tagCount;
     public final Supplier<Integer> getPriorityTarget;
     public final Consumer<Integer> setPriorityTarget;
+    public final Supplier<Double> averageAreaSupplier;
     public final Runnable enable;
     public final Runnable update;
 
@@ -49,6 +50,7 @@ public class FieldDetector {
             Supplier<Integer> tagCount,
             Supplier<Integer> getPriorityTarget,
             Consumer<Integer> setPriorityTarget,
+            Supplier<Double> averageAreaSupplier,
             Runnable enable,
             Runnable update) {
         this.name = name;
@@ -59,6 +61,7 @@ public class FieldDetector {
         this.latency = latency;
         this.getPriorityTarget = getPriorityTarget;
         this.setPriorityTarget = setPriorityTarget;
+        this.averageAreaSupplier = averageAreaSupplier;
         this.enable = enable;
         this.update = update;
     }
@@ -144,6 +147,8 @@ public class FieldDetector {
                         }
                     };
 
+                    MutableMeasure<Dimensionless> averageArea = MutableMeasure.zero(Value);
+
                     Supplier<Optional<Pose2d>> fieldPosition = () -> {
                         if (RobotBase.isSimulation()) {
                             Pose2d simPose = simFieldPose.get();
@@ -157,6 +162,7 @@ public class FieldDetector {
                                 latencyMeasure.mut_setMagnitude(poseArray[6]);
                                 if (poseArray.length > 7) {
                                     tagCount.mut_setMagnitude(poseArray[7]);
+                                    averageArea.mut_setMagnitude(poseArray[10]);
                                 }
                                 return Optional.of(new Pose2d(fieldX.in(Meters), fieldY.in(Meters),
                                         Rotation2d.fromDegrees(fieldYaw.in(Degrees))));
@@ -198,6 +204,10 @@ public class FieldDetector {
 
                     };
 
+                    Supplier<Double> averageAreaSupplier = () -> {
+                        return averageArea.in(Value);
+                    };
+
                     return new FieldDetector(
                             name,
                             fieldPosition,
@@ -207,6 +217,7 @@ public class FieldDetector {
                             tagCountSupplier,
                             getPriorityTarget,
                             setPriorityTarget,
+                            averageAreaSupplier,
                             enable,
                             update);
                 };

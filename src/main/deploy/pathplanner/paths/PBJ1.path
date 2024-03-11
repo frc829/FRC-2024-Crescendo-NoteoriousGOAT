@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.32,
+        "x": 0.76,
         "y": 4.49
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3561156613961085,
+        "x": 1.7961156613961085,
         "y": 4.387321871393178
       },
       "isLocked": false,
@@ -69,7 +69,7 @@
   "reversed": false,
   "folder": "PBJ",
   "previewStartingState": {
-    "rotation": -39.81,
+    "rotation": -60.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

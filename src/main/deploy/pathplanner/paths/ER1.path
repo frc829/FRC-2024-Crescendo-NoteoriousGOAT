@@ -3,12 +3,12 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.32,
+        "x": 0.76,
         "y": 4.49
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.3561156613961085,
+        "x": 1.7961156613961085,
         "y": 4.387321871393178
       },
       "isLocked": false,
@@ -56,8 +56,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.25,
-    "maxAcceleration": 4.0,
+    "maxVelocity": 5.25,
+    "maxAcceleration": 5.0,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 180.0
   },
@@ -69,8 +69,8 @@
   "reversed": false,
   "folder": "EleanorRigby",
   "previewStartingState": {
-    "rotation": -39.81,
+    "rotation": -60.0,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

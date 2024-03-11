@@ -55,6 +55,7 @@ public class Telemetry {
         public final List<Runnable> enableFieldDetectors;
         public final List<Runnable> enableObjectDetectors;
         public final Runnable update;
+        public final List<Supplier<Double>> averageAreaSuppliers;
 
         private Telemetry(
                         Field2d field2d,
@@ -75,7 +76,8 @@ public class Telemetry {
                         List<Consumer<Integer>> setPriorityTargetsFromFieldDetectors,
                         List<Runnable> enableFieldDetectors,
                         List<Runnable> enableObjectDetectors,
-                        Runnable update) {
+                        Runnable update, 
+                        List<Supplier<Double>> averageAreaSuppliers) {
                 this.field2d = field2d;
                 this.gyroYaw = gyroYaw;
                 this.accelerationX = accelerationX;
@@ -95,6 +97,7 @@ public class Telemetry {
                 this.enableFieldDetectors = enableFieldDetectors;
                 this.enableObjectDetectors = enableObjectDetectors;
                 this.update = update;
+                this.averageAreaSuppliers = averageAreaSuppliers;
                 SmartDashboard.putData(field2d);
         }
 
@@ -136,6 +139,7 @@ public class Telemetry {
                                 List<Runnable> enableFieldDetectors = new ArrayList<>();
                                 List<Runnable> enableObjectDetectors = new ArrayList<>();
                                 List<Pair<String, Supplier<Integer>>> fieldDetectorTagCounts = new ArrayList<>();
+                                List<Supplier<Double>> averageAreaSupplier = new ArrayList<>();
 
                                 Supplier<Optional<Double>> priorityTargetDistance = () -> {
                                         if (fieldDetectors.size() == 2) {
@@ -222,7 +226,9 @@ public class Telemetry {
                                                 addDetectedPosesToEstimator,
                                                 setPriorityTargetsFromFieldDetectors,
                                                 enableFieldDetectors,
-                                                enableObjectDetectors, update);
+                                                enableObjectDetectors, 
+                                                update, 
+                                                averageAreaSupplier);
                         };
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (
@@ -241,6 +247,7 @@ public class Telemetry {
                                 telemetry.setPriorityTargetsFromFieldDetectors.add(fieldDetector.setPriorityTarget);
                                 telemetry.enableFieldDetectors.add(fieldDetector.enable);
                                 fieldDetector.enable.run();
+                                telemetry.averageAreaSuppliers.add(fieldDetector.averageAreaSupplier);
                                 return telemetry;
                         };
 

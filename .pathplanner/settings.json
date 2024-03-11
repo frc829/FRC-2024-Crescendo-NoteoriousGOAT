@@ -4,6 +4,8 @@
   "holonomicMode": true,
   "pathFolders": [
     "EleanorRigby",
+    "LOC",
+    "WeirdAllenYankovich",
     "PBJ",
     "PathSpeakerToNotes",
     "PathsNotesToSpeaker"
