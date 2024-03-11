@@ -50,8 +50,8 @@ public class Turner {
         this.stop = stop;
     }
 
-    public static final Function<Double, Function<Double, Function<Double, Function<Motor, Turner>>>> create = (
-            gearing) -> (absGearingUp) -> (absGearingDown) -> (motor) -> {
+    public static final Function<Double, Function<Motor, Turner>> create = (
+            gearing) -> (motor) -> {
                 MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
@@ -71,13 +71,11 @@ public class Turner {
                 };
                 Runnable resetRelEncoderFromAbsolute = () -> {
                     double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
-                    if (absoluteAngleValue > 0.25 * absGearingDown) {
+                    if (absoluteAngleValue >= 0.5) {
                         absoluteAngleValue -= 1.0;
                     }
-                    turnSetpoint.mut_setMagnitude(absoluteAngleValue * (absGearingUp));
-                    motor.setRelativeEncoderAngle
-                            .accept(turnSetpoint);
-
+                    turnSetpoint.mut_setMagnitude(absoluteAngleValue * gearing);
+                    motor.setRelativeEncoderAngle.accept(turnSetpoint);
                 };
                 Runnable hold = () -> motor.turn.accept(turnSetpoint);
                 Runnable stop = () -> motor.stop.run();
@@ -85,10 +83,10 @@ public class Turner {
                     motor.update.run();
                     angle.mut_setMagnitude(motor.angle.in(Rotations) / gearing);
                     double absoluteAngleValue = motor.absoluteAngle.in(Rotations);
-                    if (absoluteAngleValue > 0.25 * absGearingDown) {
-                        absoluteAngleValue -= 1;
+                    if (absoluteAngleValue >= 0.5) {
+                        absoluteAngleValue -= 1.0;
                     }
-                    absoluteAngle.mut_setMagnitude(absoluteAngleValue / absGearingDown);
+                    absoluteAngle.mut_setMagnitude(absoluteAngleValue);
                     velocity.mut_setMagnitude(motor.angularVelocity.in(RPM));
                     velocity.mut_divide(motor.maxAngularVelocity.in(RPM));
                 };

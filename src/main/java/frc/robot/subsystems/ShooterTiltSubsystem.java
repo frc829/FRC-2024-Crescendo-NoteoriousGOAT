@@ -33,8 +33,6 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   private static final class Constants {
     private static final int deviceId = 18;
     private static final double gearing = 5.0 * 4.0 * 3.0 * 56.0 / 18.0;
-    private static final double absoluteGearingUp = 5 * 4 * 3.0;
-    private static final double absoluteGearingDown = 56.0 / 18.0;
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
     private static final double slot0kD = 0.0;
@@ -136,9 +134,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     }
 
     Turner turner = Motor.REV.createNEOMotor
-        .andThen(Turner.create.apply(Constants.gearing).apply(Constants.absoluteGearingUp)
-            .apply(Constants.absoluteGearingDown))
-        .apply(neo);
+        .andThen(Turner.create.apply(Constants.gearing)).apply(neo);
 
     return new ShooterTiltSubsystem(
         turner.voltage,
