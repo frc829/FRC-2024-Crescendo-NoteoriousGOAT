@@ -20,6 +20,7 @@ public class Turner {
     public final Measure<Angle> angle;
     public final Measure<Angle> absoluteAngle;
     public final Measure<Dimensionless> velocity;
+    public final Consumer<Measure<Angle>> setRelativeEncoder;
     public final Consumer<Measure<Angle>> turn;
     public final Consumer<Double> drive;
     public final Runnable resetRelEncoderFromAbsolute;
@@ -32,6 +33,7 @@ public class Turner {
             Measure<Angle> angle,
             Measure<Angle> absoluteAngle,
             Measure<Dimensionless> velocity,
+            Consumer<Measure<Angle>> setRelativeEncoder,
             Consumer<Measure<Angle>> turn,
             Consumer<Double> drive,
             Runnable resetRelEncoderFromAbsolute,
@@ -42,6 +44,7 @@ public class Turner {
         this.angle = angle;
         this.absoluteAngle = absoluteAngle;
         this.velocity = velocity;
+        this.setRelativeEncoder = setRelativeEncoder;
         this.turn = turn;
         this.drive = drive;
         this.resetRelEncoderFromAbsolute = resetRelEncoderFromAbsolute;
@@ -57,6 +60,11 @@ public class Turner {
                 MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
 
                 MutableMeasure<Angle> turnSetpoint = MutableMeasure.zero(Rotations);
+                Consumer<Measure<Angle>> setRelativeEncoder = (setpoint) -> {
+                    turnSetpoint.mut_setMagnitude(setpoint.in(Rotations));
+                    turnSetpoint.mut_times(gearing);
+                    motor.setRelativeEncoderAngle.accept(turnSetpoint);
+                };
                 Consumer<Measure<Angle>> turn = (setpoint) -> {
                     turnSetpoint.mut_setMagnitude(setpoint.in(Rotations));
                     turnSetpoint.mut_times(gearing);
@@ -96,6 +104,7 @@ public class Turner {
                         angle,
                         absoluteAngle,
                         velocity,
+                        setRelativeEncoder,
                         turn,
                         drive,
                         resetRelEncoderFromAbsolute,

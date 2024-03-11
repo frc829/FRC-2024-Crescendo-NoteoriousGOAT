@@ -32,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "PBJ1"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "PBJ2"
           }
         },
         {
@@ -56,7 +56,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "PBJ3"
           }
         },
         {
@@ -74,7 +74,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "PBJ4"
           }
         },
         {
@@ -92,7 +92,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged3"
+            "name": "PBJ5"
           }
         }
       ]

@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
+import static frc.robot.RobotContainer.shooterTiltSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -123,6 +124,12 @@ public class BasicCommands {
             };
         };
 
+        public static final Supplier<Runnable> tareRelativeEncoder = () -> {
+            return () -> {
+                shooterTiltSubsystem.setRelativeEncoder.accept(Degrees.of(0.0));
+            };
+        };
+
         public static final Function<Measure<Angle>, Runnable> setTiltAngle = (angle) -> {
             return () -> RobotContainer.shooterTiltSubsystem.turn.accept(angle);
         };
@@ -164,6 +171,12 @@ public class BasicCommands {
             String name = String.format("Set at %s deg", angle.in(Degrees));
             command.setName(name);
             return command;
+        };
+
+        public static final Supplier<Command> createTareRelativeEncoderCommand = () -> {
+            return Commands.runOnce(
+                    tareRelativeEncoder.get(),
+                    shooterTiltSubsystem);
         };
     }
 

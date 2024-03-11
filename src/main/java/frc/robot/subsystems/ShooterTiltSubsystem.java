@@ -48,6 +48,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Measure<Angle> angle;
   public final Measure<Angle> absoluteAngle;
   public final Measure<Dimensionless> velocity;
+  public final Consumer<Measure<Angle>> setRelativeEncoder;
   public final Consumer<Measure<Angle>> turn;
   public final Consumer<Double> drive;
   public final Runnable resetRelEncoderFromAbsolute;
@@ -60,6 +61,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
       Measure<Angle> angle,
       Measure<Angle> absoluteAngle,
       Measure<Dimensionless> velocity,
+      Consumer<Measure<Angle>> setRelativeEncoder,
       Consumer<Measure<Angle>> turn,
       Consumer<Double> drive,
       Runnable resetRelEncoderFromAbsolute,
@@ -70,6 +72,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.angle = angle;
     this.absoluteAngle = absoluteAngle;
     this.velocity = velocity;
+    this.setRelativeEncoder = setRelativeEncoder;
     this.turn = turn;
     this.resetRelEncoderFromAbsolute = resetRelEncoderFromAbsolute;
     this.drive = drive;
@@ -141,6 +144,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         turner.angle,
         turner.absoluteAngle,
         turner.velocity,
+        turner.setRelativeEncoder,
         turner.turn,
         turner.drive,
         turner.resetRelEncoderFromAbsolute,
