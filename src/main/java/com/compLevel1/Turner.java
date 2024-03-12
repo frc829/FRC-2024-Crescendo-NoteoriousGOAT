@@ -67,14 +67,13 @@ public class Turner {
                 };
                 Consumer<Measure<Angle>> turn = (setpoint) -> {
                     turnSetpoint.mut_setMagnitude(setpoint.in(Rotations));
-                    turnSetpoint.mut_times(gearing);
                     motor.turn.accept(turnSetpoint);
                 };
                 MutableMeasure<Velocity<Angle>> driveSetpoint = MutableMeasure.zero(RPM);
                 Consumer<Double> drive = (setpoint) -> {
-                    driveSetpoint.mut_setMagnitude(motor.maxAngularVelocity.in(RPM));
+                    driveSetpoint.mut_setMagnitude(motor.maxAngularVelocity.in(RPM) / gearing);
                     driveSetpoint.mut_times(setpoint);
-                    turnSetpoint.mut_setMagnitude(motor.angle.in(Rotations));
+                    turnSetpoint.mut_setMagnitude(motor.absoluteAngle.in(Rotations));
                     motor.spin.accept(driveSetpoint);
                 };
                 Runnable resetRelEncoderFromAbsolute = () -> {

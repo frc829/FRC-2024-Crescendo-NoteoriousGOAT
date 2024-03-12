@@ -13,6 +13,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.MotorFeedbackSensor;
 import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
@@ -37,8 +38,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     private static final double slot0kI = 0.0;
     private static final double slot0kD = 0.0;
     private static final double slot0kF = 1.0
-        / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec);
-    private static final double slot1kP = 1.0;
+        / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec / gearing);
+    private static final double slot1kP = 1.0 / gearing;
     private static final double slot1kI = 0.0;
     private static final double slot1kD = 0.0;
     private static final double slot1kF = 0.0;
@@ -117,6 +118,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public static final Supplier<ShooterTiltSubsystem> create = () -> {
 
     CANSparkMax neo = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
+    MotorFeedbackSensor motorFeedbackSensor = neo.getAbsoluteEncoder();
+    neo.getPIDController().setFeedbackDevice(motorFeedbackSensor);
     neo.getPIDController().setP(Constants.slot0kP, 0);
     neo.getPIDController().setI(Constants.slot0kI, 0);
     neo.getPIDController().setD(Constants.slot0kD, 0);
@@ -128,8 +131,8 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     neo.setIdleMode(IdleMode.kBrake);
     neo.setInverted(true);
     neo.getPIDController().setPositionPIDWrappingEnabled(true);
-    neo.getPIDController().setPositionPIDWrappingMinInput(-0.5 * Constants.gearing);
-    neo.getPIDController().setPositionPIDWrappingMaxInput(0.5 * Constants.gearing);
+    neo.getPIDController().setPositionPIDWrappingMinInput(-0.5);
+    neo.getPIDController().setPositionPIDWrappingMaxInput(0.5);
     neo.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
 
     if (RobotBase.isSimulation()) {
