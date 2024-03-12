@@ -104,7 +104,7 @@ public class BasicCommands {
             return () -> {
                 return MathUtil.isNear(
                         angle.in(Degrees),
-                        RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
+                        RobotContainer.shooterTiltSubsystem.absoluteAngle.in(Degrees),
                         tolerance.in(Degrees));
             };
         };

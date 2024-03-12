@@ -81,7 +81,7 @@ public class Turner {
                     if (absoluteAngleValue >= 0.5) {
                         absoluteAngleValue -= 1.0;
                     }
-                    turnSetpoint.mut_setMagnitude(absoluteAngleValue * gearing);
+                    turnSetpoint.mut_setMagnitude(absoluteAngleValue);
                     motor.setRelativeEncoderAngle.accept(turnSetpoint);
                 };
                 Runnable hold = () -> motor.turn.accept(turnSetpoint);
