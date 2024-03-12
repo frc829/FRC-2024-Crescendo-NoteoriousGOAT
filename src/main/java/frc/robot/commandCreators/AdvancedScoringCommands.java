@@ -97,7 +97,7 @@ public class AdvancedScoringCommands {
                     && shootersAtSpeed.getAsBoolean();
         };
 
-        private static final Runnable setDistanceAndAngle = () -> {
+        private static final BooleanSupplier setDistanceAndAngle = () -> {
             var distance = telemetrySubsystem.priorityTargetDistance.get();
             var angle = telemetrySubsystem.priorityTargetRotation.get();
             if (distance.isPresent() && angle.isPresent()) {
@@ -109,13 +109,16 @@ public class AdvancedScoringCommands {
                 poseAngle = poseAngle.plus(angle.get());
                 Constants.rotationPIDController.setSetpoint(poseAngle.getDegrees());
                 Constants.rotationPIDController.setTolerance(Constants.tolerance);
+                return true;
             } else {
                 SmartDashboard.putBoolean("Has Priority Tag", false);
+                return false;
             }
         };
 
         private static final Supplier<Command> setDistanceAndAngleCommand = () -> {
-            return Commands.runOnce(setDistanceAndAngle);
+            Runnable blank = () -> {};
+            return Commands.run(blank).until(setDistanceAndAngle);
         };
 
         private static final Runnable rotateDriveToFoundTarget = () -> {
