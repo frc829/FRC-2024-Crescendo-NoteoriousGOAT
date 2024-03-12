@@ -140,7 +140,8 @@ public class AdvancedScoringCommands {
                     BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
                     BasicCommands.BottomShooter.createSpinCommand
                             .apply(Constants.bottomShooterPercent))
-                    .until(elevatorTiltShooterDriveAtPositionCondition);
+                    .until(elevatorTiltShooterDriveAtPositionCondition)
+                    .raceWith(Commands.waitSeconds(0.5));
             command.setName("Ranged Aim");
             return command;
         };
