@@ -47,10 +47,10 @@ public class AdvancedScoringCommands {
             };
             private static final double[] anglesDegrees = new double[] {
                     57.0,
-                    40.0,
-                    31.0,
-                    26.0,
-                    23.0
+                    44.0,
+                    36.0,
+                    30.0,
+                    27.0
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);

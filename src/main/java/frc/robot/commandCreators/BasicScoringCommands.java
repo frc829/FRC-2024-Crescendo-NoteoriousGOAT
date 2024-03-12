@@ -42,6 +42,8 @@ public class BasicScoringCommands {
                         private static double bottomShooterPercent = -0.8;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.7;
+                        private static double trapTopPercent = -0.6;
+                        private static double trapBotPercent = 0.6;
                 }
 
                 public static final Supplier<Command> createAmpPosition = () -> {
@@ -70,11 +72,26 @@ public class BasicScoringCommands {
                         command.setName("Amp Drop");
                         return command;
                 };
+
+                public static final Supplier<Command> createTrapShoot = () -> {
+                        Command command = Commands.parallel(
+                                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.trapTopPercent),
+                                        BasicCommands.BottomShooter.createSpinCommand
+                                                        .apply(Constants.trapBotPercent),
+                                        BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
+                                                        .apply(Constants.elevatorPosition),
+                                        BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
+                                        BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                        BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+
+                        command.setName("Amp Drop");
+                        return command;
+                };
         }
 
         public static final class Climb {
                 private static final class Constants {
-                        private static final Measure<Distance> elevatorHeightStart = Meters.of(0.36);
+                        private static final Measure<Distance> elevatorHeightStart = Meters.of(0.40);
                         private static final Measure<Distance> elevatorHeightEnd = Meters.of(0.10);
                         private static final Measure<Angle> tiltAngle = Degrees.of(0.0);
                 }
@@ -670,10 +687,10 @@ public class BasicScoringCommands {
 
         public static final class Pass {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(45);
+                        private static Measure<Angle> tiltAngle = Degrees.of(35);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = -0.7;
-                        private static double bottomShooterPercent = 0.7;
+                        private static double topShooterPercent = -0.5;
+                        private static double bottomShooterPercent = 0.5;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
