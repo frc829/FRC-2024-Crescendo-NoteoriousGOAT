@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import static frc.robot.RobotContainer.*;
 
-public class AdvancedScoringCommands {
+public class StationaryRangedShot {
     public static final class Ranged {
         private static final class Constants {
             private static Measure<Distance> elevatorPosition = Meters.of(0.0);

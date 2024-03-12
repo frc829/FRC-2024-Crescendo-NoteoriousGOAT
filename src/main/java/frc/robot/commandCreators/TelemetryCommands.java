@@ -86,6 +86,7 @@ public class TelemetryCommands {
                 Runnable setFrontCameraToField = () -> {
                         telemetrySubsystem.enableFieldDetectors.get(0).run();
                 };
+                DriveCommands.createFieldCentricDriveOriginCommand.get();
                 Command command = Commands.runOnce(setFrontCameraToField,
                                 RobotContainer.telemetrySubsystem);
                 command.setName("Set Front Camera to Field");
@@ -98,6 +99,18 @@ public class TelemetryCommands {
                 };
                 Command command = Commands.runOnce(setFrontCameraToField,
                                 RobotContainer.telemetrySubsystem);
+                command.setName("Set Rear Camera to Field");
+                return command;
+        };
+
+        public static final Supplier<Command> createSetRearCameraToFieldCommandDriveSlow = () -> {
+                Runnable setFrontCameraToField = () -> {
+                        telemetrySubsystem.enableFieldDetectors.get(1).run();
+                };
+                Command setCameraCommand = Commands.runOnce(setFrontCameraToField,
+                                RobotContainer.telemetrySubsystem);
+                Command driveCommand = DriveCommands.createFieldCentricDriveOriginSlowCommand.get();
+                Command command = Commands.race(setCameraCommand, driveCommand);
                 command.setName("Set Rear Camera to Field");
                 return command;
         };

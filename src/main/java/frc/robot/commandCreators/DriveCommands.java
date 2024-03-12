@@ -77,11 +77,47 @@ public class DriveCommands {
                 };
         };
 
+        private static final Function<Translation2d, Runnable> createFieldCentricDriveSlow = (cor) -> {
+                ChassisSpeeds speeds = new ChassisSpeeds();
+                return () -> {
+                        double flipper = 0.15;
+                        var color = DriverStation.getAlliance();
+                        if (color.isPresent() && color.get() == Alliance.Red) {
+                                flipper *= -1;
+                        }
+                        speeds.vxMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
+                                        .in(MetersPerSecond) * RobotContainer.driver.leftYValue.getAsDouble();
+                        speeds.vyMetersPerSecond = DriveSubsystem.Constants.maxLinearVelocity
+                                        .in(MetersPerSecond) * RobotContainer.driver.leftXValue.getAsDouble();
+                        speeds.omegaRadiansPerSecond = DriveSubsystem.Constants.maxAngularVelocity
+                                        .in(RadiansPerSecond)
+                                        * RobotContainer.driver.fullTriggerValue.getAsDouble();
+                        speeds.vxMetersPerSecond *= flipper;
+                        speeds.vyMetersPerSecond *= flipper;
+                        ChassisSpeeds adjustedSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds,
+                                        RobotContainer.telemetrySubsystem.poseEstimate.get().getRotation());
+                        speeds.vxMetersPerSecond = adjustedSpeeds.vxMetersPerSecond;
+                        speeds.vyMetersPerSecond = adjustedSpeeds.vyMetersPerSecond;
+                        speeds.omegaRadiansPerSecond = adjustedSpeeds.omegaRadiansPerSecond;
+                        RobotContainer.driveSubsystem.controlRobotChassisSpeeds
+                                        .apply(cor)
+                                        .accept(speeds);
+                };
+        };
+
         public static final Supplier<Command> createFieldCentricDriveOriginCommand = () -> {
                 Command command = Commands.run(
                                 createFieldCentricDrive.apply(DriveConstants.originCOR),
                                 driveSubsystem);
                 command.setName("Manual FC Origin Drive");
+                return command;
+        };
+
+        public static final Supplier<Command> createFieldCentricDriveOriginSlowCommand = () -> {
+                Command command = Commands.run(
+                                createFieldCentricDriveSlow.apply(DriveConstants.originCOR),
+                                driveSubsystem);
+                command.setName("Manual FC Origin Drive Slow");
                 return command;
         };
 

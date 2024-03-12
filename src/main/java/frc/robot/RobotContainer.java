@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commandCreators.AdvancedScoringCommands;
+import frc.robot.commandCreators.StationaryRangedShot;
 import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
 import frc.robot.commandCreators.PickupCommands;
@@ -146,7 +146,7 @@ public class RobotContainer {
                 driver.padDown.whileTrue(BasicScoringCommands.Amp.createTrapShoot.get());
                 driver.leftBumper.whileTrue(BasicScoringCommands.Fender.create.get());
                 driver.leftBumper.onFalse(PickupCommands.Level.command.get());
-                driver.rightBumper.whileTrue(AdvancedScoringCommands.Ranged.create.get());
+                driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());
                 driver.rightBumper.onFalse((PickupCommands.Level.command.get()));
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
