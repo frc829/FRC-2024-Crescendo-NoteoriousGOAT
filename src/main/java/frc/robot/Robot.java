@@ -6,7 +6,6 @@ package frc.robot;
 
 import com.revrobotics.REVPhysicsSim;
 
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
