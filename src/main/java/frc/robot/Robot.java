@@ -8,6 +8,7 @@ import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,7 +23,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    rioComments = RoboRioDataJNI.getComments();
+    rioComments = RobotController.getComments();
     for (int port = 5800; port <= 5807; port++) {
       PortForwarder.add(port, "limelight-front.local", port);
     }
