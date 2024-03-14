@@ -143,7 +143,8 @@ public class RobotContainer {
                 operator.leftBumper.onFalse(PickupCommands.Level.command.get());
                 operator.rightBumper.whileTrue(PickupCommands.BabyBird.babyBirdCommandThenLevel.get());
                 operator.rightBumper.onFalse(PickupCommands.Level.command.get());
-                driver.padDown.whileTrue(BasicScoringCommands.Amp.createTrapShoot.get());
+                driver.padUp.whileTrue(BasicScoringCommands.Trap.createTrapPosition.get());
+                operator.padUp.whileTrue(BasicScoringCommands.Trap.createTrapShoot.get());
                 driver.leftBumper.whileTrue(BasicScoringCommands.Fender.create.get());
                 driver.leftBumper.onFalse(PickupCommands.Level.command.get());
                 driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());

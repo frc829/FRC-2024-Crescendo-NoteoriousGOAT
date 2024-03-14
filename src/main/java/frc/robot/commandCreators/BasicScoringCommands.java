@@ -42,8 +42,6 @@ public class BasicScoringCommands {
                         private static double bottomShooterPercent = -0.8;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.7;
-                        private static double trapTopPercent = -0.6;
-                        private static double trapBotPercent = 0.6;
                 }
 
                 public static final Supplier<Command> createAmpPosition = () -> {
@@ -65,21 +63,6 @@ public class BasicScoringCommands {
                                                         .apply(Constants.bottomShooterPercent),
                                         BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                         .apply(Constants.elevatorPosition),
-                                        BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
-                                        BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                        BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
-
-                        command.setName("Amp Drop");
-                        return command;
-                };
-
-                public static final Supplier<Command> createTrapShoot = () -> {
-                        Command command = Commands.parallel(
-                                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.trapTopPercent),
-                                        BasicCommands.BottomShooter.createSpinCommand
-                                                        .apply(Constants.trapBotPercent),
-                                        BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
-                                                        .apply(Meters.of(0.40)),
                                         BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                         BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
                                         BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
@@ -207,6 +190,44 @@ public class BasicScoringCommands {
                                         createShootCommand.get()
                                                         .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
                                         stop.get());
+                };
+        }
+
+        public static final class Trap {
+                private static final class Constants {
+                        private static Measure<Angle> tiltAngle = Degrees.of(48);
+                        private static Measure<Distance> elevatorPosition = Meters.of(0.4);
+                        private static double topShooterPercent = -0.6;
+                        private static double bottomShooterPercent = 0.6;
+                        private static double transportPercent = 0.9;
+                        private static double singulatorPercent = -0.7;
+                }
+
+                public static final Supplier<Command> createTrapPosition = () -> {
+                        Command command = Commands.parallel(
+                                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
+                                        BasicCommands.BottomShooter.createSpinCommand
+                                                        .apply(Constants.bottomShooterPercent),
+                                        BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
+                                                        .apply(Constants.elevatorPosition),
+                                        BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle));
+                        command.setName("Amp Position");
+                        return command;
+                };
+
+                public static final Supplier<Command> createTrapShoot = () -> {
+                        Command command = Commands.parallel(
+                                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
+                                        BasicCommands.BottomShooter.createSpinCommand
+                                                        .apply(Constants.bottomShooterPercent),
+                                        BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
+                                                        .apply(Meters.of(0.40)),
+                                        BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
+                                        BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                        BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+
+                        command.setName("Amp Drop");
+                        return command;
                 };
         }
 
