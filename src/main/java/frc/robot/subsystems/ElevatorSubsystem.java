@@ -32,7 +32,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 29;
-    private static final double gearing = 4.0 * 4.0 * 3.0 * 40.0 / 30.0;  //TODO:  Change me for PRAC
+    private static final double gearing = 4.0 * 4.0 * 3.0 * 40.0 / 30.0;
     private static final Measure<Distance> drumRadius = Inches.of(1.0);
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
