@@ -211,7 +211,7 @@ public class BasicScoringCommands {
                                         BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                         .apply(Constants.elevatorPosition),
                                         BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle));
-                        command.setName("Amp Position");
+                        command.setName("Trap Position");
                         return command;
                 };
 
@@ -221,12 +221,12 @@ public class BasicScoringCommands {
                                         BasicCommands.BottomShooter.createSpinCommand
                                                         .apply(Constants.bottomShooterPercent),
                                         BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
-                                                        .apply(Meters.of(0.40)),
+                                                        .apply(Constants.elevatorPosition),
                                         BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                         BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
                                         BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
 
-                        command.setName("Amp Drop");
+                        command.setName("Trap Drop");
                         return command;
                 };
         }
