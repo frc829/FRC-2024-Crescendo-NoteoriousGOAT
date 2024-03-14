@@ -55,7 +55,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                 0.32,
                                                                 new Rotation3d(
                                                                                 0,
-                                                                                Math.toRadians(12),
+                                                                                Math.toRadians(23),
                                                                                 Math.toRadians(180)))));
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(

@@ -79,7 +79,7 @@ public class BasicScoringCommands {
                                         BasicCommands.BottomShooter.createSpinCommand
                                                         .apply(Constants.trapBotPercent),
                                         BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
-                                                        .apply(Constants.elevatorPosition),
+                                                        .apply(Meters.of(0.40)),
                                         BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                         BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
                                         BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
