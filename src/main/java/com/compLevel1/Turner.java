@@ -55,6 +55,7 @@ public class Turner {
 
     public static final Function<Double, Function<Motor, Turner>> create = (
             gearing) -> (motor) -> {
+                
                 MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
