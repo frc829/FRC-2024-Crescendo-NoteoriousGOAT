@@ -2,12 +2,18 @@ package com.compLevel1;
 
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Value;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.compLevel0.Motor;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
@@ -55,6 +61,12 @@ public class Turner {
 
     public static final Function<Double, Function<Motor, Turner>> create = (
             gearing) -> (motor) -> {
+                double maxRPM = Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNEO(1).freeSpeedRadPerSec);
+                double maxRPS = maxRPM / 60.0;
+                Constraints constraints = new Constraints(maxRPS, maxRPS);
+                TrapezoidProfile trapezoidProfile = new TrapezoidProfile(constraints);
+                State current = new State();
+                State goal = new State();
                 MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
@@ -66,8 +78,13 @@ public class Turner {
                     motor.setRelativeEncoderAngle.accept(turnSetpoint);
                 };
                 Consumer<Measure<Angle>> turn = (setpoint) -> {
-                    turnSetpoint.mut_setMagnitude(setpoint.in(Rotations));
-                    turnSetpoint.mut_times(gearing);
+                    double motorSetpoint = setpoint.in(Rotations) * gearing;
+                    current.position = motor.angle.in(Rotations);
+                    current.velocity = motor.angularVelocity.in(RotationsPerSecond);
+                    goal.position = motorSetpoint;
+                    goal.velocity = 0.0;
+                    State state = trapezoidProfile.calculate(0.020, current, goal);
+                    turnSetpoint.mut_setMagnitude(state.position);
                     motor.turn.accept(turnSetpoint);
                 };
                 MutableMeasure<Velocity<Angle>> driveSetpoint = MutableMeasure.zero(RPM);
