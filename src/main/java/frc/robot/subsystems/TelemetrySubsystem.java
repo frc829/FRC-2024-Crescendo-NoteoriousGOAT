@@ -50,7 +50,7 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 new Pair<>(
                                                 "limelight-rear",
                                                 new Pose3d(
-                                                                -0.2702,
+                                                                -0.2802,
                                                                 0.0127,
                                                                 0.32,
                                                                 new Rotation3d(

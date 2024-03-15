@@ -126,7 +126,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     neo.getPIDController().setD(Constants.slot1kD, 1);
     neo.getPIDController().setFF(Constants.slot1kF, 1);
     neo.setIdleMode(IdleMode.kBrake);
-    neo.setInverted(true);
+    neo.setInverted(false);
     neo.getPIDController().setPositionPIDWrappingEnabled(true);
     neo.getPIDController().setPositionPIDWrappingMinInput(-0.5 * Constants.gearing);
     neo.getPIDController().setPositionPIDWrappingMaxInput(0.5 * Constants.gearing);

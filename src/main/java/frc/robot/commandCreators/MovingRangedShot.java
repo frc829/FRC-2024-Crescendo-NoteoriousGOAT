@@ -131,7 +131,7 @@ public class MovingRangedShot {
         private static final Runnable rotateDriveToFoundTarget = () -> {
             var angle = telemetrySubsystem.poseEstimate.get().getRotation().getDegrees();
             double omegaRadiansPerSecond = Constants.rotationPIDController.calculate(angle);
-            double flipper = 0.15;
+            double flipper = 0.35;
             var color = DriverStation.getAlliance();
             if (color.isPresent() && color.get() == Alliance.Red) {
                 flipper *= -1;
