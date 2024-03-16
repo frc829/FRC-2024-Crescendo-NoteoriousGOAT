@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.69,
-        "y": 4.24
+        "x": 2.88,
+        "y": 5.57
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2309157033663958,
-        "y": 4.417349782780831
+        "x": 4.458101077722347,
+        "y": 4.319142890067254
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.88,
-        "y": 5.57
+        "x": 8.270256540513081,
+        "y": 4.065649176428995
       },
       "prevControl": {
-        "x": 1.1344718136840337,
-        "y": 5.6166718766394625
+        "x": 6.7492942586835305,
+        "y": 3.8121554627907357
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.2,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,13 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "Pickup"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "SpinUp"
+                "name": "GetLow"
               }
             }
           ]
@@ -63,13 +57,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0,
-    "rotateFast": true
+    "rotation": 0,
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "PBJ",
+  "folder": null,
   "previewStartingState": {
-    "rotation": -19.860000000000014,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true
