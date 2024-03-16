@@ -37,7 +37,7 @@ public class StationaryRangedShot {
             private static final double endOfShootDelay = 0.2;
 
             private static final double tolerance = 2;
-            private static final PIDController rotationPIDController = new PIDController(0.05, 0, 0);
+            private static final PIDController rotationPIDController = new PIDController(0.10, 0, 0);
             private static final double[] distances = new double[] {
                     1.28,
                     2.00,
@@ -48,15 +48,26 @@ public class StationaryRangedShot {
             private static final double[] anglesDegrees = new double[] {
                     57.0,
                     44.0,
-                    36.0,
-                    30.0,
-                    27.0
+                    34.0,
+                    29.0,
+                    25.0
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);
 
             private static final Function<Measure<Distance>, Measure<Angle>> distanceToAngle = (distance) -> {
                 return Degrees.of(spline.interpolate(distance.in(Meters)));
+            };
+
+            private static final Supplier<Double> angleAdjust = () -> {
+                double angleDegrees = telemetrySubsystem.poseEstimate.get().getRotation().getDegrees();
+                if(angleDegrees >= 10){
+                    return 3.0;
+                }else if(angleDegrees <= -10){
+                    return -1.5;
+                }else{
+                    return 0.0;
+                }
             };
         }
 
@@ -106,8 +117,9 @@ public class StationaryRangedShot {
                 var aimAngle = Constants.distanceToAngle.apply(targetDistance);
                 tiltAngle.mut_setMagnitude(aimAngle.in(Degrees));
                 Rotation2d poseAngle = telemetrySubsystem.poseEstimate.get().getRotation();
+                double angleAdjust = Constants.angleAdjust.get();
                 poseAngle = poseAngle.plus(angle.get());
-                Constants.rotationPIDController.setSetpoint(poseAngle.getDegrees());
+                Constants.rotationPIDController.setSetpoint(poseAngle.getDegrees() + angleAdjust);
                 Constants.rotationPIDController.setTolerance(Constants.tolerance);
                 return true;
             } else {
@@ -117,7 +129,8 @@ public class StationaryRangedShot {
         };
 
         private static final Supplier<Command> setDistanceAndAngleCommand = () -> {
-            Runnable blank = () -> {};
+            Runnable blank = () -> {
+            };
             return Commands.run(blank).until(setDistanceAndAngle);
         };
 
@@ -149,6 +162,20 @@ public class StationaryRangedShot {
             return command;
         };
 
+        private static final Supplier<Command> createAimCommandInitial = () -> {
+            Command command = Commands.parallel(
+                    rotateDriveToAlignTargetCommand.get(),
+                    BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
+                            .apply(Constants.elevatorPosition),
+                    BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(tiltAngle),
+                    BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
+                    BasicCommands.BottomShooter.createSpinCommand
+                            .apply(Constants.bottomShooterPercent))
+                    .until(BasicCommands.Tilt.createAtAngleCondition.apply(tiltAngle));
+            command.setName("Ranged Aim Initial");
+            return command;
+        };
+
         private static final Supplier<Command> createShootCommand = () -> {
             Command command = Commands.parallel(
                     Commands.run(driveSubsystem.stop, driveSubsystem),
@@ -166,16 +193,24 @@ public class StationaryRangedShot {
 
         public static final Supplier<Command> create = () -> {
             return Commands.sequence(
+                    Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     setDistanceAndAngleCommand.get(),
+                    createAimCommandInitial.get(),
+                    Commands.race(Commands.waitSeconds(0.75), Commands.run(driveSubsystem.stop, driveSubsystem)),
+                    Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     createAimCommand.get(),
                     createShootCommand.get());
         };
 
         public static final Supplier<Command> createWithDelay = () -> {
             return Commands.sequence(
+                    Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     setDistanceAndAngleCommand.get(),
+                    createAimCommandInitial.get(),
+                    Commands.race(Commands.waitSeconds(0.75), Commands.run(driveSubsystem.stop, driveSubsystem)),
+                    Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     createAimCommand.get(),
                     createShootCommand.get()
                             .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)));

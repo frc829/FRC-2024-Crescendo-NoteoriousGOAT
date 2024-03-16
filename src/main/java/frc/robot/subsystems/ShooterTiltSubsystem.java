@@ -112,6 +112,13 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         "Velocity",
         () -> GoatMath.round(velocity.in(Percent), 2),
         null);
+
+    builder.addDoubleProperty("Angle Diff",
+        () -> {
+          double angleNum = GoatMath.round(MathUtil.inputModulus(angle.in(Degrees), -180, 180), 2);
+          double absoluteAngleNum = GoatMath.round(absoluteAngle.in(Degrees), 2);
+          return Math.abs(angleNum - absoluteAngleNum);
+        }, null);
   }
 
   public static final Supplier<ShooterTiltSubsystem> create = () -> {
