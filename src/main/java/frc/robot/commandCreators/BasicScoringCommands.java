@@ -75,7 +75,7 @@ public class BasicScoringCommands {
         public static final class Climb {
                 private static final class Constants {
                         private static final Measure<Distance> elevatorHeightStart = Meters.of(0.40);
-                        private static final Measure<Distance> elevatorHeightEnd = Meters.of(0.10);
+                        private static final Measure<Distance> elevatorHeightEnd = Meters.of(0.15);
                         private static final Measure<Angle> tiltAngle = Degrees.of(0.0);
                 }
 
@@ -708,7 +708,7 @@ public class BasicScoringCommands {
 
         public static final class Pass {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(35);
+                        private static Measure<Angle> tiltAngle = Degrees.of(40);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.5;
                         private static double bottomShooterPercent = 0.5;

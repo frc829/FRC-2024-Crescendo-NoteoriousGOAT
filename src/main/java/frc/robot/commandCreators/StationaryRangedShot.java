@@ -144,7 +144,7 @@ public class StationaryRangedShot {
                     BasicCommands.BottomShooter.createSpinCommand
                             .apply(Constants.bottomShooterPercent))
                     .until(elevatorTiltShooterDriveAtPositionCondition)
-                    .raceWith(Commands.waitSeconds(0.5));
+                    .raceWith(Commands.waitSeconds(2));
             command.setName("Ranged Aim");
             return command;
         };
