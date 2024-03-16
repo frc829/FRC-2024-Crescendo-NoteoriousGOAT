@@ -3,6 +3,7 @@ package frc.robot.commands;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.robot.commandCreators.PickupCommands;
+import frc.robot.commandCreators.StationaryRangedShot;
 import frc.robot.commandCreators.BasicScoringCommands;
 import frc.robot.commandCreators.TelemetryCommands;
 
@@ -12,6 +13,8 @@ public class AutoCommands {
                 NamedCommands.registerCommand("BackReset",
                                 TelemetryCommands.createResetPoseFromBackCameraCommand.get());
                 NamedCommands.registerCommand("Fender", BasicScoringCommands.Fender.createWithDelay.get());
+                NamedCommands.registerCommand("Ranged", StationaryRangedShot.Ranged.createWithDelay.get());
+
                 NamedCommands.registerCommand("PBJ1", BasicScoringCommands.PBJ1.createWithDelay.get());
                 NamedCommands.registerCommand("PBJ2", BasicScoringCommands.PBJ2.createWithDelay.get());
                 NamedCommands.registerCommand("PBJ3", BasicScoringCommands.PBJ3.createWithDelay.get());

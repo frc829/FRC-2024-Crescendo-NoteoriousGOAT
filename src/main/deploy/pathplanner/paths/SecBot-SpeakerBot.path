@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.279501243687172,
-        "y": 2.403622825263669
+        "x": 8.28,
+        "y": 2.32
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.025365726407128,
-        "y": 0.23111757935227617
+        "x": 5.025864482719956,
+        "y": 0.14749475408860713
       },
       "isLocked": false,
       "linkedName": null
@@ -69,7 +69,7 @@
   "reversed": false,
   "folder": "PathsNotesToSpeaker",
   "previewStartingState": {
-    "rotation": 46.974934010882016,
+    "rotation": 35.75,
     "velocity": 0
   },
   "useDefaultConstraints": true
