@@ -55,6 +55,9 @@ public class ShooterTiltSubsystem extends SubsystemBase {
   public final Runnable hold;
   public final Runnable stop;
   public final Runnable update;
+  public final Runnable setFeedbackDeviceToRelative;
+  public final Runnable setFeedbackDeviceToAbsolute;
+  public final Consumer<Measure<Angle>> turnAbsolute;
 
   private ShooterTiltSubsystem(
       Measure<Voltage> voltage,
@@ -67,7 +70,10 @@ public class ShooterTiltSubsystem extends SubsystemBase {
       Runnable resetRelEncoderFromAbsolute,
       Runnable hold,
       Runnable stop,
-      Runnable update) {
+      Runnable update,
+      Runnable setFeedbackDeviceToRelative,
+      Runnable setFeedbackDeviceToAbsolute,
+      Consumer<Measure<Angle>> turnAbsolute) {
     this.voltage = voltage;
     this.angle = angle;
     this.absoluteAngle = absoluteAngle;
@@ -79,8 +85,11 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     this.hold = hold;
     this.update = update;
     this.stop = stop;
+    this.setFeedbackDeviceToRelative = setFeedbackDeviceToRelative;
+    this.setFeedbackDeviceToAbsolute = setFeedbackDeviceToAbsolute;
+    this.turnAbsolute = turnAbsolute;
 
-    Command defaultCommand = run(hold);
+    Command defaultCommand = runOnce(setFeedbackDeviceToRelative).andThen(hold);
     defaultCommand.setName("HOLD");
     this.setDefaultCommand(defaultCommand);
   }
@@ -157,6 +166,9 @@ public class ShooterTiltSubsystem extends SubsystemBase {
         turner.resetRelEncoderFromAbsolute,
         turner.hold,
         turner.stop,
-        turner.update);
+        turner.update,
+        turner.setFeedbackDeviceToRelative,
+        turner.setFeedbackDeviceToAbsolute,
+        turner.turnAbsolute);
   };
 }

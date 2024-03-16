@@ -35,8 +35,11 @@ public class Motor {
         public final Measure<Velocity<Angle>> maxAngularVelocity;
         public final Consumer<Measure<Angle>> setRelativeEncoderAngle;
         public final Consumer<Measure<Angle>> turn;
+        public final Consumer<Measure<Angle>> turnOnAbsolute;
         public final Consumer<Measure<Velocity<Angle>>> spin;
         public final Consumer<Measure<Voltage>> setVoltage;
+        public final Runnable setFeedBackToRelative;
+        public final Runnable setFeedbackToAbsolute;
         public final Runnable stop;
         public final Runnable update;
 
@@ -48,8 +51,11 @@ public class Motor {
                         Measure<Velocity<Angle>> maxAngularVelocity,
                         Consumer<Measure<Angle>> setRelativeEncoderAngle,
                         Consumer<Measure<Angle>> turn,
+                        Consumer<Measure<Angle>> turnOnAbsolute,
                         Consumer<Measure<Velocity<Angle>>> spin,
                         Consumer<Measure<Voltage>> setVoltage,
+                        Runnable setFeedBackToRelative,
+                        Runnable setFeedbackToAbsolute,
                         Runnable stop,
                         Runnable update) {
                 this.voltage = voltage;
@@ -59,8 +65,11 @@ public class Motor {
                 this.maxAngularVelocity = maxAngularVelocity;
                 this.setRelativeEncoderAngle = setRelativeEncoderAngle;
                 this.turn = turn;
+                this.turnOnAbsolute = turnOnAbsolute;
                 this.spin = spin;
                 this.setVoltage = setVoltage;
+                this.setFeedBackToRelative = setFeedBackToRelative;
+                this.setFeedbackToAbsolute = setFeedbackToAbsolute;
                 this.stop = stop;
                 this.update = update;
         }
@@ -111,6 +120,26 @@ public class Motor {
                                 }
 
                         };
+
+                        Consumer<Measure<Angle>> turnOnAbsolute = (setpoint) -> {
+                                if (RobotBase.isSimulation()) {
+
+                                        MutableMeasure<Voltage> voltageSetpoint = MutableMeasure.zero(Volts);
+                                        double measurement = canSparkBase.getEncoder().getPosition();
+                                        double goal = setpoint.in(Rotations);
+                                        double volts = pidController.calculate(measurement,
+                                                        goal);
+                                        volts = MathUtil.clamp(volts, -12.0, 12.0);
+                                        voltageSetpoint.mut_setMagnitude(volts / 12.0);
+                                        canSparkBase.getPIDController().setReference(voltageSetpoint.in(Volts),
+                                                        ControlType.kVoltage);
+                                } else {
+                                        canSparkBase.getPIDController()
+                                                        .setReference(setpoint.in(Rotations),
+                                                                        ControlType.kPosition, 2);
+                                }
+                        };
+
                         Consumer<Measure<Velocity<Angle>>> spin = (setpoint) -> {
                                 if (RobotBase.isSimulation()) {
                                         double rpm = setpoint.in(RPM);
@@ -131,6 +160,15 @@ public class Motor {
                                 canSparkBase.getPIDController().setReference(setpoint.in(Volts),
                                                 ControlType.kVoltage);
                         };
+
+                        Runnable setFeedbackToRelative = () -> {
+                                canSparkBase.getPIDController().setFeedbackDevice(canSparkBase.getEncoder());
+                        };
+
+                        Runnable setFeedbackToAbsolute = () -> {
+                                canSparkBase.getPIDController().setFeedbackDevice(canSparkBase.getAbsoluteEncoder());
+                        };
+
                         Runnable stop = () -> canSparkBase.setVoltage(0);
                         Runnable update = () -> {
                                 voltage.mut_setMagnitude(
@@ -151,8 +189,21 @@ public class Motor {
 
                         };
 
-                        return new Motor(voltage, angle, absoluteAngle, angularVelocity, maxAngularVelocity,
-                                        setRelativeEncoderAngle, turn, spin, setVoltage, stop, update);
+                        return new Motor(
+                                        voltage,
+                                        angle,
+                                        absoluteAngle,
+                                        angularVelocity,
+                                        maxAngularVelocity,
+                                        setRelativeEncoderAngle,
+                                        turn,
+                                        turnOnAbsolute,
+                                        spin,
+                                        setVoltage,
+                                        setFeedbackToRelative,
+                                        setFeedbackToAbsolute,
+                                        stop,
+                                        update);
                 };
                 // #endregion
 
@@ -196,6 +247,10 @@ public class Motor {
                         };
                         Consumer<Measure<Angle>> turn = (setpoint) -> {
                         };
+                        Consumer<Measure<Angle>> turnOnAbsolute = (setpoint) -> {
+
+                        };
+
                         VelocityTorqueCurrentFOC velocityTorqueCurrentFOC = new VelocityTorqueCurrentFOC(
                                         0,
                                         0,
@@ -222,6 +277,14 @@ public class Motor {
                         Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
                         };
                         NeutralOut brake = new NeutralOut();
+
+                        Runnable setFeedbackToRelative = () -> {
+                        };
+
+                        Runnable setFeedbackToAbsolute = () -> {
+
+                        };
+
                         Runnable stop = () -> {
                                 if (RobotBase.isSimulation()) {
                                         talonFX.setControl(brake);
@@ -250,9 +313,20 @@ public class Motor {
                                                 talonFX.getVelocity().getValueAsDouble());
                         };
 
-                        return new Motor(voltage, angle, absoluteAngle, angularVelocity,
+                        return new Motor(voltage,
+                                        angle,
+                                        absoluteAngle,
+                                        angularVelocity,
                                         maxAngularVelocity,
-                                        setRelativeEncoder, turn, spin, setVoltage, stop, update);
+                                        setRelativeEncoder,
+                                        turn,
+                                        turnOnAbsolute,
+                                        spin,
+                                        setVoltage,
+                                        setFeedbackToRelative,
+                                        setFeedbackToAbsolute,
+                                        stop,
+                                        update);
                 };
 
                 public static final Function<TalonFX, Motor> createKrakenX60FOCMotor = (talonFX) -> {

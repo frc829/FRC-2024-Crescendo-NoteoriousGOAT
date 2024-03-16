@@ -27,6 +27,9 @@ public class Turner {
     public final Runnable hold;
     public final Runnable update;
     public final Runnable stop;
+    public final Runnable setFeedbackDeviceToRelative;
+    public final Runnable setFeedbackDeviceToAbsolute;
+    public final Consumer<Measure<Angle>> turnAbsolute;
 
     private Turner(
             Measure<Voltage> voltage,
@@ -39,7 +42,10 @@ public class Turner {
             Runnable resetRelEncoderFromAbsolute,
             Runnable hold,
             Runnable update,
-            Runnable stop) {
+            Runnable stop,
+            Runnable setFeedbackDeviceToRelative,
+            Runnable setFeedbackDeviceToAbsolute,
+            Consumer<Measure<Angle>> turnAbsolute) {
         this.voltage = voltage;
         this.angle = angle;
         this.absoluteAngle = absoluteAngle;
@@ -51,11 +57,14 @@ public class Turner {
         this.hold = hold;
         this.update = update;
         this.stop = stop;
+        this.setFeedbackDeviceToRelative = setFeedbackDeviceToRelative;
+        this.setFeedbackDeviceToAbsolute = setFeedbackDeviceToAbsolute;
+        this.turnAbsolute = turnAbsolute;
     }
 
     public static final Function<Double, Function<Motor, Turner>> create = (
             gearing) -> (motor) -> {
-                
+
                 MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
                 MutableMeasure<Dimensionless> velocity = MutableMeasure.zero(Value);
@@ -111,7 +120,10 @@ public class Turner {
                         resetRelEncoderFromAbsolute,
                         hold,
                         update,
-                        stop);
+                        stop,
+                        motor.setFeedBackToRelative,
+                        motor.setFeedbackToAbsolute,
+                        motor.turnOnAbsolute);
             };
 
 }
