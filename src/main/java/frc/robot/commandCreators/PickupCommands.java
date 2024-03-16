@@ -44,7 +44,7 @@ public class PickupCommands {
                 private static final class Constants {
                         private static Measure<Angle> tiltAngle = Degrees.of(55);
                         private static Measure<Distance> elevatorPosition = Meters.of(0);
-                        private static double transportPercent = 0.9;
+                        private static double transportPercent = 0.5;
                         private static double innerIntakePercent = 0.9;
                         private static double outerIntakePercent = 0.9;
                         private static final BooleanSupplier elevatorAndTiltAtPositionCondition = () -> {
