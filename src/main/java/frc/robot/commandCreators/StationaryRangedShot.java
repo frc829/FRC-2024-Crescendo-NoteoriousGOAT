@@ -41,16 +41,20 @@ public class StationaryRangedShot {
             private static final double[] distances = new double[] {
                     1.28,
                     2.00,
+                    2.49,
                     3.00,
-                    4.00,
-                    5.00
+                    3.50,
+                    4.01,
+                    4.50
             };
             private static final double[] anglesDegrees = new double[] {
                     57.0,
                     44.0,
-                    34.0,
-                    29.0,
-                    25.0
+                    38.0,
+                    32.5,
+                    30.5,
+                    28.0,
+                    25.75
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);
@@ -61,11 +65,11 @@ public class StationaryRangedShot {
 
             private static final Supplier<Double> angleAdjust = () -> {
                 double angleDegrees = telemetrySubsystem.poseEstimate.get().getRotation().getDegrees();
-                if(angleDegrees >= 10){
+                if (angleDegrees >= 10) {
                     return 3.0;
-                }else if(angleDegrees <= -10){
+                } else if (angleDegrees <= -10) {
                     return -1.5;
-                }else{
+                } else {
                     return 0.0;
                 }
             };
