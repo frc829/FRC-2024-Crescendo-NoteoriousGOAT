@@ -32,7 +32,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FarBot-SpeakerBot"
+            "pathName": "Copy of FarBot-SpeakerBot"
           }
         },
         {
@@ -44,19 +44,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerBot-SecBot"
+            "pathName": "Copy of SpeakerBot-SecBot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SecBot-SpeakerBot"
+            "pathName": "Copy of SecBot-SpeakerBot"
           }
         },
         {
@@ -68,12 +68,12 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": "Fender-3Notes",
+  "folder": "Ranged-3Notes",
   "choreoAuto": false
 }

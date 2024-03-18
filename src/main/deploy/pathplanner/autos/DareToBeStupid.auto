@@ -26,13 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerMid-MidNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MidNote-SpeakerMid"
+            "pathName": "DTBS1"
           }
         },
         {
@@ -44,19 +38,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerMid-BotNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BotNote-SpeakerMid"
+            "pathName": "DTBS2"
           }
         },
         {
@@ -68,19 +56,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerMid-FarBot"
+            "pathName": "DTBS3"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FarBot-SpeakerBot"
+            "pathName": "DTBS4"
           }
         },
         {
@@ -92,12 +80,12 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": "Fender-4Notes",
+  "folder": "Ranged-4Notes",
   "choreoAuto": false
 }

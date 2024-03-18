@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.28,
-        "y": 6.0
+        "x": 0.76,
+        "y": 6.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.219137648207576,
-        "y": 4.211993525567187
+        "x": 1.2654580294915574,
+        "y": 6.665668032190766
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.27025654051308,
-        "y": 2.4291278379396495
+        "x": 2.9143338058755885,
+        "y": 6.993104356579084
       },
       "prevControl": {
-        "x": 8.372934669119903,
-        "y": 2.4384622132675426
+        "x": 2.119131303789673,
+        "y": 6.572114796651245
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,30 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.05,
-      "command": {
-        "type": "parallel",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "GetLow"
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "SpinUp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "New Event Marker",
-      "waypointRelativePos": 0.6,
+      "waypointRelativePos": 0.1,
       "command": {
         "type": "parallel",
         "data": {
@@ -86,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -39.39999999999998,
+    "rotation": 17.24145939893992,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "LOC",
+  "folder": "RingOfFire",
   "previewStartingState": {
-    "rotation": 8.74,
+    "rotation": 60.0,
     "velocity": 0
   },
   "useDefaultConstraints": true

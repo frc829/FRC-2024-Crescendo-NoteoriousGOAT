@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.28,
-        "y": 2.45
+        "x": 2.58,
+        "y": 4.3
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.562065855508686,
-        "y": 1.5143590558061488
+        "x": 0.15451335745976336,
+        "y": 3.765517730465661
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.28,
-        "y": 2.45
+        "x": 8.270256540513081,
+        "y": 0.7835083476434771
       },
       "prevControl": {
-        "x": 6.198025217720865,
-        "y": 0.8796215335094323
+        "x": 7.124229405153967,
+        "y": 0.8536732742981157
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.0,
+      "waypointRelativePos": 0.25,
       "command": {
         "type": "parallel",
         "data": {
@@ -56,21 +56,21 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 5.25,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 4.25,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -37.26999999999998,
-    "rotateFast": true
+    "velocity": 0.0,
+    "rotation": 0.0,
+    "rotateFast": false
   },
   "reversed": false,
-  "folder": "EleanorRigby",
+  "folder": "DareToBeStupid",
   "previewStartingState": {
-    "rotation": 29.04,
-    "velocity": 0
+    "rotation": -29.05000000000001,
+    "velocity": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

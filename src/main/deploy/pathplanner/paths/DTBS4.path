@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.28,
-        "y": 5.79
+        "x": 8.27,
+        "y": 0.78
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.168800251821723,
-        "y": 6.56425610819619
+        "x": 4.867257597763059,
+        "y": 0.6314843398917582
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.413937690177864,
-        "y": 6.312227974343082
+        "x": 3.101440276954628,
+        "y": 3.274363243883183
       },
       "prevControl": {
-        "x": 6.590068981492364,
-        "y": 6.573590483524083
+        "x": 3.230075975821468,
+        "y": 2.058171181869428
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.1,
+      "waypointRelativePos": 0,
       "command": {
         "type": "parallel",
         "data": {
@@ -62,15 +62,15 @@
     "maxAngularAcceleration": 180.0
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 9.462322208025913,
+    "velocity": 0.0,
+    "rotation": -39.805571092265254,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "LOC",
+  "folder": "DareToBeStupid",
   "previewStartingState": {
-    "rotation": -26.569999999999993,
-    "velocity": 0
+    "rotation": 0.0,
+    "velocity": 0.0
   },
   "useDefaultConstraints": true
 }

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.49,
-      "y": 5.5
+      "x": 0.76,
+      "y": 4.49
     },
-    "rotation": 0.0
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PBJStart"
+            "name": "SpeakerBotStart"
           }
         },
         {
@@ -26,72 +26,60 @@
         {
           "type": "path",
           "data": {
-            "pathName": "LOC1"
+            "pathName": "PBJ1"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LOC2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LOC3"
+            "pathName": "PBJ2"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged3"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LOC4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LOC5"
+            "pathName": "PBJ3"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LOC6"
+            "pathName": "PBJ4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LOC7"
+            "pathName": "PBJ5"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Ranged-5Notes",
   "choreoAuto": false
 }

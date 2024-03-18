@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.88,
-        "y": 5.57
+        "x": 1.24,
+        "y": 5.53
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.458101077722347,
-        "y": 4.319142890067254
+        "x": 2.239999999999999,
+        "y": 5.53
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.270256540513081,
-        "y": 4.065649176428995
+        "x": 2.89,
+        "y": 5.53
       },
       "prevControl": {
-        "x": 6.7492942586835305,
-        "y": 3.8121554627907357
+        "x": 1.8900000000000001,
+        "y": 5.53
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "GetLow"
+                "name": "Pickup"
+              }
+            },
+            {
+              "type": "named",
+              "data": {
+                "name": "SpinUp"
               }
             }
           ]
@@ -61,7 +67,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "DareToBeStupid",
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

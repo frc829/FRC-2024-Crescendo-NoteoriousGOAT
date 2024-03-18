@@ -32,7 +32,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged1"
+            "name": "Ranged"
           }
         },
         {
@@ -50,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "Ranged"
           }
         },
         {
@@ -68,7 +68,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "Ranged"
           }
         },
         {
@@ -86,12 +86,12 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoRanged2"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Ranged-5Notes",
   "choreoAuto": false
 }

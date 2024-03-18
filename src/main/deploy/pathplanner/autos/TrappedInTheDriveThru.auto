@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.73,
-      "y": 4.54
+      "x": 0.76,
+      "y": 4.49
     },
     "rotation": -60.0
   },
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "SpeakerBotStart"
+            "name": "PBJStart"
           }
         },
         {
@@ -26,78 +26,54 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerBot-BotNote"
+            "pathName": "ER1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "BotNote-SpeakerBot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "BackReset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Fender"
+            "pathName": "ER2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerBot-FarBot"
+            "pathName": "ER3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FarBot-SpeakerBot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "BackReset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Fender"
+            "pathName": "ER4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerBot-SecBot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "SecBot-SpeakerBot"
+            "pathName": "ER5"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "BackReset"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": "Fender-4Notes",
+  "folder": "Ranged-4Notes",
   "choreoAuto": false
 }

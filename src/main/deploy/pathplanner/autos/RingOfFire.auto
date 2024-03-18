@@ -26,13 +26,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerTop-TopNote"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "TopNote-SpeakerTop"
+            "pathName": "ROF1"
           }
         },
         {
@@ -44,19 +38,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerTop-FarTop"
+            "pathName": "ROF2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FarTop-SpeakerTop"
+            "pathName": "ROF3"
           }
         },
         {
@@ -68,19 +62,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SpeakerTop-SecTop"
+            "pathName": "ROF4"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "SecTop-SpeakerTop"
+            "pathName": "ROF5"
           }
         },
         {
@@ -92,12 +86,12 @@
         {
           "type": "named",
           "data": {
-            "name": "Fender"
+            "name": "Ranged"
           }
         }
       ]
     }
   },
-  "folder": "Fender-4Notes",
+  "folder": "Ranged-4Notes",
   "choreoAuto": false
 }

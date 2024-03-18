@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.31,
-        "y": 4.1
+        "x": 8.28,
+        "y": 5.79
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.758087737394436,
-        "y": 3.4092372473684014
+        "x": 8.800330779126657,
+        "y": 5.607084814550683
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.28,
-        "y": 6.0
+        "x": 3.9901960145800635,
+        "y": 6.162819391165848
       },
       "prevControl": {
-        "x": 4.536506409355934,
-        "y": 3.9226278904025085
+        "x": 5.522130246539695,
+        "y": 7.308846526524962
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.05,
+      "waypointRelativePos": 0.0,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "GetLow"
+                "name": "Pickup"
               }
             },
             {
@@ -63,14 +63,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 8.74,
+    "rotation": 12.094757077012229,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "LOC",
+  "folder": "RingOfFire",
   "previewStartingState": {
-    "rotation": -50.90999999999997,
-    "velocity": 0
+    "rotation": -29.360000000000014,
+    "velocity": 0.0
   },
   "useDefaultConstraints": true
 }

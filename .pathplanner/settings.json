@@ -3,17 +3,23 @@
   "robotLength": 0.74,
   "holonomicMode": true,
   "pathFolders": [
+    "DareToBeStupid",
     "EleanorRigby",
-    "LOC",
-    "WeirdAllenYankovich",
     "PBJ",
     "PathSpeakerToNotes",
-    "PathsNotesToSpeaker"
+    "PathsNotesToSpeaker",
+    "RingOfFire",
+    "WeirdAllenYankovich"
   ],
   "autoFolders": [
     "Fender-2Notes",
     "Fender-3Notes",
-    "Fender-4Notes"
+    "Fender-4Notes",
+    "Amp Autos",
+    "Ranged-3Notes",
+    "Ranged-4Notes",
+    "Ranged-5Notes",
+    "Ranged-6Notes"
   ],
   "defaultMaxVel": 4.25,
   "defaultMaxAccel": 4.0,

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.49,
-        "y": 5.500137320816402
+        "x": 2.91,
+        "y": 6.99
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4900000000000007,
-        "y": 5.500137320816402
+        "x": 3.1415273481116763,
+        "y": 6.988819286598687
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.902990726974682,
-        "y": 5.500137320816402
+        "x": 8.34042146716772,
+        "y": 7.4608705342766815
       },
       "prevControl": {
-        "x": 1.9029907269746822,
-        "y": 5.500137320816402
+        "x": 6.948817088517368,
+        "y": 7.4842588431615615
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,13 +41,13 @@
             {
               "type": "named",
               "data": {
-                "name": "SpinUp"
+                "name": "Pickup"
               }
             },
             {
               "type": "named",
               "data": {
-                "name": "Pickup"
+                "name": "SpinUp"
               }
             }
           ]
@@ -63,14 +63,14 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 0.0,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "LOC",
+  "folder": "RingOfFire",
   "previewStartingState": {
-    "rotation": 0,
-    "velocity": 0
+    "rotation": 17.24,
+    "velocity": 0.0
   },
   "useDefaultConstraints": true
 }
