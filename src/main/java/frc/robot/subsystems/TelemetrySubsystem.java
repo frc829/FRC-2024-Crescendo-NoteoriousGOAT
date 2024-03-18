@@ -50,12 +50,12 @@ public class TelemetrySubsystem extends SubsystemBase {
                                 new Pair<>(
                                                 "limelight-rear",
                                                 new Pose3d(
-                                                                -0.2802,
-                                                                0.0127,
+                                                                -0.2702,
+                                                                0.0198,
                                                                 0.32,
                                                                 new Rotation3d(
                                                                                 0,
-                                                                                Math.toRadians(12),
+                                                                                Math.toRadians(15),
                                                                                 Math.toRadians(180)))));
                 private static final List<Pair<String, Pose3d>> objectDetectorNamesPositions = List.of(
                                 new Pair<>(

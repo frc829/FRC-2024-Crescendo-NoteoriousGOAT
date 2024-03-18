@@ -14,6 +14,7 @@ public class AutoCommands {
                                 TelemetryCommands.createResetPoseFromBackCameraCommand.get());
                 NamedCommands.registerCommand("Fender", BasicScoringCommands.Fender.createWithDelay.get());
                 NamedCommands.registerCommand("Ranged", StationaryRangedShot.Ranged.createWithDelay.get());
+                NamedCommands.registerCommand("Pass", BasicScoringCommands.Pass.createWithDelay.get());
 
                 NamedCommands.registerCommand("PBJ1", BasicScoringCommands.PBJ1.createWithDelay.get());
                 NamedCommands.registerCommand("PBJ2", BasicScoringCommands.PBJ2.createWithDelay.get());

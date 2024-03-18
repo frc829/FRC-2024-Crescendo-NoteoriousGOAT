@@ -36,7 +36,7 @@ public class ElevatorShootCommand {
 
         public static final class ElevatorShoot {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(40);
+                        private static Measure<Angle> tiltAngle = Degrees.of(33);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.30);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;

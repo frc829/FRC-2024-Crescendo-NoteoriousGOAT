@@ -2,10 +2,13 @@ package frc.robot.commandCreators;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.RobotContainer.bottomShooterSubsystem;
 import static frc.robot.RobotContainer.innerIntakeSubsystem;
 import static frc.robot.RobotContainer.notedLoadedSubsystem;
 import static frc.robot.RobotContainer.outerIntakeSubsystem;
+import static frc.robot.RobotContainer.singulatorSubsystem;
 import static frc.robot.RobotContainer.telemetrySubsystem;
+import static frc.robot.RobotContainer.topShooterSubsystem;
 import static frc.robot.RobotContainer.transportSubsystem;
 
 import java.util.function.BooleanSupplier;
@@ -41,6 +44,17 @@ public class PickupCommands {
                                                         .apply(Constants.elevatorPosition),
                                         BasicCommands.Tilt.createSetTiltAngleCommand.apply(Constants.tiltAngle))
                                         .until(Constants.elevatorAndTiltAtPositionCondition);
+                };
+        }
+
+        public static final class ShutOff {
+                public static final Supplier<Command> shutOffCommand = () -> {
+                        return Commands.sequence(
+                                Commands.runOnce(topShooterSubsystem.stop, topShooterSubsystem),
+                                Commands.runOnce(bottomShooterSubsystem.stop, bottomShooterSubsystem),
+                                Commands.runOnce(singulatorSubsystem.stop, singulatorSubsystem),
+                                Commands.runOnce(transportSubsystem.stop, topShooterSubsystem)
+                        );
                 };
         }
 

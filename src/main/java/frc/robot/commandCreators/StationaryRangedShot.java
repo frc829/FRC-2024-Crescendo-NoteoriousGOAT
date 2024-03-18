@@ -49,12 +49,12 @@ public class StationaryRangedShot {
             };
             private static final double[] anglesDegrees = new double[] {
                     57.0,
-                    44.0,
-                    38.0,
+                    46.0,
+                    40.0,
+                    34.5,
                     32.5,
-                    30.5,
-                    28.0,
-                    25.75
+                    30.0,
+                    27.75
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);
@@ -217,7 +217,8 @@ public class StationaryRangedShot {
                     Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     createAimCommand.get(),
                     createShootCommand.get()
-                            .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)));
+                            .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
+                    PickupCommands.ShutOff.shutOffCommand.get());
         };
     }
 }
