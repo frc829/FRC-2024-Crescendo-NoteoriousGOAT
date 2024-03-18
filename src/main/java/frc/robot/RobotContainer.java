@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commandCreators.StationaryRangedShot;
 import frc.robot.commandCreators.BasicCommands;
 import frc.robot.commandCreators.DriveCommands;
+import frc.robot.commandCreators.ElevatorShootCommand;
 import frc.robot.commandCreators.MovingRangedShot;
 import frc.robot.commandCreators.PickupCommands;
 import frc.robot.commandCreators.BasicScoringCommands;
@@ -147,6 +148,8 @@ public class RobotContainer {
                 driver.padUp.onFalse(PickupCommands.Level.command.get());
                 operator.padUp.whileTrue(BasicScoringCommands.Trap.createTrapShoot.get());
                 operator.padUp.onFalse(PickupCommands.Level.command.get());
+                operator.padDown.whileTrue(ElevatorShootCommand.ElevatorShoot.create.get());
+                operator.padDown.onFalse(PickupCommands.Level.command.get());
                 driver.leftBumper.whileTrue(BasicScoringCommands.Fender.create.get());
                 driver.leftBumper.onFalse(PickupCommands.Level.command.get());
                 driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());
