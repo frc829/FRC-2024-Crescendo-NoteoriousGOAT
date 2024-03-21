@@ -233,10 +233,10 @@ public class BasicScoringCommands {
 
         public static final class PBJ1 {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(40);
+                        private static Measure<Angle> tiltAngle = Degrees.of(45);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = -0.7;
-                        private static double bottomShooterPercent = 0.7;
+                        private static double topShooterPercent = -0.8;
+                        private static double bottomShooterPercent = 0.8;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
@@ -708,7 +708,7 @@ public class BasicScoringCommands {
 
         public static final class Pass {
                 private static final class Constants {
-                        private static Measure<Angle> tiltAngle = Degrees.of(40);
+                        private static Measure<Angle> tiltAngle = Degrees.of(45);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.5;
                         private static double bottomShooterPercent = 0.5;

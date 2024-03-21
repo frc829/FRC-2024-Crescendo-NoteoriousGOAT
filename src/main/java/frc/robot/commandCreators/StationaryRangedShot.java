@@ -29,8 +29,8 @@ public class StationaryRangedShot {
     public static final class Ranged {
         private static final class Constants {
             private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-            private static double topShooterPercent = -0.7;
-            private static double bottomShooterPercent = 0.7;
+            private static double topShooterPercent = -0.8;
+            private static double bottomShooterPercent = 0.8;
             private static double transportPercent = 0.9;
             private static double singulatorPercent = -0.9;
             private static final double shooterTolerancePercent = 0.10;
@@ -213,7 +213,7 @@ public class StationaryRangedShot {
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     setDistanceAndAngleCommand.get(),
                     createAimCommandInitial.get(),
-                    Commands.race(Commands.waitSeconds(0.75), Commands.run(driveSubsystem.stop, driveSubsystem)),
+                    Commands.race(Commands.waitSeconds(0.4), Commands.run(driveSubsystem.stop, driveSubsystem)),
                     Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     createAimCommand.get(),
                     createShootCommand.get()

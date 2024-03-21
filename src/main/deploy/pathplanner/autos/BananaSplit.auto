@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.76,
-      "y": 4.49
+      "x": 0.62,
+      "y": 4.36
     },
     "rotation": -60.0
   },
@@ -26,60 +26,30 @@
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "PBJ1"
+            "pathName": "SpeakerBot-FarBot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "PBJ2"
+            "pathName": "FarBot-SpeakerBot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "PBJ1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ3"
+            "name": "BackReset"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "PBJ1"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ4"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "PBJ5"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Ranged"
+            "name": "Fender"
           }
         }
       ]
     }
   },
-  "folder": "Ranged-5Notes",
+  "folder": "Fender-2Notes",
   "choreoAuto": false
 }
