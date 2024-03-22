@@ -39,6 +39,8 @@ public class AutoCommands {
                 NamedCommands.registerCommand("PBJStart",
                                 TelemetryCommands.createSetStartPoseCommand
                                                 .apply(TelemetryCommands.Constants.pbjStart));
+                NamedCommands.registerCommand("RearToField",
+                                TelemetryCommands.createSetRearCameraToFieldCommand.get());
         }
 
 }

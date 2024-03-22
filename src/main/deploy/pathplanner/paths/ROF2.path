@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.91,
-        "y": 6.99
+        "x": 3.02,
+        "y": 7.11
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.1415273481116763,
-        "y": 6.988819286598687
+        "x": 3.251527348111676,
+        "y": 7.1088192865986874
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.34042146716772,
-        "y": 7.4608705342766815
+        "x": 8.51,
+        "y": 7.6
       },
       "prevControl": {
-        "x": 6.948817088517368,
-        "y": 7.4842588431615615
+        "x": 7.118395621349647,
+        "y": 7.62338830888488
       },
       "nextControl": null,
       "isLocked": false,
@@ -69,7 +69,7 @@
   "reversed": false,
   "folder": "RingOfFire",
   "previewStartingState": {
-    "rotation": 17.24,
+    "rotation": 32.21,
     "velocity": 0.0
   },
   "useDefaultConstraints": true

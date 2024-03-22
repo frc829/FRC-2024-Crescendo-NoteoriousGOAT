@@ -5,12 +5,18 @@
       "x": 0.62,
       "y": 4.36
     },
-    "rotation": -74.82999999999998
+    "rotation": -60.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "RearToField"
+          }
+        },
         {
           "type": "named",
           "data": {
