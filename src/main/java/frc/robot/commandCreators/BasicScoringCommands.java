@@ -38,7 +38,7 @@ public class BasicScoringCommands {
                 private static final class Constants {
                         private static Measure<Angle> tiltAngle = Degrees.of(48);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.325);
-                        private static double topShooterPercent = -0.8;
+                        private static double topShooterPercent = -0.9;
                         private static double bottomShooterPercent = -0.8;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.7;
