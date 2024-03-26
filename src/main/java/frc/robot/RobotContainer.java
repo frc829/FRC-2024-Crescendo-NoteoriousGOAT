@@ -13,6 +13,7 @@ import java.util.function.BooleanSupplier;
 import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -26,15 +27,14 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commandCreators.StationaryRangedShot;
-import frc.robot.commandCreators.BasicCommands;
-import frc.robot.commandCreators.DriveCommands;
-import frc.robot.commandCreators.ElevatorShootCommand;
-import frc.robot.commandCreators.MovingRangedShot;
-import frc.robot.commandCreators.PickupCommands;
-import frc.robot.commandCreators.BasicScoringCommands;
-import frc.robot.commandCreators.TelemetryCommands;
-import frc.robot.commands.AutoCommands;
+import frc.robot.commands.BasicCommands;
+import frc.robot.commands.BasicScoringCommands;
+import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ElevatorShootCommand;
+import frc.robot.commands.MovingRangedShot;
+import frc.robot.commands.PickupCommands;
+import frc.robot.commands.StationaryRangedShot;
+import frc.robot.commands.TelemetryCommands;
 import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -42,6 +42,7 @@ import frc.robot.subsystems.InnerIntakeSubsystem;
 import frc.robot.subsystems.MechanismSubsystem;
 import frc.robot.subsystems.NotedLoadedSubsystem;
 import frc.robot.subsystems.OuterIntakeSubsystem;
+import frc.robot.subsystems.ServoRollerSubsystem;
 import frc.robot.subsystems.TopShooterSubsystem;
 import frc.robot.subsystems.TransportSubsystem;
 import frc.robot.triggers.ComplexTriggers;
@@ -105,6 +106,7 @@ public class RobotContainer {
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
         public static final MechanismSubsystem mechanismSubsystem = new MechanismSubsystem();
+        public static final ServoRollerSubsystem servoRollerSubsystem = new ServoRollerSubsystem();
         public static final PowerDistribution pdh = new PowerDistribution();
 
         private final SendableChooser<Command> autoChooser;
@@ -197,7 +199,37 @@ public class RobotContainer {
 
                 PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
 
-                new AutoCommands();
+                NamedCommands.registerCommand("BackReset",
+                                TelemetryCommands.createResetPoseFromBackCameraCommand.get());
+                NamedCommands.registerCommand("Fender", BasicScoringCommands.Fender.createWithDelay.get());
+                NamedCommands.registerCommand("Ranged", StationaryRangedShot.Ranged.createWithDelay.get());
+                NamedCommands.registerCommand("Pass", BasicScoringCommands.Pass.createWithDelay.get());
+
+                NamedCommands.registerCommand("PBJ1", BasicScoringCommands.PBJ1.createWithDelay.get());
+                NamedCommands.registerCommand("PBJ2", BasicScoringCommands.PBJ2.createWithDelay.get());
+                NamedCommands.registerCommand("PBJ3", BasicScoringCommands.PBJ3.createWithDelay.get());
+                NamedCommands.registerCommand("PBJ4", BasicScoringCommands.PBJ4.createWithDelay.get());
+                NamedCommands.registerCommand("PBJ5", BasicScoringCommands.PBJ5.createWithDelay.get());
+                NamedCommands.registerCommand("Pickup", PickupCommands.Ground.groundCommand.get());
+                NamedCommands.registerCommand("SpinUp", BasicScoringCommands.SpinUp.createSpinUp.get());
+                NamedCommands.registerCommand("GetLow", PickupCommands.Level.command.get());
+                NamedCommands.registerCommand("SpeakerTopStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.SpeakerTopStart));
+                NamedCommands.registerCommand("SpeakerMidStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.SpeakerMidStart));
+                NamedCommands.registerCommand("SpeakerBotStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.SpeakerBotStart));
+                NamedCommands.registerCommand("AmpStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.AmpStart));
+                NamedCommands.registerCommand("PBJStart",
+                                TelemetryCommands.createSetStartPoseCommand
+                                                .apply(TelemetryCommands.Constants.pbjStart));
+                NamedCommands.registerCommand("RearToField",
+                                TelemetryCommands.createSetRearCameraToFieldCommand.get());
 
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);
