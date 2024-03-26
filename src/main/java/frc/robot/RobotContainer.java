@@ -27,14 +27,23 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.Amp;
+import frc.robot.commands.BabyBird;
+import frc.robot.commands.Barf;
 import frc.robot.commands.BasicCommands;
-import frc.robot.commands.BasicScoringCommands;
+import frc.robot.commands.Climb;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.ElevatorShootCommand;
+import frc.robot.commands.ElevatorShoot;
+import frc.robot.commands.Fender;
+import frc.robot.commands.Ground;
+import frc.robot.commands.Level;
 import frc.robot.commands.MovingRangedShot;
-import frc.robot.commands.PickupCommands;
+import frc.robot.commands.Pass;
+import frc.robot.commands.NoteDetect;
+import frc.robot.commands.SpinUp;
 import frc.robot.commands.StationaryRangedShot;
 import frc.robot.commands.TelemetryCommands;
+import frc.robot.commands.Trap;
 import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -133,43 +142,43 @@ public class RobotContainer {
                 SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
 
-                operator.back.onTrue(PickupCommands.Level.command.get());
+                operator.back.onTrue(Level.command.get());
                 operator.leftY.whileTrue(BasicCommands.Elevator.createDriveElevatorCommand.apply(operator.leftYValue));
                 operator.rightY.whileTrue(BasicCommands.Tilt.createRotateTiltCommand.apply(operator.rightYValue));
                 operator.fullTrigger.whileTrue(BasicCommands.ManualSpinners.spinCommand.get());
-                operator.b.whileTrue(PickupCommands.Barf.barfCommand.get());
-                operator.y.whileTrue(BasicScoringCommands.SpinUp.createSpinUp.get());
-                operator.x.whileTrue(BasicScoringCommands.Climb.createClimbPrep.get());
-                operator.x.onFalse(BasicScoringCommands.Climb.createClimbEnd.get());
-                operator.a.whileTrue(BasicScoringCommands.Amp.createAmpPosition.get());
-                operator.leftBumper.whileTrue(PickupCommands.Ground.groundCommandThenLevel.get());
-                operator.leftBumper.onFalse(PickupCommands.Level.command.get());
-                operator.rightBumper.whileTrue(PickupCommands.BabyBird.babyBirdCommandThenLevel.get());
-                operator.rightBumper.onFalse(PickupCommands.Level.command.get());
-                driver.padUp.whileTrue(BasicScoringCommands.Trap.createTrapPosition.get());
-                driver.padUp.onFalse(PickupCommands.Level.command.get());
-                operator.padUp.whileTrue(BasicScoringCommands.Trap.createTrapShoot.get());
-                operator.padUp.onFalse(PickupCommands.Level.command.get());
-                operator.padDown.whileTrue(ElevatorShootCommand.ElevatorShoot.create.get());
-                operator.padDown.onFalse(PickupCommands.Level.command.get());
-                driver.leftBumper.whileTrue(BasicScoringCommands.Fender.create.get());
-                driver.leftBumper.onFalse(PickupCommands.Level.command.get());
+                operator.b.whileTrue(Barf.barfCommand.get());
+                operator.y.whileTrue(SpinUp.createSpinUp.get());
+                operator.x.whileTrue(Climb.createClimbPrep.get());
+                operator.x.onFalse(Climb.createClimbEnd.get());
+                operator.a.whileTrue(Amp.createAmpPosition.get());
+                operator.leftBumper.whileTrue(Ground.groundCommandThenLevel.get());
+                operator.leftBumper.onFalse(Level.command.get());
+                operator.rightBumper.whileTrue(BabyBird.babyBirdCommandThenLevel.get());
+                operator.rightBumper.onFalse(Level.command.get());
+                driver.padUp.whileTrue(Trap.createTrapPosition.get());
+                driver.padUp.onFalse(Level.command.get());
+                operator.padUp.whileTrue(Trap.createTrapShoot.get());
+                operator.padUp.onFalse(Level.command.get());
+                operator.padDown.whileTrue(ElevatorShoot.create.get());
+                operator.padDown.onFalse(Level.command.get());
+                driver.leftBumper.whileTrue(Fender.create.get());
+                driver.leftBumper.onFalse(Level.command.get());
                 driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());
-                driver.rightBumper.onFalse((PickupCommands.Level.command.get()));
+                driver.rightBumper.onFalse((Level.command.get()));
                 driver.back.whileTrue(DriveCommands.createZeroModulesCommand.get());
 
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.testingStartPose));
-                driver.x.whileTrue(PickupCommands.createNoteDetect.get());
+                driver.x.whileTrue(NoteDetect.create.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get()
-                                .andThen(PickupCommands.Level.command.get()));
+                                .andThen(Level.command.get()));
 
-                driver.a.whileTrue(BasicScoringCommands.Amp.createAmpDrop.get());
-                driver.a.onFalse(PickupCommands.Level.command.get());
+                driver.a.whileTrue(Amp.createAmpDrop.get());
+                driver.a.onFalse(Level.command.get());
                 driver.b.whileTrue(MovingRangedShot.Ranged.create.get());
-                driver.b.onFalse(PickupCommands.Level.command.get());
-                driver.y.whileTrue(BasicScoringCommands.Pass.create.get());
-                driver.y.onFalse(PickupCommands.Level.command.get());
+                driver.b.onFalse(Level.command.get());
+                driver.y.whileTrue(Pass.create.get());
+                driver.y.onFalse(Level.command.get());
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(DriveCommands.createRobotCentricDriveOriginCommand.get());
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -201,18 +210,13 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("BackReset",
                                 TelemetryCommands.createResetPoseFromBackCameraCommand.get());
-                NamedCommands.registerCommand("Fender", BasicScoringCommands.Fender.createWithDelay.get());
+                NamedCommands.registerCommand("Fender", Fender.createWithDelay.get());
                 NamedCommands.registerCommand("Ranged", StationaryRangedShot.Ranged.createWithDelay.get());
-                NamedCommands.registerCommand("Pass", BasicScoringCommands.Pass.createWithDelay.get());
+                NamedCommands.registerCommand("Pass", Pass.createWithDelay.get());
 
-                NamedCommands.registerCommand("PBJ1", BasicScoringCommands.PBJ1.createWithDelay.get());
-                NamedCommands.registerCommand("PBJ2", BasicScoringCommands.PBJ2.createWithDelay.get());
-                NamedCommands.registerCommand("PBJ3", BasicScoringCommands.PBJ3.createWithDelay.get());
-                NamedCommands.registerCommand("PBJ4", BasicScoringCommands.PBJ4.createWithDelay.get());
-                NamedCommands.registerCommand("PBJ5", BasicScoringCommands.PBJ5.createWithDelay.get());
-                NamedCommands.registerCommand("Pickup", PickupCommands.Ground.groundCommand.get());
-                NamedCommands.registerCommand("SpinUp", BasicScoringCommands.SpinUp.createSpinUp.get());
-                NamedCommands.registerCommand("GetLow", PickupCommands.Level.command.get());
+                NamedCommands.registerCommand("Pickup", Ground.groundCommand.get());
+                NamedCommands.registerCommand("SpinUp", SpinUp.createSpinUp.get());
+                NamedCommands.registerCommand("GetLow", Level.command.get());
                 NamedCommands.registerCommand("SpeakerTopStart",
                                 TelemetryCommands.createSetStartPoseCommand
                                                 .apply(TelemetryCommands.Constants.SpeakerTopStart));

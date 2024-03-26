@@ -219,7 +219,7 @@ public class StationaryRangedShot {
                     createAimCommand.get(),
                     createShootCommand.get()
                             .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
-                    PickupCommands.ShutOff.shutOffCommand.get());
+                    ShutOff.shutOffCommand.get());
         };
     }
 }
