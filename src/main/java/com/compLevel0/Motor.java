@@ -68,6 +68,7 @@ public class Motor {
         public static final class REV {
 
                 // #region createMotorFromCANSparkMax
+                @SuppressWarnings("resource")
                 public static final BiFunction<CANSparkBase, Measure<Velocity<Angle>>, Motor> createMotorFromCANSparkBase = (
                                 canSparkBase, maxAngularVelocity) -> {
                         MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
