@@ -235,6 +235,9 @@ public class RobotContainer {
                 NamedCommands.registerCommand("RearToField",
                                 TelemetryCommands.createSetRearCameraToFieldCommand.get());
 
+                NamedCommands.registerCommand("GetNote",
+                                NoteDetect.createForAuto.get());
+
                 autoChooser = AutoBuilder.buildAutoChooser();
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 

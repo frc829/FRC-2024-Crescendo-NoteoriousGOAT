@@ -35,7 +35,31 @@ public abstract class NoteDetect {
                 return command;
         };
 
-        public NoteDetect() {
-        }
+        public static final Supplier<Command> createForAuto = () -> {
+                Command setObjectDetectModeCommand = Commands.runOnce(
+                                RobotContainer.telemetrySubsystem.enableObjectDetectors.get(0)::run,
+                                RobotContainer.telemetrySubsystem);
+
+                Command waitUntilNoteDetected = Commands.waitUntil(() -> {
+                        return telemetrySubsystem.objectPositions.get(0).getSecond().get().isPresent();
+                });
+
+                Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier);
+
+                Command setFieldDetectModeCommand = Commands.runOnce(
+                                RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
+                                RobotContainer.telemetrySubsystem);
+
+                Command pickupDetectedNote = Commands.race(goToNoteCommand, Ground.groundCommand.get());
+
+                Command command = Commands.sequence(
+                                setObjectDetectModeCommand,
+                                waitUntilNoteDetected,
+                                pickupDetectedNote,
+                                setFieldDetectModeCommand);
+
+                command.setName("Note Detect");
+                return command;
+        };
 
 }

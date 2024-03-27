@@ -25,6 +25,8 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Time;
 import edu.wpi.first.units.Velocity;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -122,7 +124,6 @@ public class TelemetrySubsystem extends SubsystemBase {
                 this.update = update;
 
                 enableFieldDetectors.stream().forEachOrdered((detector) -> detector.run());
-
         }
 
         @Override

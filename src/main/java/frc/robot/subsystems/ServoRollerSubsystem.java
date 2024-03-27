@@ -57,6 +57,22 @@ public class ServoRollerSubsystem extends SubsystemBase {
     }
   }
 
+  public void setSpeed(double speed){
+    if (RobotBase.isSimulation()) {
+      servoSim.setSpeed(speed);
+    } else {
+      servo.setSpeed(speed);
+    }
+  }
+
+  public void stop(){
+    if (RobotBase.isSimulation()) {
+      servoSim.setSpeed(0.0);
+    } else {
+      servo.setDisabled();
+    }
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -77,6 +93,10 @@ public class ServoRollerSubsystem extends SubsystemBase {
         "Servo Speed",
         () -> getSpeed(),
         null);
+  }
+
+  public Command createStopCommand(){
+    return run(this::stop);
   }
 
   public Command createSetPositionCommand(double position) {
