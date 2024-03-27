@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.RobotContainer.*;
 
 import java.util.function.Supplier;
 
@@ -23,9 +24,8 @@ public abstract class Trap {
 
         public static final Supplier<Command> createTrapPosition = () -> {
                 Command command = Commands.parallel(
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent),
+                                topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle));
@@ -35,13 +35,12 @@ public abstract class Trap {
 
         public static final Supplier<Command> createTrapShoot = () -> {
                 Command command = Commands.parallel(
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent),
+                                topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                singulatorSubsystem.createSetSpeedCommand(() -> Constants.singulatorPercent),
                                 BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
 
                 command.setName("Trap Drop");

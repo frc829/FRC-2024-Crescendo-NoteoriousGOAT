@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degree;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
-import static frc.robot.RobotContainer.shooterTiltSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -19,6 +18,7 @@ import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
+import static frc.robot.RobotContainer.*;
 
 public class BasicCommands {
 
@@ -222,68 +222,23 @@ public class BasicCommands {
         };
     }
 
-    public static final class Singulator {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.singulatorSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.singulatorSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class TopShooter {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.topShooterSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.topShooterSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class BottomShooter {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.bottomShooterSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.bottomShooterSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
     public static final class ManualSpinners {
-        public static final Runnable spin = () -> {
-            double value = RobotContainer.operator.fullTriggerValue.getAsDouble();
-            RobotContainer.topShooterSubsystem.spin.accept(value);
-            RobotContainer.bottomShooterSubsystem.spin.accept(value);
-            RobotContainer.singulatorSubsystem.spin.accept(value);
-            RobotContainer.transportSubsystem.spin.accept(-value);
-            RobotContainer.innerIntakeSubsystem.spin.accept(-value);
-            RobotContainer.outerIntakeSubsystem.spin.accept(-value);
-        };
+        // public static final Runnable spin = () -> {
+        // double value = RobotContainer.operator.fullTriggerValue.getAsDouble();
+        // RobotContainer.topShooterSubsystem.spin.accept(value);
+        // bottomShooterSubsystem.createSetSpeedCommand(value);
+        // RobotContainer.singulatorSubsystem.spin.accept(value);
+        // RobotContainer.transportSubsystem.spin.accept(-value);
+        // RobotContainer.innerIntakeSubsystem.spin.accept(-value);
+        // RobotContainer.outerIntakeSubsystem.spin.accept(-value);
+        // };
 
         public static final Supplier<Command> spinCommand = () -> {
-            Command command = Commands.run(
-                    spin,
-                    RobotContainer.bottomShooterSubsystem,
-                    RobotContainer.topShooterSubsystem,
-                    RobotContainer.innerIntakeSubsystem,
-                    RobotContainer.outerIntakeSubsystem,
-                    RobotContainer.transportSubsystem,
-                    RobotContainer.singulatorSubsystem);
+            Command command = Commands.parallel(
+                    bottomShooterSubsystem.createSetSpeedCommand(RobotContainer.operator.fullTriggerValue),
+                    topShooterSubsystem.createSetSpeedCommand(RobotContainer.operator.fullTriggerValue),
+                    singulatorSubsystem.createSetSpeedCommand(RobotContainer.operator.fullTriggerValue));
+                    
             String name = String.format("Run");
             command.setName(name);
             return command;

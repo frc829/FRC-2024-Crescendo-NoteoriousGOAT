@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-
+import static frc.robot.RobotContainer.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
@@ -42,10 +42,10 @@ public abstract class BabyBird {
                 return Commands.parallel(
                                 BasicCommands.Elevator.createHoldElevatorCommand.get(),
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent));
+                                singulatorSubsystem.createSetSpeedCommand(() -> Constants.singulatorPercent),
+                                topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent)
+                                );
         };
 
         private static final Supplier<Command> babyBirdCommand = () -> Commands

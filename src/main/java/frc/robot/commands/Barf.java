@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import static frc.robot.RobotContainer.*;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,8 +20,7 @@ public abstract class Barf {
                         BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
                         BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
                         BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),
-                        BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                        BasicCommands.BottomShooter.createSpinCommand
-                                        .apply(Constants.bottomShooterPercent));
+                        singulatorSubsystem.createSetSpeedCommand(() -> Constants.singulatorPercent),
+                        topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                        bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent));
 }

@@ -1,6 +1,11 @@
 {
   "HALProvider": {
     "Other Devices": {
+      "SPARK MAX [16]": {
+        "header": {
+          "open": true
+        }
+      },
       "SPARK MAX [20]": {
         "header": {
           "open": false
@@ -9,6 +14,16 @@
       "SPARK MAX [21]": {
         "header": {
           "open": false
+        }
+      },
+      "SPARK MAX [25]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [26]": {
+        "header": {
+          "open": true
         }
       }
     },
@@ -108,12 +123,15 @@
   },
   "NetworkTables": {
     "transitory": {
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
+        "Bottom Shooter": {
+          "open": true
+        },
         "CommandCreator": {
           "open": false
-        },
-        "Drive": {
-          "open": true
         },
         "Field": {
           "double[]##v_/SmartDashboard/Field/limelightPickup-ObjectPose": {
@@ -132,7 +150,9 @@
           },
           "double[]##v_/SmartDashboard/Telemetry/Pose Estimate": {
             "open": false
-          },
+          }
+        },
+        "Top Shooter": {
           "open": true
         },
         "double[]##v_/SmartDashboard/objectCamSpace": {

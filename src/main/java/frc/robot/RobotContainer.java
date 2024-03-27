@@ -44,7 +44,7 @@ import frc.robot.commands.SpinUp;
 import frc.robot.commands.StationaryRangedShot;
 import frc.robot.commands.TelemetryCommands;
 import frc.robot.commands.Trap;
-import frc.robot.subsystems.BottomShooterSubsystem;
+import frc.robot.subsystems.BottomShooterSubsystemOOP;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.InnerIntakeSubsystem;
@@ -52,11 +52,11 @@ import frc.robot.subsystems.MechanismSubsystem;
 import frc.robot.subsystems.NotedLoadedSubsystem;
 import frc.robot.subsystems.OuterIntakeSubsystem;
 import frc.robot.subsystems.ServoRollerSubsystem;
-import frc.robot.subsystems.TopShooterSubsystem;
+import frc.robot.subsystems.TopShooterSubsystemOOP;
 import frc.robot.subsystems.TransportSubsystem;
 import frc.robot.triggers.ComplexTriggers;
 import frc.robot.subsystems.ShooterTiltSubsystem;
-import frc.robot.subsystems.SingulatorSubsystem;
+import frc.robot.subsystems.SingulatorSubsystemOOP;
 import frc.robot.subsystems.TelemetrySubsystem;
 
 public class RobotContainer {
@@ -103,12 +103,12 @@ public class RobotContainer {
         // .apply(Constants.Controller.testPort)
         // .apply(Constants.Controller.deadband);
 
-        public static final TopShooterSubsystem topShooterSubsystem = TopShooterSubsystem.create.get();
-        public static final BottomShooterSubsystem bottomShooterSubsystem = BottomShooterSubsystem.create.get();
+        public static final TopShooterSubsystemOOP topShooterSubsystem = new TopShooterSubsystemOOP();
+        public static final BottomShooterSubsystemOOP bottomShooterSubsystem = new BottomShooterSubsystemOOP();
         public static final OuterIntakeSubsystem outerIntakeSubsystem = OuterIntakeSubsystem.create.get();
         public static final InnerIntakeSubsystem innerIntakeSubsystem = InnerIntakeSubsystem.create.get();
         public static final TransportSubsystem transportSubsystem = TransportSubsystem.create.get();
-        public static final SingulatorSubsystem singulatorSubsystem = SingulatorSubsystem.create.get();
+        public static final SingulatorSubsystemOOP singulatorSubsystem = new SingulatorSubsystemOOP();
         public static final NotedLoadedSubsystem notedLoadedSubsystem = NotedLoadedSubsystem.create.get();
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
@@ -121,6 +121,9 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
+                bottomShooterSubsystem.setDefaultCommand(bottomShooterSubsystem.createStopCommand());
+                topShooterSubsystem.setDefaultCommand(topShooterSubsystem.createStopCommand());
+                singulatorSubsystem.setDefaultCommand(singulatorSubsystem.createStopCommand());
                 SmartDashboard.putData("PDH", pdh);
                 AutoBuilder.configureHolonomic(
                                 telemetrySubsystem.poseEstimate,

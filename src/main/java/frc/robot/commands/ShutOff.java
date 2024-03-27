@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public abstract class ShutOff {
         public static final Supplier<Command> shutOffCommand = () -> {
-                return Commands.sequence(
-                        Commands.runOnce(topShooterSubsystem.stop, topShooterSubsystem),
-                        Commands.runOnce(bottomShooterSubsystem.stop, bottomShooterSubsystem),
-                        Commands.runOnce(singulatorSubsystem.stop, singulatorSubsystem),
-                        Commands.runOnce(transportSubsystem.stop, topShooterSubsystem)
+                return Commands.parallel(
+                        topShooterSubsystem.createStopCommand(),
+                        bottomShooterSubsystem.createStopCommand(),
+                        singulatorSubsystem.createStopCommand(),
+                        Commands.runOnce(transportSubsystem.stop, transportSubsystem)
                 );
         };
 }

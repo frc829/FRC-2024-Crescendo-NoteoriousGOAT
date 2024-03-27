@@ -3,8 +3,6 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Value;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -12,7 +10,6 @@ import java.util.function.Supplier;
 import com.utility.Spline;
 import com.utility.Spline.MonotoneCubicSpline;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -70,13 +67,11 @@ public class MovingRangedShot {
         private static final MutableMeasure<Angle> tiltAngle = MutableMeasure.zero(Degrees);
 
         private static final BooleanSupplier shootersAtSpeed = () -> {
-            boolean topCondition = MathUtil.isNear(
-                    Math.abs(Constants.topShooterPercent),
-                    Math.abs(topShooterSubsystem.velocity.in(Value)),
-                    Constants.shooterTolerancePercent);
-            boolean bottomCondition = MathUtil.isNear(
+            boolean topCondition = bottomShooterSubsystem.atTolerance(
+                Math.abs(Constants.topShooterPercent),
+                Constants.shooterTolerancePercent);
+            boolean bottomCondition = bottomShooterSubsystem.atTolerance(
                     Math.abs(Constants.bottomShooterPercent),
-                    Math.abs(bottomShooterSubsystem.velocity.in(Value)),
                     Constants.shooterTolerancePercent);
             boolean condition = topCondition && bottomCondition;
             SmartDashboard.putBoolean("ShooterAt Speed", condition);
@@ -162,9 +157,8 @@ public class MovingRangedShot {
                     BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                             .apply(Constants.elevatorPosition),
                     BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(tiltAngle),
-                    BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                    BasicCommands.BottomShooter.createSpinCommand
-                            .apply(Constants.bottomShooterPercent))
+                    topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                    bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent))
                     .until(elevatorTiltShooterDriveAtPositionCondition)
                     .raceWith(Commands.waitSeconds(0.5));
             command.setName("Ranged Aim");
@@ -177,10 +171,9 @@ public class MovingRangedShot {
                     BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                             .apply(Constants.elevatorPosition),
                     BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(tiltAngle),
-                    BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                    BasicCommands.BottomShooter.createSpinCommand
-                            .apply(Constants.bottomShooterPercent),
-                    BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                    topShooterSubsystem.createSetSpeedCommand(() -> Constants.topShooterPercent),
+                    bottomShooterSubsystem.createSetSpeedCommand(() -> Constants.bottomShooterPercent),
+                    singulatorSubsystem.createSetSpeedCommand(() -> Constants.singulatorPercent),
                     BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
             command.setName("Ranged Shoot");
             return command;
