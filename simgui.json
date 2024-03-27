@@ -109,6 +109,12 @@
   "NetworkTables": {
     "transitory": {
       "SmartDashboard": {
+        "Auto Chooser": {
+          "open": true,
+          "string[]##v_/SmartDashboard/Auto Chooser/options": {
+            "open": true
+          }
+        },
         "CommandCreator": {
           "open": false
         },
