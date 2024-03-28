@@ -6,6 +6,7 @@ import static frc.robot.RobotContainer.innerIntakeSubsystem;
 import static frc.robot.RobotContainer.mechanismSubsystem;
 import static frc.robot.RobotContainer.outerIntakeSubsystem;
 import static frc.robot.RobotContainer.shooterTiltSubsystem;
+import static frc.robot.RobotContainer.singulatorSubsystem;
 import static frc.robot.RobotContainer.telemetrySubsystem;
 import static frc.robot.RobotContainer.transportSubsystem;
 
@@ -59,7 +60,8 @@ public abstract class NoteDetect {
                         outerIntakeSubsystem,
                         transportSubsystem,
                         elevatorSubsystem,
-                        shooterTiltSubsystem
+                        shooterTiltSubsystem,
+                        singulatorSubsystem
                 );
 
                 Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set);
