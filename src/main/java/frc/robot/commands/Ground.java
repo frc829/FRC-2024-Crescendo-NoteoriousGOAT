@@ -47,7 +47,8 @@ public abstract class Ground {
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
                                 BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
                                 BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
-                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),
+                                BasicCommands.Singulator.createSpinCommand.apply(0.0));
         };
 
         private static final Supplier<Command> stop = () -> {
