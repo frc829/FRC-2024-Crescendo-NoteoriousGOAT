@@ -42,7 +42,7 @@ public abstract class NoteDetect {
 
                 Command waitUntilNoteDetected = Commands.waitUntil(() -> {
                         return telemetrySubsystem.objectPositions.get(0).getSecond().get().isPresent();
-                });
+                }).raceWith(Commands.waitSeconds(2));
 
                 Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier);
 
