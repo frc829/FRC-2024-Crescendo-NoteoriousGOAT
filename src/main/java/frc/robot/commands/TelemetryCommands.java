@@ -115,6 +115,13 @@ public class TelemetryCommands {
                 return command;
         };
 
+        public static final Function<Integer, Command> createSetRearPriorityTargetCommand = (priorityTarget) -> {
+                Runnable setPriorityTarget = () -> telemetrySubsystem.setPriorityTargetsFromFieldDetectors.get(1)
+                                .accept(priorityTarget);
+                Command command = Commands.runOnce(setPriorityTarget, telemetrySubsystem);
+                return command;
+        };
+
         public TelemetryCommands() {
 
         }

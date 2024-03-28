@@ -14,6 +14,7 @@ import com.controllers.Controller;
 import com.ctre.phoenix6.Orchestra;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.AlignedPass;
 import frc.robot.commands.Amp;
 import frc.robot.commands.BabyBird;
 import frc.robot.commands.Barf;
@@ -177,8 +179,10 @@ public class RobotContainer {
                 driver.a.onFalse(Level.command.get());
                 driver.b.whileTrue(MovingRangedShot.Ranged.create.get());
                 driver.b.onFalse(Level.command.get());
-                driver.y.whileTrue(Pass.create.get());
-                driver.y.onFalse(Level.command.get());
+                // driver.y.whileTrue(Pass.create.get());
+                // driver.y.onFalse(Level.command.get());
+                driver.y.whileTrue(AlignedPass.create.get());
+                driver.y.onFalse(Level.command.get().andThen(AlignedPass.resetPriorityTargetCommand.get()));
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(DriveCommands.createRobotCentricDriveOriginCommand.get());
                 ComplexTriggers.fieldCentricOriginDriveTrigger
@@ -236,6 +240,7 @@ public class RobotContainer {
                                 NoteDetect.createForAuto.get());
 
                 autoChooser = AutoBuilder.buildAutoChooser();
+
                 SmartDashboard.putData("Auto Chooser", autoChooser);
 
         }
