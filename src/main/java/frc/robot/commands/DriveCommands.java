@@ -3,6 +3,7 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.RobotContainer.driveSubsystem;
+import static frc.robot.RobotContainer.telemetrySubsystem;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -204,7 +205,8 @@ public class DriveCommands {
                                                         pose.get(),
                                                         Constants.NoteDetection.pathConstraints,
                                                         Constants.NoteDetection.goalEndVelocityMPS,
-                                                        Constants.NoteDetection.rotationDelayDistance);
+                                                        Constants.NoteDetection.rotationDelayDistance)
+                                        .raceWith(Ground.groundCommand.get());
                 } else {
                         return Commands.none();
                 }

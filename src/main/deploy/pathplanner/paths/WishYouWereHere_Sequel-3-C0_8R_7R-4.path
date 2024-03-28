@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.27,
-        "y": 2.43
+        "x": 5.78,
+        "y": 1.51
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.015864482719956,
-        "y": 0.25749475408860745
+        "x": 3.8600790732655335,
+        "y": 1.4925748719641432
       },
       "isLocked": false,
       "linkedName": null
@@ -20,8 +20,8 @@
         "y": 3.2
       },
       "prevControl": {
-        "x": 3.539381300615334,
-        "y": 1.2632144578778475
+        "x": 3.822071025289356,
+        "y": 1.0003817292615267
       },
       "nextControl": null,
       "isLocked": false,
@@ -69,7 +69,7 @@
   "reversed": false,
   "folder": "WishYouWereHere_Sequel-3-C0_8R_7R",
   "previewStartingState": {
-    "rotation": 35.75,
+    "rotation": 0.0,
     "velocity": 0
   },
   "useDefaultConstraints": false

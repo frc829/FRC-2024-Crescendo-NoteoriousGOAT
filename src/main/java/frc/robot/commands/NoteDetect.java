@@ -1,11 +1,20 @@
 package frc.robot.commands;
 
+import static frc.robot.RobotContainer.driveSubsystem;
+import static frc.robot.RobotContainer.elevatorSubsystem;
+import static frc.robot.RobotContainer.innerIntakeSubsystem;
+import static frc.robot.RobotContainer.mechanismSubsystem;
+import static frc.robot.RobotContainer.outerIntakeSubsystem;
+import static frc.robot.RobotContainer.shooterTiltSubsystem;
 import static frc.robot.RobotContainer.telemetrySubsystem;
+import static frc.robot.RobotContainer.transportSubsystem;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
 
 public abstract class NoteDetect {
@@ -42,20 +51,25 @@ public abstract class NoteDetect {
 
                 Command waitUntilNoteDetected = Commands.waitUntil(() -> {
                         return telemetrySubsystem.objectPositions.get(0).getSecond().get().isPresent();
-                }).raceWith(Commands.waitSeconds(2));
+                });
 
-                Command goToNoteCommand = Commands.deferredProxy(DriveCommands.goToNoteCommandSupplier);
+                Set<Subsystem> set = Set.of(
+                        driveSubsystem,
+                        innerIntakeSubsystem,
+                        outerIntakeSubsystem,
+                        transportSubsystem,
+                        elevatorSubsystem,
+                        shooterTiltSubsystem
+                );
+
+                Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set);
 
                 Command setFieldDetectModeCommand = Commands.runOnce(
                                 RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
 
-                Command pickupDetectedNote = Commands.race(goToNoteCommand, Ground.groundCommand.get());
-
-                Command command = Commands.sequence(
-                                setObjectDetectModeCommand,
-                                waitUntilNoteDetected,
-                                pickupDetectedNote,
+                Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected,
+                                goToNoteCommand,
                                 setFieldDetectModeCommand);
 
                 command.setName("Note Detect");
