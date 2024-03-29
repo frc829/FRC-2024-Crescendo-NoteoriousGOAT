@@ -35,6 +35,7 @@ import frc.robot.commands.Barf;
 import frc.robot.commands.BasicCommands;
 import frc.robot.commands.Climb;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.ElevatorShoot;
 import frc.robot.commands.Fender;
 import frc.robot.commands.Ground;
 import frc.robot.commands.Level;
@@ -159,10 +160,10 @@ public class RobotContainer {
                 operator.rightBumper.onFalse(Level.command.get());
                 driver.padUp.whileTrue(Trap.createTrapPosition.get());
                 driver.padUp.onFalse(Level.command.get());
-                operator.padUp.whileTrue(Trap.createTrapShoot.get());
+                // operator.padUp.whileTrue(Trap.createTrapShoot.get());
+                // operator.padUp.onFalse(Level.command.get());
+                operator.padUp.whileTrue(ElevatorShoot.create.get());
                 operator.padUp.onFalse(Level.command.get());
-                // operator.padDown.whileTrue(ElevatorShoot.create.get());
-                // operator.padDown.onFalse(Level.command.get());
                 operator.padDown.whileTrue(AlignElevatorShoot.create.get());
                 operator.padDown.onFalse(Level.command.get());
                 driver.leftBumper.whileTrue(Fender.create.get());
@@ -181,10 +182,10 @@ public class RobotContainer {
                 driver.a.onFalse(Level.command.get());
                 driver.b.whileTrue(MovingRangedShot.Ranged.create.get());
                 driver.b.onFalse(Level.command.get());
-                // driver.y.whileTrue(Pass.create.get());
-                // driver.y.onFalse(Level.command.get());
-                driver.y.whileTrue(AlignedPass.create.get());
-                driver.y.onFalse(Level.command.get().andThen(AlignedPass.resetPriorityTargetCommand.get()));
+                driver.y.whileTrue(Pass.create.get());
+                driver.y.onFalse(Level.command.get());
+                // driver.y.whileTrue(AlignedPass.create.get());
+                // driver.y.onFalse(Level.command.get().andThen(AlignedPass.resetPriorityTargetCommand.get()));
                 ComplexTriggers.robotCentricOriginDriveTrigger
                                 .whileTrue(DriveCommands.createRobotCentricDriveOriginCommand.get());
                 ComplexTriggers.fieldCentricOriginDriveTrigger

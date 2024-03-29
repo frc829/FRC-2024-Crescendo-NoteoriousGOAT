@@ -3,6 +3,9 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.RobotContainer.driveSubsystem;
+import static frc.robot.RobotContainer.notedLoadedSubsystem;
+import static frc.robot.RobotContainer.telemetrySubsystem;
+
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -25,11 +28,11 @@ public class DriveCommands {
         private static final class DriveConstants {
                 private static final Translation2d originCOR = new Translation2d();
                 private static final Translation2d bottomLeftCOR = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(20));
+                                Units.inchesToMeters(13 + 2.75 + 2.5 + 6),
+                                Units.inchesToMeters(0));
                 private static final Translation2d bottomRightCOR = new Translation2d(
-                                Units.inchesToMeters(-20),
-                                Units.inchesToMeters(-20));
+                                Units.inchesToMeters(-13 - 2.75 - 6),
+                                Units.inchesToMeters(0));
         }
 
         private static final Function<Translation2d, Runnable> createRobotCentricDrive = (cor) -> {
@@ -198,15 +201,24 @@ public class DriveCommands {
         public static final Supplier<Command> goToNoteCommandSupplier = () -> {
                 var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
                 if (pose.isPresent()) {
-                        return AutoBuilder
+                        Command pathCommand = AutoBuilder
                                         .pathfindToPose(
                                                         pose.get(),
                                                         Constants.NoteDetection.pathConstraints,
                                                         Constants.NoteDetection.goalEndVelocityMPS,
-                                                        Constants.NoteDetection.rotationDelayDistance)
-                                        .raceWith(Ground.groundCommand.get());
+                                                        Constants.NoteDetection.rotationDelayDistance);
+                        Command command = pathCommand.until(() -> pathCommand.isFinished());
+                        return command;
+
                 } else {
-                        return Commands.none();
+                        Command pathCommand = AutoBuilder
+                                        .pathfindToPose(
+                                                        telemetrySubsystem.poseEstimate.get(),
+                                                        Constants.NoteDetection.pathConstraints,
+                                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                                        Constants.NoteDetection.rotationDelayDistance);
+                        Command command = pathCommand.until(() -> pathCommand.isFinished());
+                        return command;
                 }
         };
 

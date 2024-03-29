@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public abstract class Pass {
         private static final class Constants {
-                private static Measure<Angle> tiltAngle = Degrees.of(45);
+                private static Measure<Angle> tiltAngle = Degrees.of(50);
                 private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                 private static double topShooterPercent = -0.5;
                 private static double bottomShooterPercent = 0.5;

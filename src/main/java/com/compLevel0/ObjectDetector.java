@@ -78,7 +78,7 @@ public class ObjectDetector {
                         if (tv == 1 && pipeline == 0) {
                             double cameraZ = cameraPosition.getZ();
                             double cameraYaw = cameraPosition.getRotation().getZ();
-                            double distance = Math.abs(cameraZ / Math.tan(Math.toRadians(tyDegrees)));
+                            double distance = Math.abs(cameraZ / Math.tan(Math.toRadians(Math.abs(tyDegrees) + 7)));
                             double objectYCamSpace = distance * Math.sin(Math.toRadians(txDegrees));
                             double objectXCamSpace = distance * Math.cos(Math.toRadians(txDegrees));
                             Translation2d objectCamSpace = new Translation2d(objectXCamSpace, objectYCamSpace);

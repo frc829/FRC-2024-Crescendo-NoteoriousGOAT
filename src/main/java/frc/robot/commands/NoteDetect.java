@@ -3,6 +3,7 @@ package frc.robot.commands;
 import static frc.robot.RobotContainer.driveSubsystem;
 import static frc.robot.RobotContainer.elevatorSubsystem;
 import static frc.robot.RobotContainer.innerIntakeSubsystem;
+import static frc.robot.RobotContainer.notedLoadedSubsystem;
 import static frc.robot.RobotContainer.outerIntakeSubsystem;
 import static frc.robot.RobotContainer.shooterTiltSubsystem;
 import static frc.robot.RobotContainer.singulatorSubsystem;
@@ -34,7 +35,9 @@ public abstract class NoteDetect {
                                 RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
 
-                Command pickupDetectedNote = Commands.parallel(goToNoteCommand, Ground.groundCommandThenLevel.get());
+                Command pickupDetectedNote = Commands
+                .race(goToNoteCommand, Ground.groundCommandThenLevel.get())
+                .until(notedLoadedSubsystem.hasNote);
 
                 Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected,
                                 pickupDetectedNote,
@@ -63,7 +66,8 @@ public abstract class NoteDetect {
                         singulatorSubsystem
                 );
 
-                Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set);
+                Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set).until(notedLoadedSubsystem.hasNote)
+                ;
 
                 Command setFieldDetectModeCommand = Commands.runOnce(
                                 RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
