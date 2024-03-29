@@ -11,11 +11,12 @@ public class ServoRollerSubsystem extends SubsystemBase {
 
   public static final class Constants {
     private static final int channel = 0;
-    private static final int max = 2;
-    private static final int deadbandMax = 2;
-    private static final int center = 1;
-    private static final int deadbandMin = 0;
-    private static final int min = 0;
+    private static final int max = 2500;
+    private static final int deadbandMax = 2497;
+    private static final int center = 1500;
+    private static final int deadbandMin = 503;
+    private static final int min = 500;
+    private static final double runningDegree = 270.0;
   }
 
   private final Servo servo;
@@ -57,7 +58,14 @@ public class ServoRollerSubsystem extends SubsystemBase {
     }
   }
 
-  public void setSpeed(double speed){
+  private void setAngle(double angleDegrees) {
+    if (angleDegrees >= 0 && angleDegrees <= Constants.runningDegree) {
+      double position = angleDegrees / Constants.runningDegree;
+      setPosition(position);
+    }
+  }
+
+  public void setSpeed(double speed) {
     if (RobotBase.isSimulation()) {
       servoSim.setSpeed(speed);
     } else {
@@ -65,7 +73,7 @@ public class ServoRollerSubsystem extends SubsystemBase {
     }
   }
 
-  public void stop(){
+  public void stop() {
     if (RobotBase.isSimulation()) {
       servoSim.setSpeed(0.0);
     } else {
@@ -86,8 +94,8 @@ public class ServoRollerSubsystem extends SubsystemBase {
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty(
-        "Servo Position (us)",
-        () -> getPosition(),
+        "Servo Position (deg)",
+        () -> getPosition() * Constants.runningDegree,
         null);
     builder.addDoubleProperty(
         "Servo Speed",
@@ -95,12 +103,12 @@ public class ServoRollerSubsystem extends SubsystemBase {
         null);
   }
 
-  public Command createStopCommand(){
+  public Command createStopCommand() {
     return run(this::stop);
   }
 
-  public Command createSetPositionCommand(double position) {
-    return runOnce(() -> setPosition(position));
+  public Command createSetAngleCommand(double angleDegrees) {
+    return runOnce(() -> setAngle(angleDegrees));
   }
 
 }

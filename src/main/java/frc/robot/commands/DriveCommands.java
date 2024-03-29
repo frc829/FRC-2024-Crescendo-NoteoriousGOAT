@@ -3,8 +3,6 @@ package frc.robot.commands;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static frc.robot.RobotContainer.driveSubsystem;
-import static frc.robot.RobotContainer.telemetrySubsystem;
-
 import java.util.function.Function;
 import java.util.function.Supplier;
 

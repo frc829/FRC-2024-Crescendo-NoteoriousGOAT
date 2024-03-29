@@ -67,6 +67,7 @@
       "/SmartDashboard/Mech": "Mechanism2d",
       "/SmartDashboard/NoteLoaded": "Subsystem",
       "/SmartDashboard/Outer Intake": "Subsystem",
+      "/SmartDashboard/Servo Roller": "Subsystem",
       "/SmartDashboard/Shooter Tilt": "Subsystem",
       "/SmartDashboard/Singulator": "Subsystem",
       "/SmartDashboard/Telemetry": "Subsystem",

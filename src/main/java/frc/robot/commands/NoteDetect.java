@@ -3,7 +3,6 @@ package frc.robot.commands;
 import static frc.robot.RobotContainer.driveSubsystem;
 import static frc.robot.RobotContainer.elevatorSubsystem;
 import static frc.robot.RobotContainer.innerIntakeSubsystem;
-import static frc.robot.RobotContainer.mechanismSubsystem;
 import static frc.robot.RobotContainer.outerIntakeSubsystem;
 import static frc.robot.RobotContainer.shooterTiltSubsystem;
 import static frc.robot.RobotContainer.singulatorSubsystem;
