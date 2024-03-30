@@ -50,12 +50,12 @@ public class StationaryRangedShot {
             };
             private static final double[] anglesDegrees = new double[] {
                     57.0,
-                    46.0,
-                    40.0,
-                    34.5,
+                    43.0,
+                    38.0,
                     32.5,
-                    30.0,
-                    27.75
+                    31.5,
+                    28.0,
+                    25.75
             };
             private static final Spline spline = MonotoneCubicSpline.createMonotoneCubicSpline(distances,
                     anglesDegrees);

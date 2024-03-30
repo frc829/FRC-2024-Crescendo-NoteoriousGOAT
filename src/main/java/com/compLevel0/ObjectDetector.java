@@ -53,8 +53,7 @@ public class ObjectDetector {
 
                     Supplier<Double> txDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            // return 5.0; 
-                            return Double.NaN;
+                            return 5.0; 
                         } else {
                             return -txSupplier.getDouble(0);
                         }
@@ -62,8 +61,7 @@ public class ObjectDetector {
 
                     Supplier<Double> tyDegreesSupplier = () -> {
                         if (RobotBase.isSimulation()) {
-                            // return 15.0;
-                            return Double.NaN;
+                            return 15.0;
                         } else {
                             return tySupplier.getDouble(0);
                         }

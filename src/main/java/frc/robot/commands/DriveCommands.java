@@ -200,9 +200,32 @@ public class DriveCommands {
         public static final Supplier<Command> goToNoteCommandSupplier = () -> {
                 var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
                 if (pose.isPresent() && !Double.isNaN(pose.get().getX())) {
+                        Command pathCommand = AutoBuilder
+                                        .pathfindToPose(
+                                                        pose.get(),
+                                                        Constants.NoteDetection.pathConstraints,
+                                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                                        Constants.NoteDetection.rotationDelayDistance);
+                        Command command = pathCommand.until(() -> pathCommand.isFinished());
+                        return command;
+                } else {
+                        Command pathCommand = AutoBuilder
+                                        .pathfindToPose(
+                                                        telemetrySubsystem.poseEstimate.get(),
+                                                        Constants.NoteDetection.pathConstraints,
+                                                        Constants.NoteDetection.goalEndVelocityMPS,
+                                                        Constants.NoteDetection.rotationDelayDistance);
+                        Command command = pathCommand.until(() -> pathCommand.isFinished());
+                        return command;
+                }
+        };
+
+        public static final Supplier<Command> goToNoteCommandSupplierAuto = () -> {
+                var pose = RobotContainer.telemetrySubsystem.objectPositions.get(0).getSecond().get();
+                if (pose.isPresent() && !Double.isNaN(pose.get().getX())) {
                         if (DriverStation.getAlliance().isPresent()
                                         && DriverStation.getAlliance().get() == Alliance.Red) {
-                                if (pose.get().getX() >= TelemetryCommands.Constants.fieldLengthMeters / 2 - 0.15) {
+                                if (pose.get().getX() >= TelemetryCommands.Constants.fieldLengthMeters / 2 - 0.30) {
                                         Command pathCommand = AutoBuilder
                                                         .pathfindToPose(
                                                                         pose.get(),
@@ -222,7 +245,7 @@ public class DriveCommands {
                                         return command;
                                 }
                         } else {
-                                if (pose.get().getX() <= TelemetryCommands.Constants.fieldLengthMeters / 2 + 0.15) {
+                                if (pose.get().getX() <= TelemetryCommands.Constants.fieldLengthMeters / 2 + 0.30) {
                                         Command pathCommand = AutoBuilder
                                                         .pathfindToPose(
                                                                         pose.get(),

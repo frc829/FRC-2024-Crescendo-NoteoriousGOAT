@@ -94,6 +94,12 @@
           "data": {
             "name": "Fender"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "UnderTheStage"
+          }
         }
       ]
     }

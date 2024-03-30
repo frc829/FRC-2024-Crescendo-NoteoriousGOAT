@@ -1,0 +1,41 @@
+"filename", "language", "JSON", "Java", "JSON with Comments", "comment", "blank", "total"
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\.DataLogTool\datalogtool.json", "JSON", 5, 0, 0, 0, 1, 6
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\.pathplanner\settings.json", "JSON with Comments", 0, 0, 24, 0, 0, 24
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\simgui.json", "JSON", 60, 0, 0, 0, 0, 60
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\com\compLevel0\Motor.java", "Java", 0, 1, 0, 0, 0, 1
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\com\compLevel1\Turner.java", "Java", 0, 0, 0, 0, 1, 1
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\Robot.java", "Java", 0, 2, 0, 0, 2, 4
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\RobotContainer.java", "Java", 0, 44, 0, 4, 2, 50
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\BasicCommands.java", "Java", 0, -262, 0, 0, -35, -297
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\BasicScoringCommands.java", "Java", 0, -705, 0, 0, -95, -800
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\DriveCommands.java", "Java", 0, -193, 0, 0, -24, -217
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\MovingRangedShot.java", "Java", 0, -185, 0, 0, -22, -207
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\PickupCommands.java", "Java", 0, -156, 0, 0, -33, -189
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\StationaryRangedShot.java", "Java", 0, -164, 0, 0, -21, -185
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commandCreators\TelemetryCommands.java", "Java", 0, -106, 0, 0, -16, -122
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\AdaptiveMovingRangedShot.java", "Java", 0, 204, 0, 0, 23, 227
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\AlignElevatorShoot.java", "Java", 0, 167, 0, 0, 20, 187
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\AlignedPass.java", "Java", 0, 182, 0, 0, 22, 204
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Amp.java", "Java", 0, 43, 0, 0, 7, 50
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\AutoCommands.java", "Java", 0, -35, 0, 0, -6, -41
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\BabyBird.java", "Java", 0, 48, 0, 0, 9, 57
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Barf.java", "Java", 0, 22, 0, 0, 4, 26
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\BasicCommands.java", "Java", 0, 262, 0, 0, 35, 297
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Climb.java", "Java", 0, 32, 0, 0, 6, 38
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\DriveCommands.java", "Java", 0, 259, 0, 0, 25, 284
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\ElevatorShoot.java", "Java", 0, 100, 0, 0, 14, 114
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Fender.java", "Java", 0, 100, 0, 0, 14, 114
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Ground.java", "Java", 0, 59, 0, 0, 10, 69
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Level.java", "Java", 0, 29, 0, 0, 7, 36
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\MovingRangedShot.java", "Java", 0, 185, 0, 0, 22, 207
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\NoteDetect.java", "Java", 0, 63, 0, 3, 21, 87
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Pass.java", "Java", 0, 93, 0, 0, 13, 106
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\ShutOff.java", "Java", 0, 18, 0, 0, 4, 22
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\SpinUp.java", "Java", 0, 18, 0, 0, 4, 22
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\StationaryRangedShot.java", "Java", 0, 202, 0, 0, 24, 226
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\TelemetryCommands.java", "Java", 0, 112, 0, 0, 17, 129
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\commands\Trap.java", "Java", 0, 43, 0, 0, 7, 50
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\subsystems\ServoRollerSubsystem.java", "Java", 0, 95, 0, 1, 19, 115
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\subsystems\ShooterTiltSubsystem.java", "Java", 0, 6, 0, 0, 1, 7
+"c:\Users\Nick Armstrong\Desktop\NoteoriousGOAT2024\src\main\java\frc\robot\subsystems\TelemetrySubsystem.java", "Java", 0, 0, 0, 0, -1, -1
+"Total", "-", 65, 583, 24, 8, 81, 761

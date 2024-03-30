@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.31,
-        "y": 7.44
+        "x": 8.29,
+        "y": 5.79
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.786090863378115,
-        "y": 7.273668633116047
+        "x": 7.244094488188975,
+        "y": 7.774795369410559
       },
       "isLocked": false,
       "linkedName": null
@@ -56,7 +56,7 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.25,
+    "maxVelocity": 5.25,
     "maxAcceleration": 4.0,
     "maxAngularVelocity": 180.0,
     "maxAngularAcceleration": 180.0
@@ -69,8 +69,8 @@
   "reversed": false,
   "folder": "BillieGoat-5-C0_3R_2R_1R_4R",
   "previewStartingState": {
-    "rotation": 0.0,
+    "rotation": -19.29000000000002,
     "velocity": 0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

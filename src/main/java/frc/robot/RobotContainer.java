@@ -162,10 +162,10 @@ public class RobotContainer {
                 driver.padUp.onFalse(Level.command.get());
                 // operator.padUp.whileTrue(Trap.createTrapShoot.get());
                 // operator.padUp.onFalse(Level.command.get());
-                operator.padUp.whileTrue(ElevatorShoot.create.get());
-                operator.padUp.onFalse(Level.command.get());
-                operator.padDown.whileTrue(AlignElevatorShoot.create.get());
+                operator.padDown.whileTrue(ElevatorShoot.create.get());
                 operator.padDown.onFalse(Level.command.get());
+                operator.padUp.whileTrue(AlignElevatorShoot.create.get());
+                operator.padUp.onFalse(Level.command.get());
                 driver.leftBumper.whileTrue(Fender.create.get());
                 driver.leftBumper.onFalse(Level.command.get());
                 driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());

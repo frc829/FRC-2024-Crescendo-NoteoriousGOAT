@@ -56,6 +56,9 @@ public abstract class NoteDetect {
                         return telemetrySubsystem.objectPositions.get(0).getSecond().get().isPresent();
                 });
 
+                Command waitDelay = Commands.waitSeconds(0.3);
+                Command delay = Commands.race(waitUntilNoteDetected, waitDelay);
+
                 Set<Subsystem> set = Set.of(
                         driveSubsystem,
                         innerIntakeSubsystem,
@@ -66,14 +69,14 @@ public abstract class NoteDetect {
                         singulatorSubsystem
                 );
 
-                Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set).until(notedLoadedSubsystem.hasNote)
+                Command goToNoteCommand = Commands.defer(DriveCommands.goToNoteCommandSupplier, set);
                 ;
 
                 Command setFieldDetectModeCommand = Commands.runOnce(
                                 RobotContainer.telemetrySubsystem.enableFieldDetectors.get(0)::run,
                                 RobotContainer.telemetrySubsystem);
 
-                Command command = Commands.sequence(setObjectDetectModeCommand, waitUntilNoteDetected,
+                Command command = Commands.sequence(setObjectDetectModeCommand, delay,
                                 goToNoteCommand,
                                 setFieldDetectModeCommand);
 
