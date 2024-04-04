@@ -337,53 +337,34 @@ public class TelemetrySubsystem extends SubsystemBase {
                         // if (!RobotBase.isSimulation()) {
                         if (true) {
                                 for (int i = 0; i < telemetry.fieldDetectorOptPositions.size(); i++) {
-                                        var optPose = telemetry.fieldDetectorOptPositions.get(i).getSecond().get();
-                                        var optLatency = telemetry.fieldDetectorLatencies.get(i).getSecond().get();
-                                        var area = telemetry.averageAreaSuppliers.get(i);
-                                        if (optPose.isPresent() && optLatency.isPresent()) {
-                                                var poseEstimate = telemetry.poseEstimate.get();
-                                                var pose = optPose.get();
-                                                var latency = optLatency.get();
-                                                var translationGood = pose.getTranslation()
-                                                                .minus(poseEstimate.getTranslation())
-                                                                .getNorm() <= Constants.poseTranslationToleranceMeters;
-                                                var rotationGood = pose.getRotation().minus(poseEstimate.getRotation())
-                                                                .getDegrees() <= Constants.poseRotationToleranceDegrees;
-                                                if (translationGood && rotationGood && telemetry.fieldDetectorTagCounts
-                                                                .get(i).getSecond().get() >= 2 && area.get() != 0.0) {
-
-                                                        boolean doRejectUpdate = false;
-                                                        LimelightHelpers.SetRobotOrientation(
-                                                                        Constants.fieldDetectorNames.get(i).getFirst(),
-                                                                        telemetry.poseEstimator.getEstimatedPosition()
-                                                                                        .getRotation().getDegrees(),
-                                                                        0, 0, 0, 0, 0);
-                                                        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
-                                                                        .getBotPoseEstimate_wpiBlue_MegaTag2(
-                                                                                        Constants.fieldDetectorNames
-                                                                                                        .get(i)
-                                                                                                        .getFirst());
-                                                        if (Math.abs(telemetry.gyroYawRate.in(DegreesPerSecond)) > 720)
-                                                        {
-                                                                doRejectUpdate = true;
-                                                        }
-                                                        if (!doRejectUpdate) {
-                                                                telemetry.poseEstimator.setVisionMeasurementStdDevs(
-                                                                                VecBuilder.fill(.6, .6, 9999999));
-                                                                telemetry.poseEstimator.addVisionMeasurement(
-                                                                                mt2.pose,
-                                                                                mt2.timestampSeconds);
-                                                        }
-                                                        SmartDashboard.putNumber("Pose Added from "
-                                                                        + telemetry.fieldDetectorOptPositions.get(i)
-                                                                                        .getFirst()
-                                                                        + " at Time Index",
-                                                                        Timer.getFPGATimestamp());
-                                                }
+                                        boolean doRejectUpdate = false;
+                                        LimelightHelpers.SetRobotOrientation(
+                                                        Constants.fieldDetectorNames.get(i).getFirst(),
+                                                        telemetry.poseEstimator.getEstimatedPosition()
+                                                                        .getRotation().getDegrees(),
+                                                        0, 0, 0, 0, 0);
+                                        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
+                                                        .getBotPoseEstimate_wpiBlue_MegaTag2(
+                                                                        Constants.fieldDetectorNames
+                                                                                        .get(i)
+                                                                                        .getFirst());
+                                        if (Math.abs(telemetry.gyroYawRate.in(DegreesPerSecond)) > 720) {
+                                                doRejectUpdate = true;
                                         }
+                                        if (!doRejectUpdate) {
+                                                // telemetry.poseEstimator.setVisionMeasurementStdDevs(
+                                                //                 VecBuilder.fill(.6, .6, 9999999));
+                                                telemetry.poseEstimator.addVisionMeasurement(
+                                                                mt2.pose,
+                                                                mt2.timestampSeconds);
+                                        }
+                                        SmartDashboard.putNumber("Pose Added from "
+                                                        + telemetry.fieldDetectorOptPositions.get(i)
+                                                                        .getFirst()
+                                                        + " at Time Index",
+                                                        Timer.getFPGATimestamp());
                                 }
                         }
-
                 };
 
                 return new TelemetrySubsystem(
