@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.6,
-        "y": 7.44
+        "x": 0.8327743151212798,
+        "y": 6.583808951093687
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.57950124368717,
-        "y": 6.71165450439009
+        "x": 1.0549632495276386,
+        "y": 7.975413329744038
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.6,
-        "y": 2.422112231611851
+        "x": 5.767707489830933,
+        "y": 7.68305946868304
       },
       "prevControl": {
-        "x": 8.58874594686126,
-        "y": 2.7364321395309466
+        "x": 3.5107356824400258,
+        "y": 7.71814193201036
       },
       "nextControl": null,
       "isLocked": false,
@@ -39,13 +39,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -45.0,
+    "rotation": 90.0,
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "Sabotage-6-A0_4_5_6_7_8R",
+  "folder": null,
   "previewStartingState": {
-    "rotation": 0.0,
+    "rotation": 56.309932474020016,
     "velocity": 0
   },
   "useDefaultConstraints": true

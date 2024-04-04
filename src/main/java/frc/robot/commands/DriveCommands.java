@@ -27,10 +27,10 @@ public class DriveCommands {
         private static final class DriveConstants {
                 private static final Translation2d originCOR = new Translation2d();
                 private static final Translation2d bottomLeftCOR = new Translation2d(
-                                Units.inchesToMeters(13 + 2.75 + 2.5 + 6),
+                                Units.inchesToMeters(13 + 2.75 + 2.5 + 12),
                                 Units.inchesToMeters(0));
                 private static final Translation2d bottomRightCOR = new Translation2d(
-                                Units.inchesToMeters(-13 - 2.75 - 6),
+                                Units.inchesToMeters(-13 - 2.75 - 12),
                                 Units.inchesToMeters(0));
         }
 
