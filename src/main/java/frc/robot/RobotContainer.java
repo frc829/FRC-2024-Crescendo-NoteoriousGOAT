@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.AlignElevatorShoot;
-import frc.robot.commands.AlignedPass;
 import frc.robot.commands.Amp;
 import frc.robot.commands.BabyBird;
 import frc.robot.commands.Barf;

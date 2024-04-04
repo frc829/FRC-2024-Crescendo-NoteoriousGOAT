@@ -67,8 +67,8 @@ public class FieldDetector {
     }
 
     public static final class Limelight {
-        public static Function<String, Function<Pose3d, Function<Supplier<Pose2d>, FieldDetector>>> createLimelight = (
-                name) -> (cameraPosition) -> (simFieldPose) -> {
+        public static Function<String, Function<Pose3d, Function<Supplier<Pose2d>, Function<Boolean, FieldDetector>>>> createLimelight = (
+                name) -> (cameraPosition) -> (simFieldPose) -> (upsideDown) -> {
 
                     NetworkTable table = NetworkTableInstance.getDefault().getTable(name);
                     NetworkTableEntry validTargetSupplier = table.getEntry("tv");
@@ -90,7 +90,11 @@ public class FieldDetector {
                         if (RobotBase.isSimulation()) {
                             return 90.0;
                         } else {
-                            return -tx.getDouble(0);
+                            if (upsideDown) {
+                                return tx.getDouble(0);
+                            } else {
+                                return -tx.getDouble(0);
+                            }
                         }
                     };
 
@@ -98,7 +102,11 @@ public class FieldDetector {
                         if (RobotBase.isSimulation()) {
                             return 25.0;
                         } else {
-                            return ty.getDouble(0);
+                            if (upsideDown) {
+                                return -ty.getDouble(0);
+                            } else {
+                                return ty.getDouble(0);
+                            }
                         }
                     };
 
@@ -129,7 +137,8 @@ public class FieldDetector {
                             Translation2d objectTranslationRobot = cameraTranslationRobotSpace
                                     .plus(objectCamSpace);
                             SmartDashboard.putNumber("Robot Space Target Distance", objectTranslationRobot.getNorm());
-                            SmartDashboard.putNumber("Robot Space Target Heading", objectTranslationRobot.getAngle().getDegrees());
+                            SmartDashboard.putNumber("Robot Space Target Heading",
+                                    objectTranslationRobot.getAngle().getDegrees());
 
                             return Optional.of(objectTranslationRobot);
                         } else {

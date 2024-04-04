@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.kauailabs.navx.frc.AHRS;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -30,6 +32,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.LimelightHelpers;
 import frc.robot.RobotContainer;
 
 public class TelemetrySubsystem extends SubsystemBase {
@@ -37,6 +40,7 @@ public class TelemetrySubsystem extends SubsystemBase {
         public static final class Constants {
                 public static final double poseTranslationToleranceMeters = 1;
                 public static final double poseRotationToleranceDegrees = 2;
+                private static final List<Boolean> upsideDowns = List.of(false, true);
                 private static final List<Pair<String, Pose3d>> fieldDetectorNames = List.of(
                                 new Pair<>(
                                                 "limelight-front",
@@ -300,13 +304,24 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                 .apply(namePosition.getSecond()))
                                                 .apply(telemetry));
 
-                Constants.fieldDetectorNames.forEach(
-                                (namePosition) -> Telemetry.addFieldDetectorToTelemetry
-                                                .apply(FieldDetector.Limelight.createLimelight
-                                                                .apply(namePosition.getFirst())
-                                                                .apply(namePosition.getSecond())
-                                                                .apply(telemetry.poseEstimate))
-                                                .apply(telemetry));
+                // Constants.fieldDetectorNames.forEach(
+                // (namePosition) -> Telemetry.addFieldDetectorToTelemetry
+                // .apply(FieldDetector.Limelight.createLimelight
+                // .apply(namePosition.getFirst())
+                // .apply(namePosition.getSecond())
+                // .apply(telemetry.poseEstimate)
+                // .apply(false))
+                // .apply(telemetry));
+
+                for (int i = 0; i < Constants.fieldDetectorNames.size(); i++) {
+                        Telemetry.addFieldDetectorToTelemetry
+                                        .apply(FieldDetector.Limelight.createLimelight
+                                                        .apply(Constants.fieldDetectorNames.get(i).getFirst())
+                                                        .apply(Constants.fieldDetectorNames.get(i).getSecond())
+                                                        .apply(telemetry.poseEstimate)
+                                                        .apply(Constants.upsideDowns.get(i)))
+                                        .apply(telemetry);
+                }
 
                 Supplier<ChassisSpeeds> fieldSpeeds = () -> {
                         return ChassisSpeeds.fromRobotRelativeSpeeds(RobotContainer.driveSubsystem.robotSpeeds.get(),
@@ -336,8 +351,29 @@ public class TelemetrySubsystem extends SubsystemBase {
                                                                 .getDegrees() <= Constants.poseRotationToleranceDegrees;
                                                 if (translationGood && rotationGood && telemetry.fieldDetectorTagCounts
                                                                 .get(i).getSecond().get() >= 2 && area.get() != 0.0) {
-                                                        telemetry.addDetectedPosesToEstimator.apply(pose)
-                                                                        .accept(latency);
+
+                                                        boolean doRejectUpdate = false;
+                                                        LimelightHelpers.SetRobotOrientation(
+                                                                        Constants.fieldDetectorNames.get(i).getFirst(),
+                                                                        telemetry.poseEstimator.getEstimatedPosition()
+                                                                                        .getRotation().getDegrees(),
+                                                                        0, 0, 0, 0, 0);
+                                                        LimelightHelpers.PoseEstimate mt2 = LimelightHelpers
+                                                                        .getBotPoseEstimate_wpiBlue_MegaTag2(
+                                                                                        Constants.fieldDetectorNames
+                                                                                                        .get(i)
+                                                                                                        .getFirst());
+                                                        if (Math.abs(telemetry.gyroYawRate.in(DegreesPerSecond)) > 720)
+                                                        {
+                                                                doRejectUpdate = true;
+                                                        }
+                                                        if (!doRejectUpdate) {
+                                                                telemetry.poseEstimator.setVisionMeasurementStdDevs(
+                                                                                VecBuilder.fill(.6, .6, 9999999));
+                                                                telemetry.poseEstimator.addVisionMeasurement(
+                                                                                mt2.pose,
+                                                                                mt2.timestampSeconds);
+                                                        }
                                                         SmartDashboard.putNumber("Pose Added from "
                                                                         + telemetry.fieldDetectorOptPositions.get(i)
                                                                                         .getFirst()

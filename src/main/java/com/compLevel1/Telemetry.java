@@ -38,6 +38,7 @@ public class Telemetry {
 
         public final Field2d field2d;
         public final Measure<Angle> gyroYaw;
+        public final Measure<Velocity<Angle>> gyroYawRate;
         public final Measure<Velocity<Velocity<Distance>>> accelerationX;
         public final Measure<Velocity<Velocity<Distance>>> accelerationY;
         public final Supplier<Pose2d> poseEstimate;
@@ -56,10 +57,12 @@ public class Telemetry {
         public final List<Runnable> enableObjectDetectors;
         public final Runnable update;
         public final List<Supplier<Double>> averageAreaSuppliers;
+        public final SwerveDrivePoseEstimator poseEstimator;
 
         private Telemetry(
                         Field2d field2d,
                         Measure<Angle> gyroYaw,
+                        Measure<Velocity<Angle>> gyroYawRate,
                         Measure<Velocity<Velocity<Distance>>> accelerationX,
                         Measure<Velocity<Velocity<Distance>>> accelerationY,
                         Supplier<Pose2d> poseEstimate,
@@ -77,9 +80,11 @@ public class Telemetry {
                         List<Runnable> enableFieldDetectors,
                         List<Runnable> enableObjectDetectors,
                         Runnable update, 
-                        List<Supplier<Double>> averageAreaSuppliers) {
+                        List<Supplier<Double>> averageAreaSuppliers,
+                        SwerveDrivePoseEstimator poseEstimator) {
                 this.field2d = field2d;
                 this.gyroYaw = gyroYaw;
+                this.gyroYawRate = gyroYawRate;
                 this.accelerationX = accelerationX;
                 this.accelerationY = accelerationY;
                 this.poseEstimate = poseEstimate;
@@ -98,6 +103,7 @@ public class Telemetry {
                 this.enableObjectDetectors = enableObjectDetectors;
                 this.update = update;
                 this.averageAreaSuppliers = averageAreaSuppliers;
+                this.poseEstimator = poseEstimator;
                 SmartDashboard.putData(field2d);
         }
 
@@ -211,6 +217,7 @@ public class Telemetry {
 
                                 return new Telemetry(field2d,
                                                 gyroscope.yaw,
+                                                gyroscope.yawRate,
                                                 gyroscope.accelerationX,
                                                 gyroscope.accelerationY,
                                                 poseEstimate,
@@ -228,7 +235,8 @@ public class Telemetry {
                                                 enableFieldDetectors,
                                                 enableObjectDetectors, 
                                                 update, 
-                                                averageAreaSupplier);
+                                                averageAreaSupplier,
+                                                swerveDrivePoseEstimator);
                         };
 
         public static final Function<FieldDetector, Function<Telemetry, Telemetry>> addFieldDetectorToTelemetry = (
