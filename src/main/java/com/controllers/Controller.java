@@ -1,16 +1,18 @@
 package com.controllers;
 
+import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Controller implements Sendable {
-
+        public final BiConsumer<RumbleType, Double> rumbleConsumer;
         public final DoubleSupplier leftXValue;
         public final DoubleSupplier leftYValue;
         public final DoubleSupplier rightXValue;
@@ -39,6 +41,7 @@ public class Controller implements Sendable {
         public final Trigger padLeft;
 
         private Controller(
+                        BiConsumer<RumbleType, Double> rumbleConsumer,
                         DoubleSupplier leftXValue,
                         DoubleSupplier leftYValue,
                         DoubleSupplier rightXValue,
@@ -66,6 +69,7 @@ public class Controller implements Sendable {
                         Trigger padDown,
                         Trigger padLeft) {
 
+                this.rumbleConsumer = rumbleConsumer;
                 this.leftXValue = leftXValue;
                 this.leftYValue = leftYValue;
                 this.rightXValue = rightXValue;
@@ -203,80 +207,97 @@ public class Controller implements Sendable {
                                 null);
         }
 
-        public static final Function<Integer, Function<Double, Controller>> createFromXBox = (port) -> (deadband) -> {
-                CommandXboxController commandXboxController = new CommandXboxController(port);
+        public static final Function<Integer, Function<Double, Function<Boolean, Controller>>> createFromXBox = (
+                        port) -> (deadband) -> (hasRumble) -> {
+                                CommandXboxController commandXboxController = new CommandXboxController(port);
+                                BiConsumer<RumbleType, Double> rumbleConsumer = (type, value) -> {
+                                        if (hasRumble) {
+                                                commandXboxController
+                                                                .getHID().setRumble(type, value);
+                                        }
 
-                DoubleSupplier leftXValue = () -> {
-                        double leftXRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftX(), deadband);
-                        double leftYRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftY(), deadband);
-                        double mag = Math.hypot(leftXRawValue, leftYRawValue);
-                        return mag > 1 ? leftXRawValue / mag : leftXRawValue;
-                };
-                DoubleSupplier leftYValue = () -> {
-                        double leftXRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftX(), deadband);
-                        double leftYRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftY(), deadband);
-                        double mag = Math.hypot(leftXRawValue, leftYRawValue);
-                        return mag > 1 ? leftYRawValue / mag : leftYRawValue;
-                };
-                DoubleSupplier rightXValue = () -> {
-                        double rightXRawValue = -MathUtil.applyDeadband(commandXboxController.getRightX(), deadband);
-                        double rightYRawValue = -MathUtil.applyDeadband(commandXboxController.getRightY(), deadband);
-                        double mag = Math.hypot(rightXRawValue, rightYRawValue);
-                        return mag > 1 ? rightXRawValue / mag : rightXRawValue;
-                };
-                DoubleSupplier rightYValue = () -> {
-                        double rightXRawValue = -MathUtil.applyDeadband(commandXboxController.getRightX(), deadband);
-                        double rightYRawValue = -MathUtil.applyDeadband(commandXboxController.getRightY(), deadband);
-                        double mag = Math.hypot(rightXRawValue, rightYRawValue);
-                        return mag > 1 ? rightYRawValue / mag : rightYRawValue;
-                };
+                                };
 
-                DoubleSupplier leftTriggerValue = () -> MathUtil.applyDeadband(
-                                commandXboxController.getLeftTriggerAxis(),
-                                deadband);
-                DoubleSupplier rightTriggerValue = () -> MathUtil.applyDeadband(
-                                commandXboxController.getRightTriggerAxis(),
-                                deadband);
+                                DoubleSupplier leftXValue = () -> {
+                                        double leftXRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftX(),
+                                                        deadband);
+                                        double leftYRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftY(),
+                                                        deadband);
+                                        double mag = Math.hypot(leftXRawValue, leftYRawValue);
+                                        return mag > 1 ? leftXRawValue / mag : leftXRawValue;
+                                };
+                                DoubleSupplier leftYValue = () -> {
+                                        double leftXRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftX(),
+                                                        deadband);
+                                        double leftYRawValue = -MathUtil.applyDeadband(commandXboxController.getLeftY(),
+                                                        deadband);
+                                        double mag = Math.hypot(leftXRawValue, leftYRawValue);
+                                        return mag > 1 ? leftYRawValue / mag : leftYRawValue;
+                                };
+                                DoubleSupplier rightXValue = () -> {
+                                        double rightXRawValue = -MathUtil
+                                                        .applyDeadband(commandXboxController.getRightX(), deadband);
+                                        double rightYRawValue = -MathUtil
+                                                        .applyDeadband(commandXboxController.getRightY(), deadband);
+                                        double mag = Math.hypot(rightXRawValue, rightYRawValue);
+                                        return mag > 1 ? rightXRawValue / mag : rightXRawValue;
+                                };
+                                DoubleSupplier rightYValue = () -> {
+                                        double rightXRawValue = -MathUtil
+                                                        .applyDeadband(commandXboxController.getRightX(), deadband);
+                                        double rightYRawValue = -MathUtil
+                                                        .applyDeadband(commandXboxController.getRightY(), deadband);
+                                        double mag = Math.hypot(rightXRawValue, rightYRawValue);
+                                        return mag > 1 ? rightYRawValue / mag : rightYRawValue;
+                                };
 
-                DoubleSupplier fullTriggerValue = () -> leftTriggerValue.getAsDouble()
-                                - rightTriggerValue.getAsDouble();
+                                DoubleSupplier leftTriggerValue = () -> MathUtil.applyDeadband(
+                                                commandXboxController.getLeftTriggerAxis(),
+                                                deadband);
+                                DoubleSupplier rightTriggerValue = () -> MathUtil.applyDeadband(
+                                                commandXboxController.getRightTriggerAxis(),
+                                                deadband);
 
-                Trigger leftX = new Trigger(() -> leftXValue.getAsDouble() != 0);
-                Trigger leftY = new Trigger(() -> leftYValue.getAsDouble() != 0);
-                Trigger rightX = new Trigger(() -> rightXValue.getAsDouble() != 0);
-                Trigger rightY = new Trigger(() -> rightYValue.getAsDouble() != 0);
-                Trigger leftTrigger = new Trigger(() -> leftTriggerValue.getAsDouble() != 0);
-                Trigger rightTrigger = new Trigger(() -> rightTriggerValue.getAsDouble() != 0);
-                Trigger fullTrigger = new Trigger(() -> {
-                        return leftTrigger.getAsBoolean() || rightTrigger.getAsBoolean();
-                });
-                return new Controller(
-                                leftXValue,
-                                leftYValue,
-                                rightXValue,
-                                rightYValue,
-                                leftTriggerValue,
-                                rightTriggerValue,
-                                fullTriggerValue,
-                                leftX,
-                                leftY,
-                                rightX,
-                                rightY,
-                                leftTrigger,
-                                rightTrigger,
-                                fullTrigger,
-                                commandXboxController.a(),
-                                commandXboxController.b(),
-                                commandXboxController.x(),
-                                commandXboxController.y(),
-                                commandXboxController.leftBumper(),
-                                commandXboxController.rightBumper(),
-                                commandXboxController.back(),
-                                commandXboxController.start(),
-                                commandXboxController.pov(0),
-                                commandXboxController.pov(90),
-                                commandXboxController.pov(180),
-                                commandXboxController.pov(270));
-        };
+                                DoubleSupplier fullTriggerValue = () -> leftTriggerValue.getAsDouble()
+                                                - rightTriggerValue.getAsDouble();
+
+                                Trigger leftX = new Trigger(() -> leftXValue.getAsDouble() != 0);
+                                Trigger leftY = new Trigger(() -> leftYValue.getAsDouble() != 0);
+                                Trigger rightX = new Trigger(() -> rightXValue.getAsDouble() != 0);
+                                Trigger rightY = new Trigger(() -> rightYValue.getAsDouble() != 0);
+                                Trigger leftTrigger = new Trigger(() -> leftTriggerValue.getAsDouble() != 0);
+                                Trigger rightTrigger = new Trigger(() -> rightTriggerValue.getAsDouble() != 0);
+                                Trigger fullTrigger = new Trigger(() -> {
+                                        return leftTrigger.getAsBoolean() || rightTrigger.getAsBoolean();
+                                });
+                                return new Controller(
+                                                rumbleConsumer,
+                                                leftXValue,
+                                                leftYValue,
+                                                rightXValue,
+                                                rightYValue,
+                                                leftTriggerValue,
+                                                rightTriggerValue,
+                                                fullTriggerValue,
+                                                leftX,
+                                                leftY,
+                                                rightX,
+                                                rightY,
+                                                leftTrigger,
+                                                rightTrigger,
+                                                fullTrigger,
+                                                commandXboxController.a(),
+                                                commandXboxController.b(),
+                                                commandXboxController.x(),
+                                                commandXboxController.y(),
+                                                commandXboxController.leftBumper(),
+                                                commandXboxController.rightBumper(),
+                                                commandXboxController.back(),
+                                                commandXboxController.start(),
+                                                commandXboxController.pov(0),
+                                                commandXboxController.pov(90),
+                                                commandXboxController.pov(180),
+                                                commandXboxController.pov(270));
+                        };
 
 }

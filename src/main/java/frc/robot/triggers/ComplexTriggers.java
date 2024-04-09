@@ -1,5 +1,9 @@
 package frc.robot.triggers;
 
+import static frc.robot.RobotContainer.notedLoadedSubsystem;
+
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotContainer;
 
@@ -30,6 +34,10 @@ public class ComplexTriggers {
                         .and(RobotContainer.driver.padLeft);
         public static final Trigger robotCentricFRDriveTrigger = robotCentricOriginDriveTrigger
                         .and(RobotContainer.driver.padRight);
+        private static final BooleanSupplier hasNote = () -> {
+                return notedLoadedSubsystem.hasNoteBB.getAsBoolean() || notedLoadedSubsystem.hasNote.getAsBoolean();
+        };
+        public static final Trigger noteLoadedTrigger = new Trigger(hasNote);
 
         // public static final Trigger templateTrigger = new Trigger(null);
 

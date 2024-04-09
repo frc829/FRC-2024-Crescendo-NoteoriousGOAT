@@ -33,6 +33,7 @@ import frc.robot.commands.BabyBird;
 import frc.robot.commands.Barf;
 import frc.robot.commands.BasicCommands;
 import frc.robot.commands.Climb;
+import frc.robot.commands.ControllerCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.ElevatorShoot;
 import frc.robot.commands.Fender;
@@ -96,10 +97,12 @@ public class RobotContainer {
         public static final Orchestra orchestra = new Orchestra();
         public static final Controller driver = Controller.createFromXBox
                         .apply(Constants.Controller.driverPort)
-                        .apply(Constants.Controller.deadband);
+                        .apply(Constants.Controller.deadband)
+                        .apply(false);
         public static final Controller operator = Controller.createFromXBox
                         .apply(Constants.Controller.operatorPort)
-                        .apply(Constants.Controller.deadband);
+                        .apply(Constants.Controller.deadband)
+                        .apply(true);
         // public static final Controller test = Controller.createFromXBox
         // .apply(Constants.Controller.testPort)
         // .apply(Constants.Controller.deadband);
@@ -206,6 +209,8 @@ public class RobotContainer {
                                 .whileTrue(DriveCommands.createRobotCentricDriveRRCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger
                                 .onFalse(DriveCommands.createRobotCentricDriveOriginCommand.get());
+                ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createOperatorRumble.get());
+                ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createDriverRumble.get());
 
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here
