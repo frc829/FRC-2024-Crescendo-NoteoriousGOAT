@@ -8,9 +8,11 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.pathplanner.lib.auto.AutoBuilder.TriFunction;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.SparkAbsoluteEncoder.Type;
+import com.revrobotics.SparkPIDController.ArbFFUnits;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -68,9 +70,8 @@ public class Motor {
         public static final class REV {
 
                 // #region createMotorFromCANSparkMax
-                @SuppressWarnings("resource")
-                public static final BiFunction<CANSparkBase, Measure<Velocity<Angle>>, Motor> createMotorFromCANSparkBase = (
-                                canSparkBase, maxAngularVelocity) -> {
+                public static final TriFunction<CANSparkBase, Measure<Velocity<Angle>>, Measure<Voltage>, Motor> createMotorFromCANSparkBase = (
+                                canSparkBase, maxAngularVelocity, kS) -> {
                         MutableMeasure<Voltage> voltage = MutableMeasure.zero(Volts);
                         MutableMeasure<Angle> angle = MutableMeasure.zero(Rotations);
                         MutableMeasure<Angle> absoluteAngle = MutableMeasure.zero(Rotations);
@@ -119,13 +120,39 @@ public class Motor {
                                                         rpm,
                                                         -maxAngularVelocity.in(RPM),
                                                         maxAngularVelocity.in(RPM));
-                                        canSparkBase
-                                                        .getPIDController()
-                                                        .setReference(rpm, ControlType.kVelocity, 0);
+                                        if (rpm != 0) {
+                                                double arb = kS.in(Volts);
+                                                if (rpm < 0) {
+                                                        arb *= -1;
+                                                }
+                                                canSparkBase
+                                                                .getPIDController()
+                                                                .setReference(rpm, ControlType.kVelocity, 0,
+                                                                                arb,
+                                                                                ArbFFUnits.kVoltage);
+                                        } else {
+                                                canSparkBase
+                                                                .getPIDController()
+                                                                .setReference(rpm, ControlType.kVelocity, 0);
+                                        }
+
                                 } else {
-                                        canSparkBase
-                                                        .getPIDController()
-                                                        .setReference(setpoint.in(RPM), ControlType.kVelocity, 0);
+                                        double rpm = setpoint.in(RPM);
+                                        double arb = kS.in(Volts);
+                                        if (rpm < 0) {
+                                                arb *= -1;
+                                        }
+                                        if (rpm != 0) {
+                                                canSparkBase
+                                                                .getPIDController()
+                                                                .setReference(rpm, ControlType.kVelocity, 0,
+                                                                                arb,
+                                                                                ArbFFUnits.kVoltage);
+                                        } else {
+                                                canSparkBase
+                                                                .getPIDController()
+                                                                .setReference(rpm, ControlType.kVelocity, 0);
+                                        }
                                 }
                         };
                         Consumer<Measure<Voltage>> setVoltage = (setpoint) -> {
@@ -157,17 +184,20 @@ public class Motor {
                 };
                 // #endregion
 
-                public static final Function<CANSparkBase, Motor> createNEOMotor = (
-                                canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
-                                                RadiansPerSecond.of(DCMotor.getNEO(1).freeSpeedRadPerSec));
+                public static final BiFunction<CANSparkBase, Measure<Voltage>, Motor> createNEOMotor = (
+                                canSparkBase, kS) -> createMotorFromCANSparkBase.apply(canSparkBase,
+                                                RadiansPerSecond.of(DCMotor.getNEO(1).freeSpeedRadPerSec),
+                                                kS);
 
-                public static final Function<CANSparkBase, Motor> createNEOVortexMotor = (
-                                canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
-                                                RadiansPerSecond.of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec));
+                public static final BiFunction<CANSparkBase, Measure<Voltage>, Motor> createNEOVortexMotor = (
+                                canSparkBase, kS) -> createMotorFromCANSparkBase.apply(canSparkBase,
+                                                RadiansPerSecond.of(DCMotor.getNeoVortex(1).freeSpeedRadPerSec),
+                                                kS);
 
-                public static final Function<CANSparkBase, Motor> createNEO550Motor = (
-                                canSparkBase) -> createMotorFromCANSparkBase.apply(canSparkBase,
-                                                RadiansPerSecond.of(DCMotor.getNeo550(1).freeSpeedRadPerSec));
+                public static final BiFunction<CANSparkBase, Measure<Voltage>, Motor> createNEO550Motor = (
+                                canSparkBase, kS) -> createMotorFromCANSparkBase.apply(canSparkBase,
+                                                RadiansPerSecond.of(DCMotor.getNeo550(1).freeSpeedRadPerSec),
+                                                kS);
         };
 
         public static final class CTRE {

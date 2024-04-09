@@ -258,7 +258,7 @@ public class DriveSubsystem extends SubsystemBase {
                                         if (RobotBase.isSimulation()) {
                                                 REVPhysicsSim.getInstance().addSparkMax(neo, DCMotor.getNEO(1));
                                         }
-                                        Motor steerMotor = Motor.REV.createNEOMotor.apply(neo);
+                                        Motor steerMotor = Motor.REV.createNEOMotor.apply(neo, Volts.of(0.0));
 
                                         TalonFXConfiguration config = new TalonFXConfiguration();
                                         config.Voltage.PeakForwardVoltage = 12.0;

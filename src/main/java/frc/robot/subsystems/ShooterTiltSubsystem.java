@@ -144,7 +144,7 @@ public class ShooterTiltSubsystem extends SubsystemBase {
     }
 
     Turner turner = Motor.REV.createNEOMotor
-        .andThen(Turner.create.apply(Constants.gearing)).apply(neo);
+        .andThen(Turner.create.apply(Constants.gearing)).apply(neo, Volts.of(0.0));
 
     return new ShooterTiltSubsystem(
         turner.voltage,

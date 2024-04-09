@@ -16,7 +16,6 @@ import com.revrobotics.REVPhysicsSim;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
@@ -29,11 +28,11 @@ public class TransportSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 24;
+    private static final Measure<Voltage> kS = Volts.of(0.14877);
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
     private static final double slot0kD = 0.0;
-    private static final double slot0kF = 1.0
-        / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNeo550(1).freeSpeedRadPerSec);
+    private static final double slot0kF = 0.0010622 / 12.0;
   }
 
   public final Measure<Voltage> voltage;
@@ -93,7 +92,7 @@ public class TransportSubsystem extends SubsystemBase {
 
     Spinner spinner = Motor.REV.createNEO550Motor
         .andThen(Spinner.create)
-        .apply(canSparkMax);
+        .apply(canSparkMax, Constants.kS);
 
     return new TransportSubsystem(
         spinner.voltage,

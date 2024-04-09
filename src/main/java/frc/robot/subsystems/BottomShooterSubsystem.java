@@ -18,7 +18,6 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Voltage;
@@ -31,11 +30,11 @@ public class BottomShooterSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 26;
+    private static final Measure<Voltage> kS = Volts.of(0.082167);
     private static final double slot0kP = 0.0;
     private static final double slot0kI = 0.0;
     private static final double slot0kD = 0.0;
-    private static final double slot0kF = 1.0
-        / Units.radiansPerSecondToRotationsPerMinute(DCMotor.getNeoVortex(1).freeSpeedRadPerSec);
+    private static final double slot0kF = 0.0018265 / 12.0;
   }
 
   public final Measure<Voltage> voltage;
@@ -99,7 +98,7 @@ public class BottomShooterSubsystem extends SubsystemBase {
 
     Spinner spinner = Motor.REV.createNEOVortexMotor
         .andThen(Spinner.create)
-        .apply(canSparkBase);
+        .apply(canSparkBase, Constants.kS);
 
     return new BottomShooterSubsystem(spinner.voltage, spinner.velocity, spinner.spin, spinner.stop, spinner.update);
 

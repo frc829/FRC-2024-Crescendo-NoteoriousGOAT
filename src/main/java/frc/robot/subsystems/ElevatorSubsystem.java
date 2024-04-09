@@ -119,7 +119,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         .andThen(Elevator.create
             .apply(Constants.gearing)
             .apply(Constants.drumRadius))
-        .apply(neo);
+        .apply(neo, Volts.of(0.0));
 
     return new ElevatorSubsystem(
         elevator.voltage,
