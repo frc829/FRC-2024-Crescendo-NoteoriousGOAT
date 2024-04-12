@@ -47,7 +47,7 @@ public abstract class Ground {
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
                                 outerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.outerIntakePercent),
                                 innerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.innerIntakePercent),
-                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),
+                                transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent),
                                 BasicCommands.Singulator.createSpinCommand.apply(0.0));
         };
 

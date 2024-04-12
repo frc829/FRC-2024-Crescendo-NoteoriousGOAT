@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.RobotContainer.bottomShooterSubsystem;
 import static frc.robot.RobotContainer.singulatorSubsystem;
 import static frc.robot.RobotContainer.topShooterSubsystem;
+import static frc.robot.RobotContainer.transportSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -82,7 +83,7 @@ public abstract class Fender {
                                 bottomShooterSubsystem
                                                 .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                                transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
                 command.setName("Fender Shoot");
                 return command;
         };

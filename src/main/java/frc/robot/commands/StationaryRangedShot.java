@@ -184,7 +184,7 @@ public class StationaryRangedShot {
                     bottomShooterSubsystem
                             .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
                     BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                    BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                    transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
             command.setName("Ranged Shoot");
             return command;
         };

@@ -42,7 +42,7 @@ public abstract class Trap {
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                                transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
 
                 command.setName("Trap Drop");
                 return command;
