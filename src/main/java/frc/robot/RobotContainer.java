@@ -50,7 +50,6 @@ import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.InnerIntakeSubsystem;
-import frc.robot.subsystems.MechanismSubsystem;
 import frc.robot.subsystems.NotedLoadedSubsystem;
 import frc.robot.subsystems.OuterIntakeSubsystem;
 import frc.robot.subsystems.ServoRollerSubsystem;
@@ -115,10 +114,9 @@ public class RobotContainer {
         public static final SingulatorSubsystem singulatorSubsystem = new SingulatorSubsystem();
         public static final NotedLoadedSubsystem notedLoadedSubsystem = NotedLoadedSubsystem.create.get();
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
-        public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
+        public static final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
         public static final DriveSubsystem driveSubsystem = DriveSubsystem.create.get();
         public static final TelemetrySubsystem telemetrySubsystem = TelemetrySubsystem.create.get();
-        public static final MechanismSubsystem mechanismSubsystem = new MechanismSubsystem();
         public static final ServoRollerSubsystem servoRollerSubsystem = new ServoRollerSubsystem();
         public static final PowerDistribution pdh = new PowerDistribution();
 

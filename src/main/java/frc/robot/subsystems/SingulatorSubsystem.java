@@ -52,7 +52,7 @@ public class SingulatorSubsystem extends SubsystemBase {
         .of(kVVoltsPerRPM * 60 / 2 / Math.PI);
     private static final double kAVoltsPerRPMSq = 4.53E-05;
     private static final Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kA = VoltsPerRadianPerSecondSquared
-        .of(kAVoltsPerRPMSq * 3600 / 2 / Math.PI);
+        .of(kAVoltsPerRPMSq * 60 / 2 / Math.PI);
     private static final LinearSystem<N2, N1, N2> plant = LinearSystemId
         .createDCMotorSystem(kV.in(VoltsPerRadianPerSecond), kAVoltsPerRPMSq);
     private static final double gearing = 1.0;
