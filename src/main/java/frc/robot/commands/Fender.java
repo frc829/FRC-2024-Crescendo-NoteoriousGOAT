@@ -82,7 +82,7 @@ public abstract class Fender {
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
                                                 .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                                 transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
                 command.setName("Fender Shoot");
                 return command;
@@ -92,18 +92,12 @@ public abstract class Fender {
                 return Commands.sequence(createAimCommand.get(), createSpinUp.get(), createShootCommand.get());
         };
 
-        public static final Supplier<Command> stop = () -> {
-                return Commands.runOnce(
-                                singulatorSubsystem.stop,
-                                singulatorSubsystem);
-        };
-
         public static final Supplier<Command> createWithDelay = () -> {
                 return Commands.sequence(
                                 createAimCommand.get(),
                                 createSpinUp.get(),
                                 createShootCommand.get()
                                                 .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
-                                stop.get());
+                                                singulatorSubsystem.createStopCommand());
         };
 }

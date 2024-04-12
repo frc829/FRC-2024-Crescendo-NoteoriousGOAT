@@ -173,8 +173,8 @@ public class MovingRangedShot {
                     topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                     bottomShooterSubsystem
                             .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
-                    BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                    transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
+                            singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
+                            transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
             command.setName("Ranged Shoot");
             return command;
         };

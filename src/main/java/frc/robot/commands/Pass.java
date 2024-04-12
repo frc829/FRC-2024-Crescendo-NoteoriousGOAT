@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.RobotContainer.bottomShooterSubsystem;
 import static frc.robot.RobotContainer.topShooterSubsystem;
 import static frc.robot.RobotContainer.transportSubsystem;
+import static frc.robot.RobotContainer.singulatorSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -54,7 +55,7 @@ public abstract class Pass {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(elevatorAndTiltAtPositionCondition);
                 command.setName("Fender Aim");
                 return command;
@@ -67,7 +68,7 @@ public abstract class Pass {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(shootersAtSpeed);
                 command.setName("Fender Spin Up");
                 return command;
@@ -80,8 +81,8 @@ public abstract class Pass {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
+                                singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                                 transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
                 command.setName("Fender Shoot");
                 return command;

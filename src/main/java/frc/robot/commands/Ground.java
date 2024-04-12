@@ -6,6 +6,7 @@ import static frc.robot.RobotContainer.innerIntakeSubsystem;
 import static frc.robot.RobotContainer.notedLoadedSubsystem;
 import static frc.robot.RobotContainer.outerIntakeSubsystem;
 import static frc.robot.RobotContainer.transportSubsystem;
+import static frc.robot.RobotContainer.singulatorSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -48,7 +49,7 @@ public abstract class Ground {
                                 outerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.outerIntakePercent),
                                 innerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.innerIntakePercent),
                                 transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent),
-                                BasicCommands.Singulator.createSpinCommand.apply(0.0));
+                                singulatorSubsystem.createSetVelocityRatioCommand(() -> 0.0));
         };
 
         private static final Supplier<Command> stop = () -> {

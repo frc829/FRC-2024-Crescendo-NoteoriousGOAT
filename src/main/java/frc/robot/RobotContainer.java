@@ -112,7 +112,7 @@ public class RobotContainer {
         public static final OuterIntakeSubsystem outerIntakeSubsystem = new OuterIntakeSubsystem();
         public static final InnerIntakeSubsystem innerIntakeSubsystem = new InnerIntakeSubsystem();
         public static final TransportSubsystem transportSubsystem = new TransportSubsystem();
-        public static final SingulatorSubsystem singulatorSubsystem = SingulatorSubsystem.create.get();
+        public static final SingulatorSubsystem singulatorSubsystem = new SingulatorSubsystem();
         public static final NotedLoadedSubsystem notedLoadedSubsystem = NotedLoadedSubsystem.create.get();
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
         public static final ElevatorSubsystem elevatorSubsystem = ElevatorSubsystem.create.get();
@@ -130,6 +130,7 @@ public class RobotContainer {
                 outerIntakeSubsystem.setDefaultCommand(outerIntakeSubsystem.createStopCommand());
                 innerIntakeSubsystem.setDefaultCommand(innerIntakeSubsystem.createStopCommand());
                 transportSubsystem.setDefaultCommand(transportSubsystem.createStopCommand());
+                singulatorSubsystem.setDefaultCommand(singulatorSubsystem.createStopCommand());
                 SmartDashboard.putData("PDH", pdh);
                 AutoBuilder.configureHolonomic(
                                 telemetrySubsystem.poseEstimate,

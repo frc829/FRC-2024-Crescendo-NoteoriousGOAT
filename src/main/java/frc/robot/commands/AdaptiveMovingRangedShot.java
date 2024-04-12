@@ -191,7 +191,7 @@ public class AdaptiveMovingRangedShot {
                     BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(tiltAngle),
                     topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                     bottomShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
-                    BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                    singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                     transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
             command.setName("Ranged Shoot");
             return command;

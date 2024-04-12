@@ -31,6 +31,16 @@
           "open": false
         }
       },
+      "SPARK MAX [24]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [25]": {
+        "header": {
+          "open": true
+        }
+      },
       "Talon FX (v6)[20]": {
         "header": {
           "open": true

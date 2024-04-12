@@ -20,7 +20,7 @@ public abstract class Barf {
                         outerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.outerIntakePercent),
                         innerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.innerIntakePercent),
                         transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent),
-                        BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                        singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                         topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                         bottomShooterSubsystem
                                         .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent));

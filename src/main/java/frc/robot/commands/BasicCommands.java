@@ -181,44 +181,27 @@ public class BasicCommands {
         };
     }
 
-    public static final class Singulator {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> singulatorSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    singulatorSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
     public static final class ManualSpinners {
-        public static final Runnable spin = () -> {
-            double value = operator.fullTriggerValue.getAsDouble();
-            singulatorSubsystem.spin.accept(value);
-        };
 
         public static final Supplier<Command> spinCommand = () -> {
-            Command command = Commands.run(
-                    spin,
-                    singulatorSubsystem)
-                    .alongWith(topShooterSubsystem
-                            .createSetVelocityRatioCommand(operator.fullTriggerValue))
-                    .alongWith(bottomShooterSubsystem
-                            .createSetVelocityRatioCommand(operator.fullTriggerValue))
-                    .alongWith(outerIntakeSubsystem
-                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()))
-                    .alongWith(innerIntakeSubsystem
-                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()))
-                    .alongWith(transportSubsystem
-                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()));
+            Command command = Commands.parallel(
+                    topShooterSubsystem
+                            .createSetVelocityRatioCommand(operator.fullTriggerValue),
+                    bottomShooterSubsystem
+                            .createSetVelocityRatioCommand(operator.fullTriggerValue),
+                    outerIntakeSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()),
+                    innerIntakeSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()),
+                    transportSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()),
+                    singulatorSubsystem
+                            .createSetVelocityRatioCommand(() -> operator.fullTriggerValue.getAsDouble()));
             String name = String.format("Run");
             command.setName(name);
             return command;
         };
+
     }
 
     public BasicCommands() {

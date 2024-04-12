@@ -2,8 +2,6 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.RobotContainer.bottomShooterSubsystem;
-import static frc.robot.RobotContainer.driveSubsystem;
 import static frc.robot.RobotContainer.*;
 
 import java.util.function.BooleanSupplier;
@@ -63,7 +61,7 @@ public abstract class AlignElevatorShoot {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(elevatorAndTiltAtPositionCondition);
                 command.setName("Fender Aim");
                 return command;
@@ -76,7 +74,7 @@ public abstract class AlignElevatorShoot {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(shootersAtSpeed);
                 command.setName("Fender Spin Up");
                 return command;
@@ -89,8 +87,8 @@ public abstract class AlignElevatorShoot {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
+                                singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                                 transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
                 command.setName("Fender Shoot");
                 return command;
@@ -145,7 +143,7 @@ public abstract class AlignElevatorShoot {
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
-                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(() -> Constants.rotationPIDController.atSetpoint());
                 command.setName("Ranged Aim Initial");
                 return command;
@@ -162,18 +160,12 @@ public abstract class AlignElevatorShoot {
                                 createShootCommand.get());
         };
 
-        public static final Supplier<Command> stop = () -> {
-                return Commands.runOnce(
-                                singulatorSubsystem.stop,
-                                singulatorSubsystem);
-        };
-
         public static final Supplier<Command> createWithDelay = () -> {
                 return Commands.sequence(
                                 createAimCommand.get(),
                                 createSpinUp.get(),
                                 createShootCommand.get()
                                                 .raceWith(Commands.waitSeconds(Constants.endOfShootDelay)),
-                                stop.get());
+                                singulatorSubsystem.createStopCommand());
         };
 }

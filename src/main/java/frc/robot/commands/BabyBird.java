@@ -44,7 +44,7 @@ public abstract class BabyBird {
                 return Commands.parallel(
                                 BasicCommands.Elevator.createHoldElevatorCommand.get(),
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
-                                BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
+                                singulatorSubsystem.createSetVelocityRatioCommand(() -> Constants.singulatorPercent),
                                 topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
                                 bottomShooterSubsystem
                                 .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent));

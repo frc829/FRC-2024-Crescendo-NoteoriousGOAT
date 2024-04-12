@@ -15,7 +15,7 @@ public abstract class ShutOff {
                 return Commands.sequence(
                         topShooterSubsystem.createStopCommand(),
                         bottomShooterSubsystem.createStopCommand(),
-                        Commands.runOnce(singulatorSubsystem.stop, singulatorSubsystem),
+                        singulatorSubsystem.createStopCommand(),
                         transportSubsystem.createStopCommand()
                 );
         };
