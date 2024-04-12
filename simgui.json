@@ -16,6 +16,11 @@
           "open": true
         }
       },
+      "SPARK MAX [16]": {
+        "header": {
+          "open": true
+        }
+      },
       "SPARK MAX [20]": {
         "header": {
           "open": false
@@ -58,18 +63,6 @@
       }
     },
     "RoboRIO": {
-      "3.3V Rail": {
-        "open": true
-      },
-      "5V Rail": {
-        "open": true
-      },
-      "6V Rail": {
-        "open": true
-      },
-      "RoboRIO Input": {
-        "open": true
-      },
       "window": {
         "visible": true
       }
@@ -138,6 +131,9 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "PathPlanner": {
         "double[]##v_/PathPlanner/activePath": {
@@ -162,6 +158,9 @@
           }
         },
         "Inner Intake": {
+          "open": true
+        },
+        "Outer Intake": {
           "open": true
         },
         "Pickup": {

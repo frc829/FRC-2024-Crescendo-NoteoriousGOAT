@@ -45,17 +45,17 @@ public abstract class Ground {
                 return Commands.parallel(
                                 BasicCommands.Elevator.createHoldElevatorCommand.get(),
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
-                                BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
-                                BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
+                                outerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.outerIntakePercent),
+                                innerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.innerIntakePercent),
                                 BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),
                                 BasicCommands.Singulator.createSpinCommand.apply(0.0));
         };
 
         private static final Supplier<Command> stop = () -> {
                 return Commands.parallel(
-                                Commands.runOnce(outerIntakeSubsystem.stop, outerIntakeSubsystem),
-                                Commands.runOnce(innerIntakeSubsystem.stop, innerIntakeSubsystem),
-                                Commands.runOnce(transportSubsystem.stop, transportSubsystem));
+                                outerIntakeSubsystem.createStopCommand(),
+                                innerIntakeSubsystem.createStopCommand(),
+                                transportSubsystem.createStopCommand());
         };
 
         public static final Supplier<Command> groundCommand = () -> Commands

@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
 import static frc.robot.RobotContainer.shooterTiltSubsystem;
+import static frc.robot.RobotContainer.topShooterSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -18,7 +19,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.RobotContainer;
+import static frc.robot.RobotContainer.*;
 
 public class BasicCommands {
 
@@ -31,34 +32,34 @@ public class BasicCommands {
             return () -> {
                 return MathUtil.isNear(
                         position.in(Meters),
-                        RobotContainer.elevatorSubsystem.position.in(Meters),
+                        elevatorSubsystem.position.in(Meters),
                         tolerance.in(Meters));
             };
         };
 
         public static final Function<DoubleSupplier, Runnable> driveElevator = (speedSupplier) -> {
             return () -> {
-                if (RobotContainer.elevatorSubsystem.position.in(Meters) >= maxPosition.in(Meters)
+                if (elevatorSubsystem.position.in(Meters) >= maxPosition.in(Meters)
                         && speedSupplier.getAsDouble() > 0) {
-                    RobotContainer.elevatorSubsystem.drive.accept(0.0);
+                    elevatorSubsystem.drive.accept(0.0);
 
-                } else if (RobotContainer.elevatorSubsystem.position.in(Meters) <= minPosition.in(Meters)
+                } else if (elevatorSubsystem.position.in(Meters) <= minPosition.in(Meters)
                         && speedSupplier.getAsDouble() < 0) {
-                    RobotContainer.elevatorSubsystem.drive.accept(0.0);
+                    elevatorSubsystem.drive.accept(0.0);
                 } else {
-                    RobotContainer.elevatorSubsystem.drive.accept(speedSupplier.getAsDouble());
+                    elevatorSubsystem.drive.accept(speedSupplier.getAsDouble());
                 }
             };
         };
 
         public static final Function<Measure<Distance>, Runnable> setElevatorPosition = (position) -> {
-            return () -> RobotContainer.elevatorSubsystem.move.accept(position);
+            return () -> elevatorSubsystem.move.accept(position);
         };
 
         public static final Supplier<Command> createHoldElevatorCommand = () -> {
             Command command = Commands.run(
-                    RobotContainer.elevatorSubsystem.hold,
-                    RobotContainer.elevatorSubsystem);
+                    elevatorSubsystem.hold,
+                    elevatorSubsystem);
             String name = String.format("Hold");
             command.setName(name);
             return command;
@@ -67,7 +68,7 @@ public class BasicCommands {
         public static final Function<DoubleSupplier, Command> createDriveElevatorCommand = (speedSupplier) -> {
             Command command = Commands.run(
                     driveElevator.apply(speedSupplier),
-                    RobotContainer.elevatorSubsystem);
+                    elevatorSubsystem);
             String name = String.format("Drive");
             command.setName(name);
             return command;
@@ -77,7 +78,7 @@ public class BasicCommands {
                 position) -> {
             Command command = Commands.run(
                     setElevatorPosition.apply(position),
-                    RobotContainer.elevatorSubsystem);
+                    elevatorSubsystem);
             String name = String.format("Set And Hold at %s m", position.in(Meters));
             command.setName(name);
             return command;
@@ -86,7 +87,7 @@ public class BasicCommands {
         public static final Function<Measure<Distance>, Command> createSetElevatorPositionCommand = (position) -> {
             Command command = Commands.run(
                     setElevatorPosition.apply(position),
-                    RobotContainer.elevatorSubsystem);
+                    elevatorSubsystem);
             BooleanSupplier atToleranceCondition = createAtPositionCondition.apply(position);
             command = command.until(atToleranceCondition);
             String name = String.format("Set at %s m", position.in(Meters));
@@ -104,22 +105,22 @@ public class BasicCommands {
             return () -> {
                 return MathUtil.isNear(
                         angle.in(Degrees),
-                        RobotContainer.shooterTiltSubsystem.angle.in(Degrees),
+                        shooterTiltSubsystem.angle.in(Degrees),
                         tolerance.in(Degrees));
             };
         };
 
         public static final Function<DoubleSupplier, Runnable> rotateTilt = (speedSupplier) -> {
             return () -> {
-                if (RobotContainer.shooterTiltSubsystem.angle.in(Degrees) >= maxAngle.in(Degrees)
+                if (shooterTiltSubsystem.angle.in(Degrees) >= maxAngle.in(Degrees)
                         && speedSupplier.getAsDouble() > 0) {
-                    RobotContainer.shooterTiltSubsystem.drive.accept(0.0);
+                    shooterTiltSubsystem.drive.accept(0.0);
 
-                } else if (RobotContainer.shooterTiltSubsystem.angle.in(Degrees) <= minAngle.in(Degrees)
+                } else if (shooterTiltSubsystem.angle.in(Degrees) <= minAngle.in(Degrees)
                         && speedSupplier.getAsDouble() < 0) {
-                    RobotContainer.shooterTiltSubsystem.drive.accept(0.0);
+                    shooterTiltSubsystem.drive.accept(0.0);
                 } else {
-                    RobotContainer.shooterTiltSubsystem.drive.accept(speedSupplier.getAsDouble());
+                    shooterTiltSubsystem.drive.accept(speedSupplier.getAsDouble());
                 }
             };
         };
@@ -131,13 +132,13 @@ public class BasicCommands {
         };
 
         public static final Function<Measure<Angle>, Runnable> setTiltAngle = (angle) -> {
-            return () -> RobotContainer.shooterTiltSubsystem.turn.accept(angle);
+            return () -> shooterTiltSubsystem.turn.accept(angle);
         };
 
         public static final Supplier<Command> createHoldTiltCommand = () -> {
             Command command = Commands.run(
-                    RobotContainer.shooterTiltSubsystem.hold,
-                    RobotContainer.shooterTiltSubsystem);
+                    shooterTiltSubsystem.hold,
+                    shooterTiltSubsystem);
             String name = String.format("Hold");
             command.setName(name);
             return command;
@@ -146,7 +147,7 @@ public class BasicCommands {
         public static final Function<DoubleSupplier, Command> createRotateTiltCommand = (speedSupplier) -> {
             Command command = Commands.run(
                     rotateTilt.apply(speedSupplier),
-                    RobotContainer.shooterTiltSubsystem);
+                    shooterTiltSubsystem);
             String name = String.format("Rotate");
             command.setName(name);
             return command;
@@ -156,7 +157,7 @@ public class BasicCommands {
                 angle) -> {
             Command command = Commands.run(
                     setTiltAngle.apply(angle),
-                    RobotContainer.shooterTiltSubsystem);
+                    shooterTiltSubsystem);
             String name = String.format("Set And Hold at %s deg", angle.in(Degrees));
             command.setName(name);
             return command;
@@ -165,7 +166,7 @@ public class BasicCommands {
         public static final Function<Measure<Angle>, Command> createSetTiltAngleCommand = (angle) -> {
             Command command = Commands.run(
                     setTiltAngle.apply(angle),
-                    RobotContainer.shooterTiltSubsystem);
+                    shooterTiltSubsystem);
             BooleanSupplier atToleranceCondition = createAtAngleCondition.apply(angle);
             command = command.until(atToleranceCondition);
             String name = String.format("Set at %s deg", angle.in(Degrees));
@@ -180,84 +181,14 @@ public class BasicCommands {
         };
     }
 
-    public static final class OuterIntake {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.outerIntakeSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.outerIntakeSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class InnerIntake {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.innerIntakeSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.innerIntakeSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class Transport {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.transportSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.transportSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
     public static final class Singulator {
         public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.singulatorSubsystem.spin.accept(speed);
+            return () -> singulatorSubsystem.spin.accept(speed);
         };
         public static final Function<Double, Command> createSpinCommand = (speed) -> {
             Command command = Commands.run(
                     spin.apply(speed),
-                    RobotContainer.singulatorSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class TopShooter {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.topShooterSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.topShooterSubsystem);
-            String name = String.format("Run at %s of Max", speed);
-            command.setName(name);
-            return command;
-        };
-    }
-
-    public static final class BottomShooter {
-        public static final Function<Double, Runnable> spin = (speed) -> {
-            return () -> RobotContainer.bottomShooterSubsystem.spin.accept(speed);
-        };
-        public static final Function<Double, Command> createSpinCommand = (speed) -> {
-            Command command = Commands.run(
-                    spin.apply(speed),
-                    RobotContainer.bottomShooterSubsystem);
+                    singulatorSubsystem);
             String name = String.format("Run at %s of Max", speed);
             command.setName(name);
             return command;
@@ -266,24 +197,24 @@ public class BasicCommands {
 
     public static final class ManualSpinners {
         public static final Runnable spin = () -> {
-            double value = RobotContainer.operator.fullTriggerValue.getAsDouble();
-            RobotContainer.topShooterSubsystem.spin.accept(value);
-            RobotContainer.bottomShooterSubsystem.spin.accept(value);
-            RobotContainer.singulatorSubsystem.spin.accept(value);
-            RobotContainer.transportSubsystem.spin.accept(-value);
-            RobotContainer.innerIntakeSubsystem.spin.accept(-value);
-            RobotContainer.outerIntakeSubsystem.spin.accept(-value);
+            double value = operator.fullTriggerValue.getAsDouble();
+            singulatorSubsystem.spin.accept(value);
         };
 
         public static final Supplier<Command> spinCommand = () -> {
             Command command = Commands.run(
                     spin,
-                    RobotContainer.bottomShooterSubsystem,
-                    RobotContainer.topShooterSubsystem,
-                    RobotContainer.innerIntakeSubsystem,
-                    RobotContainer.outerIntakeSubsystem,
-                    RobotContainer.transportSubsystem,
-                    RobotContainer.singulatorSubsystem);
+                    singulatorSubsystem)
+                    .alongWith(topShooterSubsystem
+                            .createSetVelocityRatioCommand(operator.fullTriggerValue))
+                    .alongWith(bottomShooterSubsystem
+                            .createSetVelocityRatioCommand(operator.fullTriggerValue))
+                    .alongWith(outerIntakeSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()))
+                    .alongWith(innerIntakeSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()))
+                    .alongWith(transportSubsystem
+                            .createSetVelocityRatioCommand(() -> -operator.fullTriggerValue.getAsDouble()));
             String name = String.format("Run");
             command.setName(name);
             return command;

@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import static frc.robot.RobotContainer.*;
 
 public abstract class Barf {
         private static final class Constants {
@@ -16,11 +17,11 @@ public abstract class Barf {
         }
 
         public static final Supplier<Command> barfCommand = () -> Commands.parallel(
-                        BasicCommands.OuterIntake.createSpinCommand.apply(Constants.outerIntakePercent),
-                        BasicCommands.InnerIntake.createSpinCommand.apply(Constants.innerIntakePercent),
-                        BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent),
+                        outerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.outerIntakePercent),
+                        innerIntakeSubsystem.createSetVelocityRatioCommand(() -> Constants.innerIntakePercent),
+                        transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent),
                         BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                        BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                        BasicCommands.BottomShooter.createSpinCommand
-                                        .apply(Constants.bottomShooterPercent));
+                        topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                        bottomShooterSubsystem
+                                        .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent));
 }

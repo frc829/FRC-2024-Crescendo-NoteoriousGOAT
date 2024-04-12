@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.RobotContainer;
 
+import static frc.robot.RobotContainer.*;
+
 public abstract class BabyBird {
         private static final class Constants {
                 private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
@@ -43,9 +45,9 @@ public abstract class BabyBird {
                                 BasicCommands.Elevator.createHoldElevatorCommand.get(),
                                 BasicCommands.Tilt.createHoldTiltCommand.get(),
                                 BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent));
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent));
         };
 
         private static final Supplier<Command> babyBirdCommand = () -> Commands

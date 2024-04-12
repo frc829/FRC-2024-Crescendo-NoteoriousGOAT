@@ -107,11 +107,11 @@ public class RobotContainer {
         // .apply(Constants.Controller.testPort)
         // .apply(Constants.Controller.deadband);
 
-        public static final TopShooterSubsystem topShooterSubsystem = TopShooterSubsystem.create.get();
-        public static final BottomShooterSubsystem bottomShooterSubsystem = BottomShooterSubsystem.create.get();
-        public static final OuterIntakeSubsystem outerIntakeSubsystem = OuterIntakeSubsystem.create.get();
-        public static final InnerIntakeSubsystem innerIntakeSubsystem = InnerIntakeSubsystem.create.get();
-        public static final TransportSubsystem transportSubsystem = TransportSubsystem.create.get();
+        public static final TopShooterSubsystem topShooterSubsystem = new TopShooterSubsystem();
+        public static final BottomShooterSubsystem bottomShooterSubsystem = new BottomShooterSubsystem();
+        public static final OuterIntakeSubsystem outerIntakeSubsystem = new OuterIntakeSubsystem();
+        public static final InnerIntakeSubsystem innerIntakeSubsystem = new InnerIntakeSubsystem();
+        public static final TransportSubsystem transportSubsystem = new TransportSubsystem();
         public static final SingulatorSubsystem singulatorSubsystem = SingulatorSubsystem.create.get();
         public static final NotedLoadedSubsystem notedLoadedSubsystem = NotedLoadedSubsystem.create.get();
         public static final ShooterTiltSubsystem shooterTiltSubsystem = ShooterTiltSubsystem.create.get();
@@ -125,6 +125,11 @@ public class RobotContainer {
         private final SendableChooser<Command> autoChooser;
 
         public RobotContainer() {
+                topShooterSubsystem.setDefaultCommand(topShooterSubsystem.createStopCommand());
+                bottomShooterSubsystem.setDefaultCommand(bottomShooterSubsystem.createStopCommand());
+                outerIntakeSubsystem.setDefaultCommand(outerIntakeSubsystem.createStopCommand());
+                innerIntakeSubsystem.setDefaultCommand(innerIntakeSubsystem.createStopCommand());
+                transportSubsystem.setDefaultCommand(transportSubsystem.createStopCommand());
                 SmartDashboard.putData("PDH", pdh);
                 AutoBuilder.configureHolonomic(
                                 telemetrySubsystem.poseEstimate,

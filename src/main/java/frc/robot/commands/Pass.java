@@ -2,14 +2,12 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Value;
 import static frc.robot.RobotContainer.bottomShooterSubsystem;
 import static frc.robot.RobotContainer.topShooterSubsystem;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
@@ -31,13 +29,9 @@ public abstract class Pass {
         }
 
         private static final BooleanSupplier shootersAtSpeed = () -> {
-                boolean topCondition = MathUtil.isNear(
-                                Math.abs(Constants.topShooterPercent),
-                                Math.abs(topShooterSubsystem.velocity.in(Value)),
+                boolean topCondition = topShooterSubsystem.atSpeed(Constants.topShooterPercent,
                                 Constants.shooterTolerancePercent);
-                boolean bottomCondition = MathUtil.isNear(
-                                Math.abs(Constants.bottomShooterPercent),
-                                Math.abs(bottomShooterSubsystem.velocity.in(Value)),
+                boolean bottomCondition = bottomShooterSubsystem.atSpeed(Constants.bottomShooterPercent,
                                 Constants.shooterTolerancePercent);
                 boolean condition = topCondition && bottomCondition;
                 SmartDashboard.putBoolean("ShooterAt Speed", condition);
@@ -57,9 +51,9 @@ public abstract class Pass {
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent))
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(elevatorAndTiltAtPositionCondition);
                 command.setName("Fender Aim");
                 return command;
@@ -70,9 +64,9 @@ public abstract class Pass {
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent))
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent))
                                 .until(shootersAtSpeed);
                 command.setName("Fender Spin Up");
                 return command;
@@ -83,9 +77,9 @@ public abstract class Pass {
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent),
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
                                 BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
                 command.setName("Fender Shoot");

@@ -10,6 +10,7 @@ import edu.wpi.first.units.Distance;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import static frc.robot.RobotContainer.*;
 
 public abstract class Amp {
         private static final class Constants {
@@ -23,9 +24,9 @@ public abstract class Amp {
 
         public static final Supplier<Command> createAmpPosition = () -> {
                 Command command = Commands.parallel(
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent),
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle));
@@ -35,14 +36,14 @@ public abstract class Amp {
 
         public static final Supplier<Command> createAmpDrop = () -> {
                 Command command = Commands.parallel(
-                                BasicCommands.TopShooter.createSpinCommand.apply(Constants.topShooterPercent),
-                                BasicCommands.BottomShooter.createSpinCommand
-                                                .apply(Constants.bottomShooterPercent),
+                                topShooterSubsystem.createSetVelocityRatioCommand(() -> Constants.topShooterPercent),
+                                bottomShooterSubsystem
+                                                .createSetVelocityRatioCommand(() -> Constants.bottomShooterPercent),
                                 BasicCommands.Elevator.createSetAndHoldElevatorPositionCommand
                                                 .apply(Constants.elevatorPosition),
                                 BasicCommands.Tilt.createSetAndHoldTiltAngleCommand.apply(Constants.tiltAngle),
                                 BasicCommands.Singulator.createSpinCommand.apply(Constants.singulatorPercent),
-                                BasicCommands.Transport.createSpinCommand.apply(Constants.transportPercent));
+                                transportSubsystem.createSetVelocityRatioCommand(() -> Constants.transportPercent));
 
                 command.setName("Amp Drop");
                 return command;

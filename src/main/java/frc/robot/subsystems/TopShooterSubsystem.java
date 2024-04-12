@@ -1,28 +1,43 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
+import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.DoubleSupplier;
 
-import com.compLevel0.Motor;
-import com.compLevel1.Spinner;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.REVPhysicsSim;
+import com.revrobotics.SparkPIDController.ArbFFUnits;
+import com.simulation.REVMotorSimulation;
 import com.utility.GoatMath;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.Angle;
+import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Dimensionless;
 import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.MutableMeasure;
+import edu.wpi.first.units.Per;
+import edu.wpi.first.units.Velocity;
 import edu.wpi.first.units.Voltage;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -30,83 +45,126 @@ public class TopShooterSubsystem extends SubsystemBase {
 
   private static final class Constants {
     private static final int deviceId = 16;
+    private static final MotorType type = MotorType.kBrushless;
     private static final Measure<Voltage> kS = Volts.of(0.082167);
-    private static final double slot0kP = 0.0;
-    private static final double slot0kI = 0.0;
-    private static final double slot0kD = 0.0;
-    private static final double slot0kF = 0.0018265 / 12.0;
+    private static final double kVVoltsPerRPM = 0.0018265;
+    private static final Measure<Per<Voltage, Velocity<Angle>>> kV = VoltsPerRadianPerSecond
+        .of(kVVoltsPerRPM * 60 / 2 / Math.PI);
+    private static final double kAVoltsPerRPMSq = 0.00028717;
+    private static final Measure<Per<Voltage, Velocity<Velocity<Angle>>>> kA = VoltsPerRadianPerSecondSquared
+        .of(kAVoltsPerRPMSq * 3600 / 2 / Math.PI);
+    private static final LinearSystem<N2, N1, N2> plant = LinearSystemId
+        .createDCMotorSystem(kV.in(VoltsPerRadianPerSecond), kAVoltsPerRPMSq);
+    private static final double gearing = 1.0;
+    private static final DCMotor gearbox = DCMotor.getNeoVortex(1);
+    private static final SimpleMotorFeedforward simpleMotorFeedforward = new SimpleMotorFeedforward(
+        kS.in(Volts),
+        kV.in(VoltsPerRadianPerSecond),
+        kA.in(VoltsPerRadianPerSecondSquared));
+    private static final Measure<Velocity<Angle>> maxVelocity = RadiansPerSecond
+        .of(simpleMotorFeedforward.maxAchievableVelocity(12.0, 0));
   }
 
-  public final Measure<Voltage> voltage;
-  public final Measure<Dimensionless> velocity;
-  public final Consumer<Double> spin;
-  public final Runnable stop;
-  public final Runnable update;
+  private final MutableMeasure<Voltage> voltage;
+  private final MutableMeasure<Dimensionless> velocityRatio;
+  private final MutableMeasure<Current> current;
 
-  private TopShooterSubsystem(
-      Measure<Voltage> voltage,
-      Measure<Dimensionless> velocity,
-      Consumer<Double> spin,
-      Runnable stop,
-      Runnable update) {
-    this.voltage = voltage;
-    this.velocity = velocity;
-    this.spin = spin;
-    this.stop = stop;
-    this.update = update;
+  private final CANSparkFlex canSparkFlex;
+  private final REVMotorSimulation revSimulation;
 
-    Command defaultCommand = run(stop);
-    defaultCommand.setName("STOP");
-    this.setDefaultCommand(defaultCommand);
+  public TopShooterSubsystem() {
+    voltage = MutableMeasure.zero(Volts);
+    velocityRatio = MutableMeasure.zero(Value);
+    current = MutableMeasure.zero(Amps);
 
+    canSparkFlex = new CANSparkFlex(Constants.deviceId, Constants.type);
+    canSparkFlex.getPIDController().setFF(Constants.kVVoltsPerRPM);
+    canSparkFlex.setIdleMode(IdleMode.kCoast);
+    canSparkFlex.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
+    revSimulation = new REVMotorSimulation(
+        Constants.deviceId,
+        Constants.gearbox.stallTorqueNewtonMeters,
+        Constants.gearbox.freeSpeedRadPerSec * 60 / 2 / Math.PI,
+        Constants.plant,
+        Constants.gearbox,
+        Constants.gearing,
+        Constants.kS);
+
+  }
+
+  public void updateTelemetry() {
+    voltage.mut_setMagnitude(canSparkFlex.getAppliedOutput() * canSparkFlex.getBusVoltage());
+    velocityRatio.mut_setMagnitude(canSparkFlex.getEncoder().getVelocity() / Constants.maxVelocity.in(RPM));
+    current.mut_setMagnitude(canSparkFlex.getOutputCurrent());
   }
 
   @Override
   public void periodic() {
-    update.run();
+    updateTelemetry();
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    revSimulation.update();
+  }
+
+  private void setVelocityRatio(double velocityRatio) {
+    if (RobotBase.isReal()) {
+      double arbFeedforward = velocityRatio != 0
+          ? Constants.kS.in(Volts) * Math.signum(velocityRatio)
+          : 0.0;
+      canSparkFlex.getPIDController().setReference(
+          velocityRatio * Constants.maxVelocity.in(RPM),
+          ControlType.kVelocity,
+          0,
+          arbFeedforward,
+          ArbFFUnits.kVoltage);
+    } else {
+      double voltage = Constants.simpleMotorFeedforward
+          .calculate(velocityRatio * Constants.maxVelocity.in(RadiansPerSecond), 0);
+      voltage = MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
+      this.voltage.mut_setMagnitude(voltage);
+      revSimulation.setInputVoltage(voltage);
+    }
+  }
+
+  private void stop() {
+    if (RobotBase.isReal()) {
+      canSparkFlex.stopMotor();
+    } else {
+      revSimulation.setInputVoltage(0.0);
+    }
+  }
+
+  public Command createSetVelocityRatioCommand(DoubleSupplier velocityRatioSupplier) {
+    return run(() -> setVelocityRatio(velocityRatioSupplier.getAsDouble()))
+        .withName("Set Velocity Ratio");
+  }
+
+  public Command createStopCommand() {
+    return run(this::stop).withName("STOP");
+  }
+
+  public boolean atSpeed(double velocityRatio, double velocityRatioTolerance) {
+    return MathUtil.isNear(velocityRatio, this.velocityRatio.in(Value), velocityRatioTolerance);
   }
 
   @Override
   public void initSendable(SendableBuilder builder) {
     super.initSendable(builder);
     builder.addDoubleProperty(
-        "Velocity",
-        () -> GoatMath.round(velocity.in(Percent), 2),
+        "Velocity % of Max",
+        () -> GoatMath.round(velocityRatio.in(Percent), 2),
         null);
 
     builder.addDoubleProperty(
-        "Voltage",
+        "Voltage (V)",
         () -> GoatMath.round(voltage.in(Volts), 2),
         null);
+
+    builder.addDoubleProperty(
+        "Current (A)",
+        () -> GoatMath.round(current.in(Amps), 2),
+        null);
   }
-
-  public static final Supplier<TopShooterSubsystem> create = () -> {
-    CANSparkBase canSparkBase;
-    if (RobotBase.isSimulation()) {
-      CANSparkMax canSparkMax = new CANSparkMax(Constants.deviceId, MotorType.kBrushless);
-      canSparkBase = canSparkMax;
-      REVPhysicsSim.getInstance().addSparkMax(canSparkMax, DCMotor.getNeoVortex(1));
-    } else {
-      canSparkBase = new CANSparkFlex(Constants.deviceId, MotorType.kBrushless);
-    }
-
-    canSparkBase.setIdleMode(IdleMode.kCoast);
-    canSparkBase.getPIDController().setP(Constants.slot0kP, 0);
-    canSparkBase.getPIDController().setI(Constants.slot0kI, 0);
-    canSparkBase.getPIDController().setD(Constants.slot0kD, 0);
-    canSparkBase.getPIDController().setFF(Constants.slot0kF, 0);
-    canSparkBase.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-
-    Spinner spinner = Motor.REV.createNEOVortexMotor
-        .andThen(Spinner.create)
-        .apply(canSparkBase, Constants.kS);
-
-    return new TopShooterSubsystem(
-        spinner.voltage,
-        spinner.velocity,
-        spinner.spin,
-        spinner.stop,
-        spinner.update);
-
-  };
 }
