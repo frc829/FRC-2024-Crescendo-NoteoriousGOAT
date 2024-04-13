@@ -13,14 +13,17 @@ import edu.wpi.first.units.Measure;
 public class PositionSwitch {
 
     public final BooleanSupplier isOn;
+    public final BooleanSupplier isOn2;
     public final BooleanSupplier isOnBB;
     public final Runnable update;
 
     private PositionSwitch(
             BooleanSupplier isOn,
+            BooleanSupplier isOn2,
             BooleanSupplier isOnBB,
             Runnable update) {
         this.isOn = isOn;
+        this.isOn2 = isOn2;
         this.isOnBB = isOnBB;
         this.update = update;
     }
@@ -31,6 +34,10 @@ public class PositionSwitch {
                     return distanceSensor.measure.in(Meters) <= maxOn.in(Meters)
                             && distanceSensor.measure.in(Meters) >= minOn.in(Meters);
                 };
+                BooleanSupplier isOn2 = () -> {
+                    return distanceSensor.measure.in(Meters) <= maxOn.in(Meters)
+                            && distanceSensor.measure.in(Meters) >= minOn.in(Meters);
+                };
                 BooleanSupplier isOnBB = () -> {
                     return distanceSensor.measure.in(Meters) <= maxOnBB.in(Meters)
                             && distanceSensor.measure.in(Meters) >= minOnBB.in(Meters);
@@ -38,7 +45,7 @@ public class PositionSwitch {
                 Runnable update = () -> {
                     distanceSensor.update.run();
                 };
-                return new PositionSwitch(isOn, isOnBB, update);
+                return new PositionSwitch(isOn, isOn2, isOnBB, update);
             };
 
 }

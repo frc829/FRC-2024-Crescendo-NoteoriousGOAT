@@ -23,7 +23,7 @@ public class ControllerCommands {
         Runnable stop = () -> {
             operator.rumbleConsumer.accept(RumbleType.kBothRumble, 0.0);
         };
-        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(2));
+        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(1.5));
         Command stopRumbleCommand = Commands.runOnce(stop);
         Command command = rumbleCommand.andThen(stopRumbleCommand);
         command.setName("Operator Rumble");
@@ -38,7 +38,7 @@ public class ControllerCommands {
         Runnable stop = () -> {
             driver.rumbleConsumer.accept(RumbleType.kBothRumble, 0.0);
         };
-        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(2));
+        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(1.0));
         Command stopRumbleCommand = Commands.runOnce(stop);
         Command command = rumbleCommand.andThen(stopRumbleCommand);
         command.setName("Driver Rumble");

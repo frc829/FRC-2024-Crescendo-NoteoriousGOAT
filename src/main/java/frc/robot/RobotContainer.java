@@ -159,16 +159,11 @@ public class RobotContainer {
                 operator.a.whileTrue(Amp.createAmpPosition.get());
                 operator.leftBumper.whileTrue(Ground.groundCommandThenLevel.get());
                 operator.leftBumper.onFalse(Level.command.get());
-                operator.rightBumper.whileTrue(BabyBird.babyBirdCommandThenLevel.get());
-                operator.rightBumper.onFalse(Level.command.get());
-                driver.padUp.whileTrue(Trap.createTrapPosition.get());
-                driver.padUp.onFalse(Level.command.get());
-                // operator.padUp.whileTrue(Trap.createTrapShoot.get());
-                // operator.padUp.onFalse(Level.command.get());
+                operator.padUp.whileTrue(BabyBird.babyBirdCommandThenLevel.get());
+                operator.padUp.onFalse(Level.command.get());
+                operator.rightBumper.whileTrue(Ground.groundCommand.get());
                 operator.padDown.whileTrue(ElevatorShoot.create.get());
                 operator.padDown.onFalse(Level.command.get());
-                operator.padUp.whileTrue(AlignElevatorShoot.create.get());
-                operator.padUp.onFalse(Level.command.get());
                 driver.leftBumper.whileTrue(Fender.create.get());
                 driver.leftBumper.onFalse(Level.command.get());
                 driver.rightBumper.whileTrue(StationaryRangedShot.Ranged.create.get());
@@ -211,12 +206,12 @@ public class RobotContainer {
                                 .whileTrue(DriveCommands.createRobotCentricDriveRRCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger
                                 .onFalse(DriveCommands.createRobotCentricDriveOriginCommand.get());
-                // ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createOperatorRumble.get());
-                // ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createDriverRumble.get());
-                ComplexTriggers.noteLoadedTrigger.onTrue(Commands.parallel(
-                        ControllerCommands.createOperatorRumble.get(),
-                        ControllerCommands.createDriverRumble.get()
-                ));
+                ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createOperatorRumble.get());
+                ComplexTriggers.noteLoadedTrigger2.onTrue(ControllerCommands.createDriverRumble.get());
+                // ComplexTriggers.noteLoadedTrigger.onTrue(Commands.parallel(
+                //         ControllerCommands.createOperatorRumble.get(),
+                //         ControllerCommands.createDriverRumble.get()
+                // ));
 
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here

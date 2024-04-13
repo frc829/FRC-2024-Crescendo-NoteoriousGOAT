@@ -28,14 +28,17 @@ public class NotedLoadedSubsystem extends SubsystemBase {
   }
 
   public final BooleanSupplier hasNote;
+  public final BooleanSupplier hasNote2;
   public final BooleanSupplier hasNoteBB;
   public final Runnable update;
 
   private NotedLoadedSubsystem(
       BooleanSupplier hasNote,
+      BooleanSupplier hasNote2,
       BooleanSupplier hasNoteBB,
       Runnable update) {
     this.hasNote = hasNote;
+    this.hasNote2 = hasNote2;
     this.hasNoteBB = hasNoteBB;
     this.update = update;
   }
@@ -67,6 +70,7 @@ public class NotedLoadedSubsystem extends SubsystemBase {
 
     return new NotedLoadedSubsystem(
         positionSwitch.isOn,
+        positionSwitch.isOn2,
         positionSwitch.isOnBB,
         positionSwitch.update);
 

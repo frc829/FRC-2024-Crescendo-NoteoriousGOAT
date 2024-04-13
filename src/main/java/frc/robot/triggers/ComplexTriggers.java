@@ -37,7 +37,11 @@ public class ComplexTriggers {
         private static final BooleanSupplier hasNote = () -> {
                 return notedLoadedSubsystem.hasNoteBB.getAsBoolean() || notedLoadedSubsystem.hasNote.getAsBoolean();
         };
+        private static final BooleanSupplier hasNote2 = () -> {
+                return notedLoadedSubsystem.hasNote2.getAsBoolean();
+        };
         public static final Trigger noteLoadedTrigger = new Trigger(hasNote);
+        public static final Trigger noteLoadedTrigger2 = new Trigger(hasNote2);
 
         // public static final Trigger templateTrigger = new Trigger(null);
 
