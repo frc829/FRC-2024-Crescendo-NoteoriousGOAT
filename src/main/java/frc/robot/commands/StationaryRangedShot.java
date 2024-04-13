@@ -202,7 +202,7 @@ public class StationaryRangedShot {
                     TelemetryCommands.createSetRearCameraToFieldCommand.get(),
                     setDistanceAndAngleCommand.get(),
                     createAimCommandInitial.get(),
-                    Commands.race(Commands.waitSeconds(0.75), Commands.run(driveSubsystem.stop, driveSubsystem)),
+                    Commands.race(Commands.waitSeconds(0.25), Commands.run(driveSubsystem.stop, driveSubsystem)),
                     Commands.runOnce(shooterTiltSubsystem.resetRelEncoderFromAbsolute, shooterTiltSubsystem),
                     createAimCommand.get(),
                     createShootCommand.get());

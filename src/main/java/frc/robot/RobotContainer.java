@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlignElevatorShoot;
 import frc.robot.commands.Amp;
 import frc.robot.commands.BabyBird;
@@ -176,6 +177,7 @@ public class RobotContainer {
 
                 driver.start.onTrue(TelemetryCommands.createSetStartPoseCommand
                                 .apply(TelemetryCommands.Constants.testingStartPose));
+                // driver.start.onTrue(Commands.runOnce(driveSubsystem.resetSteerEncodersFromAbsolutes));
                 driver.x.whileTrue(NoteDetect.create.get());
                 driver.x.onFalse(TelemetryCommands.createSetFrontCameraToFieldCommand.get()
                                 .andThen(Level.command.get()));
@@ -209,8 +211,12 @@ public class RobotContainer {
                                 .whileTrue(DriveCommands.createRobotCentricDriveRRCommand.get());
                 ComplexTriggers.robotCentricFRDriveTrigger
                                 .onFalse(DriveCommands.createRobotCentricDriveOriginCommand.get());
-                ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createOperatorRumble.get());
-                ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createDriverRumble.get());
+                // ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createOperatorRumble.get());
+                // ComplexTriggers.noteLoadedTrigger.onTrue(ControllerCommands.createDriverRumble.get());
+                ComplexTriggers.noteLoadedTrigger.onTrue(Commands.parallel(
+                        ControllerCommands.createOperatorRumble.get(),
+                        ControllerCommands.createDriverRumble.get()
+                ));
 
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here

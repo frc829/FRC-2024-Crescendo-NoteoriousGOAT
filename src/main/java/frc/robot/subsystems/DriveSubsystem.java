@@ -62,7 +62,7 @@ public class DriveSubsystem extends SubsystemBase {
                 private static final List<Double> steerkIs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkDs = Collections.nCopies(4, 0.0);
                 private static final List<Double> steerkFs = Collections.nCopies(4, 0.0);
-                private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 7.9508);
+                private static final List<Double> wheelFOCkPs = Collections.nCopies(4, 10.951);
                 private static final List<Double> wheelFOCkIs = Collections.nCopies(4, 0.00);
                 private static final List<Double> wheelFOCkDs = Collections.nCopies(4, 0.000);
                 private static final List<Double> wheelFOCkFs = Collections.nCopies(4, 0.0);
@@ -263,8 +263,8 @@ public class DriveSubsystem extends SubsystemBase {
                                         TalonFXConfiguration config = new TalonFXConfiguration();
                                         config.Voltage.PeakForwardVoltage = 12.0;
                                         config.Voltage.PeakReverseVoltage = -12.0;
-                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -40;
+                                        config.TorqueCurrent.PeakForwardTorqueCurrent = 70;
+                                        config.TorqueCurrent.PeakReverseTorqueCurrent = -70;
                                         config.Slot0.kP = Constants.wheelFOCkPs.get(i);
                                         config.Slot0.kI = Constants.wheelFOCkIs.get(i);
                                         config.Slot0.kD = Constants.wheelFOCkDs.get(i);
