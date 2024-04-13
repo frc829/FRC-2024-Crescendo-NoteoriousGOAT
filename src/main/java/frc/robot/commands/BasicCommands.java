@@ -25,7 +25,7 @@ public class BasicCommands {
     public static final class Elevator {
         public static final Measure<Distance> tolerance = Millimeters.of(5);
         public static final Measure<Distance> minPosition = Centimeters.of(0.0);
-        public static final Measure<Distance> maxPosition = Centimeters.of(38.5);
+        public static final Measure<Distance> maxPosition = Centimeters.of(37);
 
         public static final Function<Measure<Distance>, BooleanSupplier> createAtPositionCondition = (position) -> {
             return () -> {

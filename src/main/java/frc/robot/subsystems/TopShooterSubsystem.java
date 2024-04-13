@@ -91,7 +91,8 @@ public class TopShooterSubsystem extends SubsystemBase {
     }
 
     canSparkBase.setIdleMode(IdleMode.kCoast);
-    
+    canSparkBase.getEncoder().setAverageDepth(2);
+    canSparkBase.getEncoder().setMeasurementPeriod(16);
     canSparkBase.getPIDController().setP(Constants.slot0kP, 0);
     canSparkBase.getPIDController().setI(Constants.slot0kI, 0);
     canSparkBase.getPIDController().setD(Constants.slot0kD, 0);

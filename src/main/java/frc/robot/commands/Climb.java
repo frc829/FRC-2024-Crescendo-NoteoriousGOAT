@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 
 public abstract class Climb {
         private static final class Constants {
-                private static final Measure<Distance> elevatorHeightStart = Meters.of(0.385);
+                private static final Measure<Distance> elevatorHeightStart = Meters.of(0.37);
                 private static final Measure<Distance> elevatorHeightEnd = Meters.of(0.15);
                 private static final Measure<Angle> tiltAngle = Degrees.of(0.0);
         }
