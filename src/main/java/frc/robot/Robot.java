@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import static frc.robot.RobotContainer.telemetrySubsystem;
-
 import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -19,7 +16,6 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-  private boolean hasInitialized = false;
   public static String rioComments;
 
   @Override
@@ -30,25 +26,17 @@ public class Robot extends TimedRobot {
     }
 
     for (int port = 5800; port <= 5809; port++) {
-      PortForwarder.add(port+10, "limelight-rear.local", port);
+      PortForwarder.add(port + 10, "limelight-rear.local", port);
     }
 
     m_robotContainer = new RobotContainer();
+    addPeriodic(() -> m_robotContainer.update(), 0.001);
 
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    if (!hasInitialized) {
-      while (Timer.getFPGATimestamp() < 5) {
-
-      }
-      hasInitialized = true;
-      System.out.println("I'm GOOOOOOOOOOOOOOOOOOOOOOOOOOOD");
-      m_robotContainer.resetEncoders();
-    }
-
   }
 
   @Override
@@ -89,9 +77,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    telemetrySubsystem.enableFieldDetectors.get(1).run();
-
   }
 
   @Override

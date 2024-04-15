@@ -22,6 +22,7 @@ public class REVElevatorSimulation {
     private final SimDouble simVelocity;
     private final SimDouble simPosition;
     private final SimDouble simCurrent;
+    private final double dtSeconds;
 
     public REVElevatorSimulation(
             int deviceId,
@@ -34,7 +35,8 @@ public class REVElevatorSimulation {
             Measure<Per<Voltage, Velocity<Velocity<Distance>>>> kA,
             double minHeightMeters, 
             double maxHeightMeters,
-            double startingHeightMeters) {
+            double startingHeightMeters,
+            double dtSecond) {
         elevatorSim = new NewElevatorSim(
             kV.in(VoltsPerMeterPerSecond), 
             kA.in(VoltsPerMeterPerSecondSquared), 
@@ -51,6 +53,7 @@ public class REVElevatorSimulation {
         simCurrent = simDeviceSim.getDouble("Motor Current");
         simDeviceSim.getDouble("Stall Torque").set(stallTorque);
         simDeviceSim.getDouble("Free Speed").set(freeSpeed);
+        this.dtSeconds = dtSecond;
     }
 
     public void setInputVoltage(double voltage){
@@ -58,7 +61,7 @@ public class REVElevatorSimulation {
     }
 
     public void update() {
-        elevatorSim.update(0.020);
+        elevatorSim.update(dtSeconds);
         simAppliedOutput.set(elevatorSim.getInput(0) / RobotController.getBatteryVoltage());
         simVelocity.set(elevatorSim.getVelocityMetersPerSecond());
         simPosition.set(elevatorSim.getPositionMeters());

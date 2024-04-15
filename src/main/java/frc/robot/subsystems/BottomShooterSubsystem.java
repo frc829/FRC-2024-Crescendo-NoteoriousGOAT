@@ -12,11 +12,9 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.simulation.REVMotorSimulation;
 import com.utility.GoatMath;
 
@@ -68,6 +66,8 @@ public class BottomShooterSubsystem extends SubsystemBase {
   private final MutableMeasure<Voltage> voltage;
   private final MutableMeasure<Dimensionless> velocityRatio;
   private final MutableMeasure<Current> current;
+  private final MutableMeasure<Dimensionless> velocityRatioSetpoint;
+  private final MutableMeasure<Velocity<Angle>> velocitySetpoint;
 
   private final CANSparkFlex canSparkFlex;
   private final REVMotorSimulation revSimulation;
@@ -75,10 +75,11 @@ public class BottomShooterSubsystem extends SubsystemBase {
   public BottomShooterSubsystem() {
     voltage = MutableMeasure.zero(Volts);
     velocityRatio = MutableMeasure.zero(Value);
+    velocityRatioSetpoint = MutableMeasure.zero(Value);
+    velocitySetpoint = MutableMeasure.zero(RadiansPerSecond);
     current = MutableMeasure.zero(Amps);
 
     canSparkFlex = new CANSparkFlex(Constants.deviceId, Constants.type);
-    canSparkFlex.getPIDController().setFF(Constants.kVVoltsPerRPM);
     canSparkFlex.setIdleMode(IdleMode.kCoast);
     canSparkFlex.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
     revSimulation = new REVMotorSimulation(
@@ -88,7 +89,8 @@ public class BottomShooterSubsystem extends SubsystemBase {
         Constants.plant,
         Constants.gearbox,
         Constants.gearing,
-        Constants.kS);
+        Constants.kS,
+        0.001);
 
   }
 
@@ -103,46 +105,30 @@ public class BottomShooterSubsystem extends SubsystemBase {
     updateTelemetry();
   }
 
-  @Override
-  public void simulationPeriodic() {
-    revSimulation.update();
-  }
-
-  private void setVelocityRatio(double velocityRatio) {
+  public void update() {
+    double voltage = Constants.simpleMotorFeedforward
+        .calculate(velocitySetpoint.in(RadiansPerSecond), 0);
+    voltage = MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
     if (RobotBase.isReal()) {
-      double arbFeedforward = velocityRatio != 0
-          ? Constants.kS.in(Volts) * Math.signum(velocityRatio)
-          : 0.0;
-      canSparkFlex.getPIDController().setReference(
-          velocityRatio * Constants.maxVelocity.in(RPM),
-          ControlType.kVelocity,
-          0,
-          arbFeedforward,
-          ArbFFUnits.kVoltage);
+      canSparkFlex.setVoltage(voltage);
     } else {
-      double voltage = Constants.simpleMotorFeedforward
-          .calculate(velocityRatio * Constants.maxVelocity.in(RadiansPerSecond), 0);
-      voltage = MathUtil.clamp(voltage, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage());
-      this.voltage.mut_setMagnitude(voltage);
       revSimulation.setInputVoltage(voltage);
+      revSimulation.update();
     }
   }
 
-  private void stop() {
-    if (RobotBase.isReal()) {
-      canSparkFlex.stopMotor();
-    } else {
-      revSimulation.setInputVoltage(0.0);
-    }
+  private void setVelocity(double velocityRatio) {
+    velocityRatioSetpoint.mut_setMagnitude(velocityRatio);
+    velocitySetpoint.mut_setMagnitude(velocityRatio * Constants.maxVelocity.in(RadiansPerSecond));
   }
 
   public Command createSetVelocityRatioCommand(DoubleSupplier velocityRatioSupplier) {
-    return run(() -> setVelocityRatio(velocityRatioSupplier.getAsDouble()))
+    return run(() -> setVelocity(velocityRatioSupplier.getAsDouble()))
         .withName("Set Velocity Ratio");
   }
 
   public Command createStopCommand() {
-    return run(this::stop).withName("STOP");
+    return run(() -> setVelocity(0.0)).withName("STOP");
   }
 
   public boolean atSpeed(double velocityRatio, double velocityRatioTolerance) {
