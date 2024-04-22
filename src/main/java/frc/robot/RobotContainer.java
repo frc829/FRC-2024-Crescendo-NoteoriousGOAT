@@ -27,8 +27,6 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.AlignElevatorShoot;
 import frc.robot.commands.Amp;
 import frc.robot.commands.BabyBird;
 import frc.robot.commands.Barf;
@@ -46,7 +44,6 @@ import frc.robot.commands.NoteDetect;
 import frc.robot.commands.SpinUp;
 import frc.robot.commands.StationaryRangedShot;
 import frc.robot.commands.TelemetryCommands;
-import frc.robot.commands.Trap;
 import frc.robot.subsystems.BottomShooterSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -99,7 +96,7 @@ public class RobotContainer {
         public static final Controller driver = Controller.createFromXBox
                         .apply(Constants.Controller.driverPort)
                         .apply(Constants.Controller.deadband)
-                        .apply(false);
+                        .apply(true);
         public static final Controller operator = Controller.createFromXBox
                         .apply(Constants.Controller.operatorPort)
                         .apply(Constants.Controller.deadband)
@@ -135,18 +132,18 @@ public class RobotContainer {
                                 Constants.config,
                                 Constants.shouldFlipPath,
                                 driveSubsystem);
-                SmartDashboard.putData("Outer Intake", outerIntakeSubsystem);
-                SmartDashboard.putData("Inner Intake", innerIntakeSubsystem);
-                SmartDashboard.putData("Transport", transportSubsystem);
-                SmartDashboard.putData("Singulator", singulatorSubsystem);
+                // SmartDashboard.putData("Outer Intake", outerIntakeSubsystem);
+                // SmartDashboard.putData("Inner Intake", innerIntakeSubsystem);
+                // SmartDashboard.putData("Transport", transportSubsystem);
+                // SmartDashboard.putData("Singulator", singulatorSubsystem);
                 SmartDashboard.putData("NoteLoaded", notedLoadedSubsystem);
-                SmartDashboard.putData("Top Shooter", topShooterSubsystem);
-                SmartDashboard.putData("Bottom Shooter", bottomShooterSubsystem);
+                // SmartDashboard.putData("Top Shooter", topShooterSubsystem);
+                // SmartDashboard.putData("Bottom Shooter", bottomShooterSubsystem);
                 SmartDashboard.putData("Shooter Tilt", shooterTiltSubsystem);
                 SmartDashboard.putData("Elevator", elevatorSubsystem);
-                SmartDashboard.putData("Drive", driveSubsystem);
+                // SmartDashboard.putData("Drive", driveSubsystem);
                 SmartDashboard.putData("Telemetry", telemetrySubsystem);
-                SmartDashboard.putData("Servo Roller", servoRollerSubsystem);
+                // SmartDashboard.putData("Servo Roller", servoRollerSubsystem);
 
                 operator.back.onTrue(Level.command.get());
                 operator.leftY.whileTrue(BasicCommands.Elevator.createDriveElevatorCommand.apply(operator.leftYValue));

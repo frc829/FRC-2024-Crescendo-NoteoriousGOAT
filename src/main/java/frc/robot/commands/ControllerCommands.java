@@ -32,13 +32,13 @@ public class ControllerCommands {
 
     public static final Supplier<Command> createDriverRumble = () -> {
         Runnable rumble = () -> {
-            driver.rumbleConsumer.accept(RumbleType.kBothRumble, 0.5);
+            driver.rumbleConsumer.accept(RumbleType.kBothRumble, 0.35);
 
         };
         Runnable stop = () -> {
             driver.rumbleConsumer.accept(RumbleType.kBothRumble, 0.0);
         };
-        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(1.0));
+        Command rumbleCommand = Commands.race(Commands.run(rumble), Commands.waitSeconds(0.5));
         Command stopRumbleCommand = Commands.runOnce(stop);
         Command command = rumbleCommand.andThen(stopRumbleCommand);
         command.setName("Driver Rumble");

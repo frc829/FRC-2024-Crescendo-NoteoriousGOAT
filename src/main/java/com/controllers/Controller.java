@@ -7,6 +7,7 @@ import java.util.function.Function;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -211,10 +212,13 @@ public class Controller implements Sendable {
                         port) -> (deadband) -> (hasRumble) -> {
                                 CommandXboxController commandXboxController = new CommandXboxController(port);
                                 BiConsumer<RumbleType, Double> rumbleConsumer = (type, value) -> {
-                                        if (hasRumble) {
+                                        if (hasRumble && RobotState.isTeleop() && RobotState.isEnabled()) {
                                                 commandXboxController
                                                                 .getHID().setRumble(type, value);
+                                        }else{
+                                                commandXboxController.getHID().setRumble(type, 0.0);
                                         }
+
 
                                 };
 
