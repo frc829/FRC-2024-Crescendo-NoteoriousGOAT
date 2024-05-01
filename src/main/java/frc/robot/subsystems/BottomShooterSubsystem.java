@@ -15,7 +15,7 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
-import com.simulation.REVMotorSimulation;
+import com.simulation.REVSimpleSimulation;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.MathUtil;
@@ -70,7 +70,7 @@ public class BottomShooterSubsystem extends SubsystemBase {
   private final MutableMeasure<Velocity<Angle>> velocitySetpoint;
 
   private final CANSparkFlex canSparkFlex;
-  private final REVMotorSimulation revSimulation;
+  private final REVSimpleSimulation revSimulation;
 
   public BottomShooterSubsystem() {
     voltage = MutableMeasure.zero(Volts);
@@ -82,14 +82,13 @@ public class BottomShooterSubsystem extends SubsystemBase {
     canSparkFlex = new CANSparkFlex(Constants.deviceId, Constants.type);
     canSparkFlex.setIdleMode(IdleMode.kCoast);
     canSparkFlex.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 20);
-    revSimulation = new REVMotorSimulation(
-        Constants.deviceId,
-        Constants.gearbox.stallTorqueNewtonMeters,
-        Constants.gearbox.freeSpeedRadPerSec * 60 / 2 / Math.PI,
-        Constants.plant,
-        Constants.gearbox,
-        Constants.gearing,
-        Constants.kS,
+    revSimulation = new REVSimpleSimulation(
+        0,
+        null,
+        null,
+        null,
+        null,
+        0,
         0.001);
 
   }

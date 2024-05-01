@@ -6,23 +6,15 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Value;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
-import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
-
 import java.util.function.DoubleSupplier;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.simulation.NewDCMotorSim;
-import com.simulation.REVMotorSimulation;
+import com.simulation.REVSimpleSimulation;
 import com.utility.GoatMath;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.Angle;
 import edu.wpi.first.units.Current;
 import edu.wpi.first.units.Dimensionless;
@@ -51,7 +43,7 @@ public abstract class FlywheelSubsystem extends SubsystemBase {
     MutableMeasure<Current> current = MutableMeasure.zero(Amps);
 
     CANSparkFlex canSparkFlex = new CANSparkFlex(deviceId, MotorType.kBrushless);
-    REVMotorSimulation revMotorSimulation = new REVMotorSimulation(
+    REVSimpleSimulation revMotorSimulation = new REVSimpleSimulation(
         deviceId,
         kS,
         kV,
@@ -74,7 +66,7 @@ public abstract class FlywheelSubsystem extends SubsystemBase {
       }
 
       @Override
-      public void spinToSetpoint() {
+      public void spin() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'spinToSetpoint'");
       }
@@ -108,13 +100,14 @@ public abstract class FlywheelSubsystem extends SubsystemBase {
     updateData();
   }
 
-  abstract public void spinToSetpoint();
+  abstract public void spin();
 
   private void setVelocity(double velocityRatio) {
     velocityRatioSetpoint.mut_setMagnitude(velocityRatio);
     velocitySetpoint.mut_setMagnitude(velocityRatio * maxVelocity.in(RadiansPerSecond));
   }
 
+  // #region Commands
   public Command createSetVelocityRatioCommand(DoubleSupplier velocityRatioSupplier) {
     return run(() -> setVelocity(velocityRatioSupplier.getAsDouble()))
         .withName("Set Velocity Ratio");
@@ -123,10 +116,13 @@ public abstract class FlywheelSubsystem extends SubsystemBase {
   public Command createStopCommand() {
     return run(() -> setVelocity(0.0)).withName("STOP");
   }
+  // #endregion
 
+  // #region Condition Checks
   public boolean atSpeed(double velocityRatio, double velocityRatioTolerance) {
     return MathUtil.isNear(velocityRatio, this.velocityRatio.in(Value), velocityRatioTolerance);
   }
+  // #endregion
 
   @Override
   public void initSendable(SendableBuilder builder) {
