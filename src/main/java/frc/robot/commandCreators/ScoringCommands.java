@@ -42,7 +42,7 @@ public class ScoringCommands {
                 }
 
                 private static final class Fender {
-                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(55, Degrees);
+                        private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(20, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
                         private static double topShooterPercent = -0.7;
                         private static double bottomShooterPercent = 0.7;
