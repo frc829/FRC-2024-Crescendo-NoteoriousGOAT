@@ -56,8 +56,8 @@ public class ScoringCommands {
                 private static final class RangedSilly {
                         private static MutableMeasure<Angle> tiltAngle = MutableMeasure.ofRelativeUnits(35, Degrees);
                         private static Measure<Distance> elevatorPosition = Meters.of(0.0);
-                        private static double topShooterPercent = -0.5;
-                        private static double bottomShooterPercent = 0.5;
+                        private static double topShooterPercent = -0.7;
+                        private static double bottomShooterPercent = 0.7;
                         private static double transportPercent = 0.9;
                         private static double singulatorPercent = -0.9;
                         private static final double shooterTolerancePercent = 0.10;
